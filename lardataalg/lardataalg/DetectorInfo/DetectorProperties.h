@@ -24,16 +24,17 @@ namespace util{
       
       void reconfigure(fhicl::ParameterSet const& p);
 
-      const double SamplingRate()   const { return fSamplingRate;   }
-      const int    TriggerOffset()  const { return fTriggerOffset;  }
-      const double ElectronsToADC() const { return fElectronsToADC; }
+      const double       SamplingRate()      const { return fSamplingRate;   }
+      const int          TriggerOffset()     const { return fTriggerOffset;  }
+      const double       ElectronsToADC()    const { return fElectronsToADC; }
+      const unsigned int NumberTimeSamples() const { return fNumberTimeSamples; }
       
     private:
 
-      double fSamplingRate;   ///< in ns
-      int    fTriggerOffset;  ///< in # of clock ticks
-      double fElectronsToADC; ///< conversion factor for # of ionization electrons to 1 ADC count
-
+      double       fSamplingRate;      ///< in ns
+      int    	   fTriggerOffset;     ///< in # of clock ticks					       	 
+      double 	   fElectronsToADC;    ///< conversion factor for # of ionization electrons to 1 ADC count
+      unsigned int fNumberTimeSamples; ///< number of clock ticks per readout window
     }; // class DetectorProperties
 } //namespace utils
 #endif // UTIL_DETECTOR_PROPERTIES_H
