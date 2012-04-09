@@ -35,6 +35,7 @@ namespace util{
       int    	   fTriggerOffset;     ///< in # of clock ticks					       	 
       double 	   fElectronsToADC;    ///< conversion factor for # of ionization electrons to 1 ADC count
       unsigned int fNumberTimeSamples; ///< number of clock ticks per readout window
+
     }; // class DetectorProperties
 } //namespace utils
 #endif // UTIL_DETECTOR_PROPERTIES_H
