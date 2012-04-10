@@ -28,6 +28,13 @@ namespace util{
       const int          TriggerOffset()     const { return fTriggerOffset;  }
       const double       ElectronsToADC()    const { return fElectronsToADC; }
       const unsigned int NumberTimeSamples() const { return fNumberTimeSamples; }
+   
+      const double       TimeOffsetU()       const { return fTimeOffsetU; };
+      const double       TimeOffsetV()       const { return fTimeOffsetV; };
+      const double       TimeOffsetW()       const { return fTimeOffsetW; };
+
+      double             ConvertXToTicks(double X,     int p, int t, int c) const;
+      double             ConvertTicksToX(double ticks, int p, int t, int c) const;
       
     private:
 
@@ -35,6 +42,9 @@ namespace util{
       int    	   fTriggerOffset;     ///< in # of clock ticks					       	 
       double 	   fElectronsToADC;    ///< conversion factor for # of ionization electrons to 1 ADC count
       unsigned int fNumberTimeSamples; ///< number of clock ticks per readout window
+      double       fTimeOffsetU;       ///< time offsets to convert spacepoint
+      double       fTimeOffsetV;       ///< coordinates to hit times on each
+      double       fTimeOffsetW;       ///< view
 
     }; // class DetectorProperties
 } //namespace utils
