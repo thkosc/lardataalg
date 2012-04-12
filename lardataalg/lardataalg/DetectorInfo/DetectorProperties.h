@@ -35,7 +35,10 @@ namespace util{
 
       double             ConvertXToTicks(double X,     int p, int t, int c) const;
       double             ConvertTicksToX(double ticks, int p, int t, int c) const;
-      
+
+      double             GetXTicksOffset(int p, int t, int c) const ;
+      double             GetXTicksCoefficient() const;
+
     private:
 
       double       fSamplingRate;      ///< in ns
