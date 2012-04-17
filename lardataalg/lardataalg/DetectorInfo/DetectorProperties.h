@@ -33,13 +33,15 @@ namespace util{
       const double       TimeOffsetV()       const { return fTimeOffsetV; };
       const double       TimeOffsetW()       const { return fTimeOffsetW; };
 
-      double             ConvertXToTicks(double X,     int p, int t, int c) const;
-      double             ConvertTicksToX(double ticks, int p, int t, int c) const;
+      double             ConvertXToTicks(double X,     int p, int t, int c) ;
+      double             ConvertTicksToX(double ticks, int p, int t, int c) ;
 
-      double             GetXTicksOffset(int p, int t, int c) const ;
-      double             GetXTicksCoefficient() const;
+      double             GetXTicksOffset(int p, int t, int c) ;
+      double             GetXTicksCoefficient() ;      
 
     private:
+
+      void         CalculateXTicksParams();
 
       double       fSamplingRate;      ///< in ns
       int    	   fTriggerOffset;     ///< in # of clock ticks					       	 
@@ -48,6 +50,10 @@ namespace util{
       double       fTimeOffsetU;       ///< time offsets to convert spacepoint
       double       fTimeOffsetV;       ///< coordinates to hit times on each
       double       fTimeOffsetW;       ///< view
+
+      double       fXTicksCoefficient; ///< Parameters for x<-->ticks
+      bool         fXTicksParamsLoaded;///<  calculations
+      std::vector<std::vector<std::vector<double> > > fXTicksOffsets;
 
     }; // class DetectorProperties
 } //namespace utils
