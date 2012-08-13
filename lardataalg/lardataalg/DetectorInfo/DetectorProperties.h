@@ -28,6 +28,7 @@ namespace util{
       const int          TriggerOffset()     const { return fTriggerOffset;  }
       const double       ElectronsToADC()    const { return fElectronsToADC; }
       const unsigned int NumberTimeSamples() const { return fNumberTimeSamples; }
+      const unsigned int ReadOutWindowSize() const { return fReadOutWindowSize; }
    
       const double       TimeOffsetU()       const { return fTimeOffsetU; };
       const double       TimeOffsetV()       const { return fTimeOffsetV; };
@@ -46,7 +47,8 @@ namespace util{
       double       fSamplingRate;      ///< in ns
       int    	   fTriggerOffset;     ///< in # of clock ticks					       	 
       double 	   fElectronsToADC;    ///< conversion factor for # of ionization electrons to 1 ADC count
-      unsigned int fNumberTimeSamples; ///< number of clock ticks per readout window
+      unsigned int fNumberTimeSamples; ///< number of clock ticks per event
+      unsigned int fReadOutWindowSize; ///< number of clock ticks per readout window
       double       fTimeOffsetU;       ///< time offsets to convert spacepoint
       double       fTimeOffsetV;       ///< coordinates to hit times on each
       double       fTimeOffsetW;       ///< view
