@@ -32,7 +32,7 @@ namespace util{
    
       const double       TimeOffsetU()       const { return fTimeOffsetU; };
       const double       TimeOffsetV()       const { return fTimeOffsetV; };
-      const double       TimeOffsetW()       const { return fTimeOffsetW; };
+      const double       TimeOffsetZ()       const { return fTimeOffsetZ; };
 
       double             ConvertXToTicks(double X,     int p, int t, int c) ;
       double             ConvertTicksToX(double ticks, int p, int t, int c) ;
@@ -51,7 +51,7 @@ namespace util{
       unsigned int fReadOutWindowSize; ///< number of clock ticks per readout window
       double       fTimeOffsetU;       ///< time offsets to convert spacepoint
       double       fTimeOffsetV;       ///< coordinates to hit times on each
-      double       fTimeOffsetW;       ///< view
+      double       fTimeOffsetZ;       ///< view
 
       double       fXTicksCoefficient; ///< Parameters for x<-->ticks
       bool         fXTicksParamsLoaded;///<  calculations
