@@ -12,6 +12,7 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Registry/ServiceMacros.h"
 
 
 ///General LArSoft Utilities
@@ -59,4 +60,5 @@ namespace util{
 
     }; // class DetectorProperties
 } //namespace utils
+DECLARE_ART_SERVICE(util::DetectorProperties, LEGACY)
 #endif // UTIL_DETECTOR_PROPERTIES_H
