@@ -30,6 +30,7 @@ namespace util{
       const double       ElectronsToADC()    const { return fElectronsToADC; }
       const unsigned int NumberTimeSamples() const { return fNumberTimeSamples; }
       const unsigned int ReadOutWindowSize() const { return fReadOutWindowSize; }
+      int 		 T0()                const; 					    
    
       const double       TimeOffsetU()       const { return fTimeOffsetU; };
       const double       TimeOffsetV()       const { return fTimeOffsetV; };
@@ -51,6 +52,9 @@ namespace util{
 
     private:
 
+      
+      void 	   preBeginRun(art::Run const& run);
+      void 	   checkDBstatus() 	const;
       void         CalculateXTicksParams();
 
       double       fSamplingRate;      ///< in ns
@@ -61,11 +65,13 @@ namespace util{
       double       fTimeOffsetU;       ///< time offsets to convert spacepoint
       double       fTimeOffsetV;       ///< coordinates to hit times on each
       double       fTimeOffsetZ;       ///< view
-
+      int 	   fT0;		       ///<TDC offset in ADC		
+      
       double       fXTicksCoefficient; ///< Parameters for x<-->ticks
       bool         fXTicksParamsLoaded;///<  calculations
       std::vector<std::vector<std::vector<double> > > fXTicksOffsets;
 
+      bool	   fAlreadyReadFromDB; ///< tests whether the values have alread been picked up from the Database
     }; // class DetectorProperties
 } //namespace utils
 DECLARE_ART_SERVICE(util::DetectorProperties, LEGACY)
