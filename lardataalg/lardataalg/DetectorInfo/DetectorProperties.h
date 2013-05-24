@@ -25,6 +25,8 @@ namespace util{
       
       void reconfigure(fhicl::ParameterSet const& p);
 
+      // Accessors.
+
       const double       SamplingRate()      const { return fSamplingRate;   }
       const double       ElectronsToADC()    const { return fElectronsToADC; }
       const unsigned int NumberTimeSamples() const { return fNumberTimeSamples; }
@@ -42,10 +44,15 @@ namespace util{
 
     private:
 
-      
+      // Callbacks.
+
+      void         postOpenFile(std::string const& filename);
       void 	   preBeginRun(art::Run const& run);
+
       void 	   checkDBstatus() 	const;
       void         CalculateXTicksParams();
+
+      static bool  isDetectorProperties(const fhicl::ParameterSet& ps);
 
       double       fSamplingRate;      ///< in ns
       int    	   fTriggerOffset;     ///< in # of clock ticks					       	 
@@ -56,9 +63,14 @@ namespace util{
       double       fTimeOffsetV;       ///< coordinates to hit times on each
       double       fTimeOffsetZ;       ///< view
             
+      bool         fInheritTriggerOffset;     ///< Flag saying whether to inherit TriggerOffset
+      bool         fInheritNumberTimeSamples; ///< Flag saying whether to inherit NumberTimeSamples
+
       double       fXTicksCoefficient; ///< Parameters for x<-->ticks
       bool         fXTicksParamsLoaded;///<  calculations
       std::vector<std::vector<std::vector<double> > > fXTicksOffsets;
+
+      fhicl::ParameterSet   fPS;       ///< Original parameter set.
 
       bool	   fAlreadyReadFromDB; ///< tests whether the values have alread been picked up from the Database
     }; // class DetectorProperties
