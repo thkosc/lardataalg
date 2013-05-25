@@ -42,6 +42,14 @@ namespace util{
       double             GetXTicksOffset(int p, int t, int c) ;
       double             GetXTicksCoefficient() ;      
 
+      // The following methods convert between TDC counts (SimChannel time) and
+      // ticks (RawDigit/Wire time).
+      double             ConvertTDCToTicks(double tdc) const {
+	return fNumberTimeSamples == fReadOutWindowSize ? tdc : tdc - fReadOutWindowSize;}
+      double             ConvertTicksToTDC(double ticks) const {
+	return fNumberTimeSamples == fReadOutWindowSize ? ticks : ticks + fReadOutWindowSize;}
+
+
     private:
 
       // Callbacks.
