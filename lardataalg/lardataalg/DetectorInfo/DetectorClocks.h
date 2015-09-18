@@ -1,105 +1,65 @@
-/**
- * \file SimpleTimeService.h
- *
- * \ingroup SimpleTimeService
- * 
- * \brief Class def header for a class SimpleTimeService
- *
- * @author kterao
- */
+////////////////////////////////////////////////////////////////////////
+//
+// DetectorClocks.h
+//
+//     This class provides electronics various electronics clocks. Currently supports
+//     three types of clocks: TPC, Optical, and Trigger in order to support the
+//     MicroBooNE experiment.
+//  
+//     Formally known as TimeService.
+//
+////////////////////////////////////////////////////////////////////////
 
-/** \addtogroup SimpleTimeService
+#ifndef DETECTORCLOCKS_H
+#define DETECTORCLOCKS_H
 
-    @{*/
-#ifndef SIMPLETIMESERVICE_H
-#define SIMPLETIMESERVICE_H
+#include "fhiclcpp/ParameterSet.h"
 
-#include <iostream>
-#include "ElecClock.h"
+#include "Utilities/ElecClock.h"
 #include "RawData/TriggerData.h"
 
-namespace util {
-  /**
-     \class SimpleTimeService
-     This class provides electronics various electronics clocks. Currently supports
-     three types of clocks: TPC, Optical, and Trigger in order to support MicroBooNE experiments.
-  */
-  class SimpleTimeService{
-    
-  protected:
-    
-    /// Default constructor
-    SimpleTimeService() 
-      : fG4RefTime    (kDEFAULT_MC_CLOCK_T0),
-	fFramePeriod  (kDEFAULT_FRAME_PERIOD),
-	fTPCClock     (0,kDEFAULT_FRAME_PERIOD,kDEFAULT_FREQUENCY_TPC),
-	fOpticalClock (0,kDEFAULT_FRAME_PERIOD,kDEFAULT_FREQUENCY_OPTICAL),
-	fTriggerClock (0,kDEFAULT_FRAME_PERIOD,kDEFAULT_FREQUENCY_TRIGGER),
-	fTriggerOffsetTPC     (kDEFAULT_TRIG_OFFSET_TPC),
-	fTriggerTime  (0),
-	fBeamGateTime (0)
-    {}
-    
-    /// Default destructor
-    ~SimpleTimeService(){};
+namespace dataprov{
 
-    /// Electronics clock counting start time in G4 time frame [us]
-    double fG4RefTime;
+  enum InheritConfigType_t {
+    kG4RefTime=0,
+    kTriggerOffsetTPC,
+    kFramePeriod,
+    kClockSpeedTPC,
+    kClockSpeedOptical,
+    kClockSpeedTrigger,
+    kDefaultTrigTime,
+    kDefaultBeamTime,
+    kInheritConfigTypeMax
+  };
 
-    /// Frame period
-    double fFramePeriod;
-
-    /// TPC clock
-    ::util::ElecClock fTPCClock;
-
-    /// Optical clock
-    ::util::ElecClock fOpticalClock;
-
-    /// Trigger clock
-    ::util::ElecClock fTriggerClock;
-
-    /// Time offset from trigger to TPC readout start
-    double fTriggerOffsetTPC;
-
-    /// Trigger time in [us]
-    double fTriggerTime;
-
-    /// BeamGate time in [us]
-    double fBeamGateTime;
-
-    /// self pointer as a singleton
-    static SimpleTimeService* _me;
-
-  protected:
-
-
-    /// Setter for trigger times
-    virtual void SetTriggerTime(double trig_time, double beam_time)
-    { 
-      fTriggerTime  = trig_time;
-      fBeamGateTime = beam_time;
-      fTPCClock.SetTime(trig_time);
-      fOpticalClock.SetTime(trig_time);
-      fTriggerClock.SetTime(trig_time);
-    }
+  class DetectorClocks {
 
   public:
+    DetectorClocks();
+    DetectorClocks(fhicl::ParameterSet const& pset);
 
-    static const SimpleTimeService* GetME()
-    {
-      if(!_me) _me = new SimpleTimeService;
-      return _me;
+    virtual ~DetectorClocks(){};
+
+    virtual bool Configure(fhicl::ParameterSet const& pset);
+    virtual bool Update(uint64_t ts=0) = 0;
+    
+    virtual double TriggerOffsetTPC() const
+    { 
+      if (fTriggerOffsetTPC<0)
+	return fTriggerOffsetTPC; 
+      else
+	return -fTriggerOffsetTPC/fTPCClock.Frequency(); //convert ticks to us
     }
 
+    /// Function to report variable contents for cout-debugging
+    virtual void debugReport() const;
+    
     /// Given Geant4 time [ns], returns relative time [us] w.r.t. electronics time T0 
     double G4ToElecTime(double g4_time) const {return g4_time * 1.e-3 - fG4RefTime; }
-
-    /// TPC readout start time offset from trigger
-    virtual double TriggerOffsetTPC() const { return fTriggerOffsetTPC; }
-
+    
     /// Trigger electronics clock time in [us]
     double TriggerTime() const { return fTriggerTime; }
-
+    
     /// Beam gate electronics clock time in [us]
     double BeamGateTime() const { return fBeamGateTime; }
 
@@ -107,49 +67,49 @@ namespace util {
     // Getters of TPC ElecClock
     //
     /// Borrow a const TPC clock with time set to Trigger time [us]
-    const ElecClock& TPCClock() const
+    const ::util::ElecClock& TPCClock() const
     { return fTPCClock; }
 
     /// Create a TPC clock for a given time [us] from clock counting start
-    ElecClock TPCClock(double time) const 
-    { return ElecClock(time,fTPCClock.FramePeriod(),fTPCClock.Frequency());}
+    ::util::ElecClock TPCClock(double time) const 
+	{ return ::util::ElecClock(time,fTPCClock.FramePeriod(),fTPCClock.Frequency());}
 
     /// Create a TPC clock for a given sample/frame number in TPC clock frequency
-    ElecClock TPCClock(unsigned int sample,
+    util::ElecClock TPCClock(unsigned int sample,
 		       unsigned int frame) const
-    { ElecClock clock = TPCClock(); clock.SetTime(sample,frame); return clock; }
-
+      { util::ElecClock clock = TPCClock(); clock.SetTime(sample,frame); return clock; }
+    
     //
     // Getters of Optical ElecClock
     //
     /// Borrow a const Optical clock with time set to Trigger time [us]
-    const ElecClock& OpticalClock() const
+    const util::ElecClock& OpticalClock() const
     { return fOpticalClock; }
 
     /// Create a Optical clock for a given time [us] from clock counting start
-    ElecClock OpticalClock(double time) const 
-    { return ElecClock(time,fOpticalClock.FramePeriod(),fOpticalClock.Frequency());}
+    util::ElecClock OpticalClock(double time) const 
+      { return util::ElecClock(time,fOpticalClock.FramePeriod(),fOpticalClock.Frequency());}
 
     /// Create a Optical clock for a given sample/frame number in Optical clock frequency
-    ElecClock OpticalClock(unsigned int sample,
+    util::ElecClock OpticalClock(unsigned int sample,
 			   unsigned int frame) const
-    { ElecClock clock = OpticalClock(); clock.SetTime(sample,frame); return clock; }
+    { util::ElecClock clock = OpticalClock(); clock.SetTime(sample,frame); return clock; }
 
     //
     // Getters of Trigger ElecClock
     //
     /// Borrow a const Trigger clock with time set to Trigger time [us]
-    const ElecClock& TriggerClock() const
+    const util::ElecClock& TriggerClock() const
     { return fTriggerClock; }
 
     /// Create a Trigger clock for a given time [us] from clock counting start    
-    ElecClock TriggerClock(double time) const 
-    { return ElecClock(time,fTriggerClock.FramePeriod(),fTriggerClock.Frequency());}
+    util::ElecClock TriggerClock(double time) const 
+    { return util::ElecClock(time,fTriggerClock.FramePeriod(),fTriggerClock.Frequency());}
 
     /// Create a Trigger clock for a given sample/frame number in Trigger clock frequency
-    ElecClock TriggerClock(unsigned int sample,
+    util::ElecClock TriggerClock(unsigned int sample,
 			   unsigned int frame) const
-    { ElecClock clock = TriggerClock(); clock.SetTime(sample,frame); return clock; }
+    { util::ElecClock clock = TriggerClock(); clock.SetTime(sample,frame); return clock; }
 
     //
     // Getters for time [us] w.r.t. trigger given information from waveform
@@ -207,10 +167,68 @@ namespace util {
     double TPCG4Time2Tick(double g4time) const
     { return (G4ToElecTime(g4time) - (TriggerTime() + TriggerOffsetTPC())) / fTPCClock.TickPeriod(); }
 
+    bool InheritClockConfig() { return fInheritClockConfig; }
+    
+  protected:
 
-  };
-  
-}
-#endif
-/** @} */ // end of doxygen group 
+    /// Setter for trigger times
+    virtual void SetTriggerTime(double trig_time, double beam_time)
+    { 
+      fTriggerTime  = trig_time;
+      fBeamGateTime = beam_time;
+      fTPCClock.SetTime(trig_time);
+      fOpticalClock.SetTime(trig_time);
+      fTriggerClock.SetTime(trig_time);
+    }
 
+    /// Internal function to apply loaded parameters to member attributes
+    void ApplyParams();
+
+    /// Internal function used to search for the right configuration set in the data file
+    bool IsRightConfig(const fhicl::ParameterSet& ps) const;
+
+    std::vector<std::string> ConfigNames() const { return fConfigName; }
+    std::vector<double> ConfigValues() const { return fConfigValue; }
+
+    void SetConfigValue(size_t i, double val) { fConfigValue[i] = val; }
+    
+  protected:
+
+    std::vector<std::string> fConfigName;
+
+    std::vector<double>      fConfigValue;
+
+    bool fInheritClockConfig;
+
+    std::string fTrigModuleName;
+
+        /// Electronics clock counting start time in G4 time frame [us]
+    double fG4RefTime;
+
+    /// Frame period
+    double fFramePeriod;
+
+    /// TPC clock
+    ::util::ElecClock fTPCClock;
+
+    /// Optical clock
+    ::util::ElecClock fOpticalClock;
+
+    /// Trigger clock
+    ::util::ElecClock fTriggerClock;
+
+    /// Time offset from trigger to TPC readout start
+    double fTriggerOffsetTPC;
+
+    /// Trigger time in [us]
+    double fTriggerTime;
+
+    /// BeamGate time in [us]
+    double fBeamGateTime;
+
+  }; // class DetectorClocks
+
+} //namespace utils
+
+
+#endif 
