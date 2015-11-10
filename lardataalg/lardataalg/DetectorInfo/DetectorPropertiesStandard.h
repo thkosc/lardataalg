@@ -8,31 +8,31 @@
 // Separation of service from data provider class:
 // jpaley@fnal.gov
 ////////////////////////////////////////////////////////////////////////
-#ifndef DATAPROV_DETECTORPROPERTIES_H
-#define DATAPROV_DETECTORPROPERTIES_H
+#ifndef DATAPROV_DETECTORPROPERTIESSTD_H
+#define DATAPROV_DETECTORPROPERTIESSTD_H
 
 #include "fhiclcpp/ParameterSet.h"
 #include "DataProviders/LArProperties.h"
 #include "DataProviders/DetectorClocks.h"
-#include "DataProviders/IDetectorProperties.h"
+#include "DataProviders/DetectorProperties.h"
 
 ///General LArSoft Utilities
 namespace dataprov{
   
-  class DetectorProperties : public IDetectorProperties {
+  class DetectorPropertiesStandard : public DetectorProperties {
     public:
 
-      DetectorProperties();
-      DetectorProperties(fhicl::ParameterSet const& pset, 
+      DetectorPropertiesStandard();
+      DetectorPropertiesStandard(fhicl::ParameterSet const& pset, 
 			 const geo::GeometryCore* geo,
-			 const dataprov::ILArProperties* lp,
-			 const dataprov::IDetectorClocks* c);
-      DetectorProperties(DetectorProperties const&) = delete;
-      virtual ~DetectorProperties();
+			 const dataprov::LArProperties* lp,
+			 const dataprov::DetectorClocks* c);
+      DetectorPropertiesStandard(DetectorPropertiesStandard const&) = delete;
+      virtual ~DetectorPropertiesStandard();
       
       void Configure(fhicl::ParameterSet const& p);
       bool Update(uint64_t ts);
-      bool UpdateClocks(const dataprov::IDetectorClocks* clks);
+      bool UpdateClocks(const dataprov::DetectorClocks* clks);
 
       void SetGeometry(const geo::GeometryCore* g) { fGeo = g; }
       void SetLArProperties(const dataprov::LArProperties* lp) { fLP = lp; }
@@ -91,8 +91,8 @@ namespace dataprov{
             
       void         CalculateXTicksParams();
       
-      const dataprov::ILArProperties* fLP;
-      const dataprov::IDetectorClocks* fClocks;
+      const dataprov::LArProperties* fLP;
+      const dataprov::DetectorClocks* fClocks;
       const geo::GeometryCore* fGeo;
       
       std::vector< double >          fEfield;           ///< kV/cm
@@ -113,7 +113,7 @@ namespace dataprov{
       std::vector<std::vector<double> >               fDriftDirection;
 
       ::util::ElecClock fTPCClock;     ///< TPC electronics clock
-    }; // class DetectorProperties
+    }; // class DetectorPropertiesStandard
 } //namespace dataprov
 
 #endif // DATAPROV_DETECTOR_PROPERTIES_H
