@@ -1,0 +1,42 @@
+# The parent line must be the first non-comment line in the file
+# This line defines the product name and version
+parent	lardataalg	v1_00_00
+defaultqual	e15
+
+# These optional lines define the installed directories where
+# headers, libraries, and executables will be found
+# Use them only if your product does not conform to the defaults
+# Format: directory_type directory_path directory_name
+# The only recognized values of the first field are fcldir, incdir, libdir, and bindir
+# The only recognized values of the second field are product_dir, fq_dir, and -
+# The third field is not constrained.
+# Defaults:
+# incdir  product_dir  include
+# fcldir  product_dir  fcl
+# libdir  fq_dir       lib
+# bindir  fq_dir       bin
+
+fcldir product_dir job
+gdmldir product_dir
+#
+# we list geant4 explicitly because we are going to set GDML_SCHEMA_DIR 
+# Defining GDML_SCHEMA_DIR here is a temporary hack
+product         version
+larcoreobj	v1_23_00
+cetbuildtools	v7_02_01	-	only_for_build
+end_product_list
+
+# We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
+# Make a table by adding columns before "notes". 
+qualifier	larcoreobj	notes
+c2:debug	c2:debug
+c2:prof		c2:prof
+e15:debug	e15:debug
+e15:prof	e15:prof
+end_qualifier_list
+
+# Preserve tabs and formatting in emacs and vi / vim:
+
+### Local Variables:
+### tab-width: 8
+### End:
