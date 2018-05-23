@@ -9,13 +9,13 @@ fcldir product_dir job
 # we list geant4 explicitly because we are going to set GDML_SCHEMA_DIR 
 # Defining GDML_SCHEMA_DIR here is a temporary hack
 product         version
-lardataobj	v1_23_00
+larcorealg	v1_20_00
 cetbuildtools	v7_03_02	-	only_for_build
 end_product_list
 
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
 # Make a table by adding columns before "notes". 
-qualifier	lardataobj	notes
+qualifier	larcorealg	notes
 c2:debug	c2:debug
 c2:prof		c2:prof
 e15:debug	e15:debug
