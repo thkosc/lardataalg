@@ -1,6 +1,6 @@
 cet_test( LArPropertiesStandard_test
   LIBRARIES
-    lardata_DetectorInfo
+    lardataalg_DetectorInfo
   DATAFILES lartest_standard.fcl
   TEST_ARGS ./lartest_standard.fcl
   INSTALL_BIN
@@ -24,7 +24,7 @@ cet_test( LArPropertiesBo_test
 
 cet_test( DetectorClocksStandard_test
   LIBRARIES
-    lardata_DetectorInfo
+    lardataalg_DetectorInfo
   DATAFILES clockstest_standard.fcl
   TEST_ARGS ./clockstest_standard.fcl
   INSTALL_BIN
@@ -54,7 +54,7 @@ cet_test( DetectorClocksCSU40L_test
 
 cet_make_exec( DetectorPropertiesStandard_test
   LIBRARIES
-    lardata_DetectorInfo
+    lardataalg_DetectorInfo
 )
 
 cet_test( DetectorPropertiesLArTPCdetector_test
@@ -64,12 +64,13 @@ cet_test( DetectorPropertiesLArTPCdetector_test
   TEST_ARGS ./dettest_lartpcdetector.fcl
 )
 
-cet_test( DetectorPropertiesBo_test
-  HANDBUILT
-  DATAFILES dettest_bo.fcl
-  TEST_EXEC DetectorPropertiesStandard_test
-  TEST_ARGS ./dettest_bo.fcl
-)
+# this test requires larcore/Geometry/geometry_bo.fcl
+##cet_test( DetectorPropertiesBo_test
+##  HANDBUILT
+##  DATAFILES dettest_bo.fcl
+##  TEST_EXEC DetectorPropertiesStandard_test
+##  TEST_ARGS ./dettest_bo.fcl
+##)
 
 install_source()
 install_fhicl()
