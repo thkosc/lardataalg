@@ -9,7 +9,7 @@ fcldir product_dir job
 # we list geant4 explicitly because we are going to set GDML_SCHEMA_DIR 
 # Defining GDML_SCHEMA_DIR here is a temporary hack
 product         version
-larcorealg	v1_20_00
+larcorealg	v1_21_00
 cetbuildtools	v7_03_02	-	only_for_build
 end_product_list
 
