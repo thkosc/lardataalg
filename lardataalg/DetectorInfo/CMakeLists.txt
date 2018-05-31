@@ -3,7 +3,6 @@ cet_make( LIBRARIES
 		    larcorealg_Geometry
 		    larcorealg_CoreUtils
                     ${MF_MESSAGELOGGER}
-                    ${MF_UTILITIES}
                     cetlib
 		    cetlib_except
 		    ${FHICLCPP}
