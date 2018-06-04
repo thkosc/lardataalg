@@ -1,5 +1,5 @@
 /**
- * \file lardata/DetectorInfo/DetectorClocks.h
+ * \file lardataalg/DetectorInfo/DetectorClocks.h
  * 
  * \brief pure virtual base interface for detector clocks
  * 

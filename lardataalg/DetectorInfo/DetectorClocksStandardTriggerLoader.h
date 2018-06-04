@@ -1,5 +1,5 @@
 /**
- * @file   lardata/DetectorInfo/DetectorClocksStandardTriggerLoader.h
+ * @file   lardataalg/DetectorInfo/DetectorClocksStandardTriggerLoader.h
  * @brief  Functions to load trigger time in `detinfo::DetectorClocksStandard`.
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   March 21, 2018
