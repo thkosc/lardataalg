@@ -34,6 +34,12 @@ namespace detinfo {
   /// Default TPC readout start time offset from trigger in micro-second
   const double kDEFAULT_TRIG_OFFSET_TPC = -1600.;
 
+  /// Default TriggerTime in micro-second
+  const double kDEFAULT_TRIG_TIME = 0.0;
+
+  /// Default BeamGateTime in micro-second
+  const double kDEFAULT_BEAM_TIME = 0.0;
+
 }
 
 #endif

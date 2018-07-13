@@ -74,11 +74,6 @@ namespace testing {
           = std::make_unique<detinfo::DetectorClocksStandard>(pset);
         
         //
-        // do the actual setup (when issue #19446 is solved, this should become redundant)
-        //
-        detClocks->SetDefaultTriggerTime();
-        
-        //
         // all done
         //
         return detClocks;

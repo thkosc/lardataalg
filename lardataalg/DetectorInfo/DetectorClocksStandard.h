@@ -102,11 +102,8 @@ namespace detinfo{
    * Trigger time
    * -------------
    * 
-   * In this implementation, the trigger time is always defined to match the
-   * beam gate time, and both are at 0.0 &micro;s. Despite the fact that two
-   * values are required in the configuration for default trigger and beam time,
-   * these values are not propagated to the current trigger and bean gate
-   * opening times (unless [issue #19446](https://cdcvs.fnal.gov/redmine/issues/19446) is solved).
+   * In this implementation, the trigger time and the beam gate time both
+   * default to 0.0 &micro;s.
    * 
    * The manager of this provider is expected to set those values by calling
    * `detinfo::DetectorClocksStandard::SetTriggerTime()`. See
