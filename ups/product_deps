@@ -18,6 +18,8 @@ end_product_list
 qualifier	larcorealg	notes
 c2:debug	c2:debug
 c2:prof		c2:prof
+e17:debug	e17:debug
+e17:prof	e17:prof
 e15:debug	e15:debug
 e15:prof	e15:prof
 end_qualifier_list
