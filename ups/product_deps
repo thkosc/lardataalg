@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	lardataalg	v07_00_00
+parent	lardataalg	v07_00_01
 defaultqual	e15
 
 fcldir product_dir job
@@ -9,8 +9,8 @@ fcldir product_dir job
 # we list geant4 explicitly because we are going to set GDML_SCHEMA_DIR 
 # Defining GDML_SCHEMA_DIR here is a temporary hack
 product         version
-larcorealg	v07_00_00
-cetbuildtools	v7_03_03	-	only_for_build
+larcorealg	v07_01_00
+cetbuildtools	v7_04_00	-	only_for_build
 end_product_list
 
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
