@@ -6,8 +6,8 @@
  * \author jpaley@fnal.gov
  * 
  */
-#ifndef LARDATA_DETECTORINFO_DETECTORCLOCKS_H
-#define LARDATA_DETECTORINFO_DETECTORCLOCKS_H
+#ifndef LARDATAALG_DETECTORINFO_DETECTORCLOCKS_H
+#define LARDATAALG_DETECTORINFO_DETECTORCLOCKS_H
 
 #include "lardataalg/DetectorInfo/ElecClock.h"
 
@@ -183,8 +183,8 @@ namespace detinfo{
    * 
    * |                                                     to &rarr; | electronics time      | (_ticks_)            | TPC time ticks     | trigger time              | trigger clock ticks | beam gate time            | Optical clock ticks   | External clock ticks   |
    * | ------------------------------------------------------------: | --------------------- | -------------------- | ------------------ | ------------------------- | ------------------- | ------------------------- | --------------------- | ---------------------- |
-   * | (unit)                                                        | &micro;s              |                      |                    | &micro;s                  | `TriggerClock()`    | &micro;s                  |                       |                        |
-   * | @ref DetectorClocksHardwareTrigger         "hardware trigger" | `TriggerTime()`       | `TPCClock()`         |                    |                           |                     |                           | `OpticalClock()`      | `ExternalClock()`      |
+   * | (unit)                                                        | &micro;s              |                      |                    | &micro;s                  |                     | &micro;s                  |                       |                        |
+   * | @ref DetectorClocksHardwareTrigger         "hardware trigger" | `TriggerTime()`       | `TPCClock()`         |                    |                           | `TriggerClock()`    |                           | `OpticalClock()`      | `ExternalClock()`      |
    * | @ref DetectorClocksBeamGateOpening         "beam gate point"  | `BeamGateTime()`      |                      |                    |                           |                     |                           |                       |                        |
    * | @ref DetectorClocksElectronicsTime         "electronics time" |                       |                      |                    |                           |                     |                           |                       |                        |
    * |                                            &nbsp; (_ticks_)   |                       |                      | `TPCTDC2Tick()`    |                           |                     |                           |                       |                        |
@@ -218,8 +218,10 @@ namespace detinfo{
    *     labelled `TDC`
    * * the @ref DetectorClocksSimulationTime "simulation time" is labelled `G4`
    *     or `G4Time`
-   * * `TPCTick` is the TPC electronics clock ticks", measured from the
-   *     @ref DetectorClocksTPCelectronicsTime "TPC electronics start time"
+   * * `TPCTick` is @ref DetectorClocksTPCelectronicsTime "TPC electronics clock"
+   *     ticks, measured from the
+   *     @ref DetectorClocksTPCelectronicsStartTime "TPC electronics start time"
+   * * `Tick` (without further qualification) is equivalent to "TPCTick" above
    * * `TPC` is usually used in conjunction with `Tick`, where it means
    *   `TPCTick`; but in `TPCG4Time2TDC()` it is a misnomer (the `TDC` wins in
    *   that the result is in ticks in
@@ -333,7 +335,7 @@ namespace detinfo{
      * This is the
      * @ref DetectorClocksTPCelectronicsStartTime "time the TPC readout starts",
      * with respect to the
-     * @ref DetectorClocksHardwareTrigger "harware trigger time". This is also
+     * @ref DetectorClocksHardwareTrigger "hardware trigger time". This is also
      * the time where the TPC clock starts, again respect to the trigger time.
      * 
      * When negative, it means the TDC electronics clock started before the
@@ -924,4 +926,4 @@ namespace detinfo{
 } //namespace detinfo
 
 
-#endif // LARDATA_DETECTORINFO_DETECTORCLOCKS_H
+#endif // LARDATAALG_DETECTORINFO_DETECTORCLOCKS_H
