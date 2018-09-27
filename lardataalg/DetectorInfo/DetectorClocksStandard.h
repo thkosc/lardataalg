@@ -10,8 +10,8 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef DETINFO_DETCLOCKSSTD_H
-#define DETINFO_DETCLOCKSSTD_H
+#ifndef LARDATAALG_DETECTORINFO_DETECTORCLOCKSSTANDARD_H
+#define LARDATAALG_DETECTORINFO_DETECTORCLOCKSSTANDARD_H
 
 #include "fhiclcpp/ParameterSet.h"
 
@@ -275,6 +275,10 @@ namespace detinfo{
     virtual double ExternalTick2BeamTime(double tick, size_t sample, size_t frame) const override
     { return fExternalClock.TickPeriod() * tick + fExternalClock.Time(sample,frame) - BeamGateTime(); }
     
+    /// Returns the specified electronics time in TDC electronics ticks. 
+    virtual double Time2Tick(double time) const override
+      { return doTime2Tick(time); }
+    
     //
     // Getters for time [tdc] (electronics clock counting ... in double precision) 
     //
@@ -370,9 +374,14 @@ namespace detinfo{
     /// Implementation of `TPCTime()`.
     double doTPCTime() const { return TriggerTime() + TriggerOffsetTPC(); }
     
+    /// Implementation of `Time2Tick()`.
+    double doTime2Tick(double time) const
+      { return (time - doTPCTime()) / fTPCClock.TickPeriod();  }
+    
   }; // class DetectorClocksStandard
 
 } //namespace detinfo
 
 
-#endif 
+#endif // LARDATAALG_DETECTORINFO_DETECTORCLOCKSSTANDARD_H
+

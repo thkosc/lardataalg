@@ -125,6 +125,7 @@ void detinfo::DetectorClocksStandard::debugReport() const
     << "TPC start tick from beam    [us] : " << TPCTick2BeamTime(0) <<std::endl
     << "TPC tdc=0 in tick     : " << TPCTDC2Tick(0) << std::endl
     << "TPC G4 time 0 in tick : " << TPCG4Time2Tick(0) << std::endl
+    << "Trigger in TPC tick   : " << Time2Tick(TriggerTime()) << std::endl
     << std::endl;
   
 }

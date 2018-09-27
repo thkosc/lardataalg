@@ -186,7 +186,7 @@ namespace detinfo{
    * | (unit)                                                        | &micro;s              |                      |                    | &micro;s                  |                     | &micro;s                  |                       |                        |
    * | @ref DetectorClocksHardwareTrigger         "hardware trigger" | `TriggerTime()`       | `TPCClock()`         |                    |                           | `TriggerClock()`    |                           | `OpticalClock()`      | `ExternalClock()`      |
    * | @ref DetectorClocksBeamGateOpening         "beam gate point"  | `BeamGateTime()`      |                      |                    |                           |                     |                           |                       |                        |
-   * | @ref DetectorClocksElectronicsTime         "electronics time" |                       |                      |                    |                           |                     |                           |                       |                        |
+   * | @ref DetectorClocksElectronicsTime         "electronics time" |                       |                      | `Time2Tick()`      |                           |                     |                           |                       |                        |
    * |                                            &nbsp; (_ticks_)   |                       |                      | `TPCTDC2Tick()`    |                           |                     |                           |                       |                        |
    * | @ref DetectorClocksTPCelectronicsTime      "TPC time"         |                       |                      |                    |                           |                     |                           |                       |                        |
    * |                                            &nbsp; (_ticks_)   | `TPCTick2Time()`      | `TPCTick2TDC()`      |                    | `TPCTick2TrigTime()`      |                     | `TPCTick2BeamTime()`      |                       |                        |
@@ -352,7 +352,6 @@ namespace detinfo{
     
     /// @ref DetectorClocksBeamGateOpening "Beam gate opening time" (in @ref DetectorClocksElectronicsTime "electronics time frame") [&micro;s].
     virtual double BeamGateTime() const = 0;
-    
     
     
     /// @}
@@ -637,6 +636,38 @@ namespace detinfo{
     /// @}
     // --- END Electronics clocks ----------------------------------------------
     
+    
+    // --- BEGIN Conversions from electronics time -----------------------------
+    /// @{
+    /**
+     *  @name Conversions from electronics time
+     *
+     *  This section includes methods converting from
+     *  @ref DetectorClocksElectronicsTime "electronics time" (for its _ticks_
+     *  see the specific section) into other time scales and frames.
+     */
+    
+    /**
+     * @name Converts an @ref DetectorClocksElectronicsTime "electronics time"
+     *       into a @ref DetectorClocksTPCelectronicsTime "TPC electronics time tick".
+     * @param time electronics time to be converted [&micro;s]
+     * @return TDC ticks elapsed from the
+     *         @ref DetectorClocksTPCelectronicsStartTime "TPC start time" to time
+     *
+     * The specified @ref DetectorClocksElectronicsTime "electronics time" is
+     * converted into a @ref DetectorClocksTPCelectronicsTime "TPC electronics time tick".
+     * 
+     * For example, the TPC (and TPC waveform) tick at which the hardware
+     * trigger happens is:
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
+     * double const TriggerTick = detClocks.Time2Tick(detClocks.TriggerTime());
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * (`detClocks` being an instance of an implementation of `DetectorClocks`).
+     */
+    virtual double Time2Tick(double time) const = 0; 
+    
+    /// @}
+    // --- END Conversions from electronics time -------------------------------
     
     
     // --- BEGIN Conversions from electronics waveform ticks -------------------
