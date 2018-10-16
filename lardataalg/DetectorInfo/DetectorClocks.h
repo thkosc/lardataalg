@@ -11,6 +11,11 @@
 
 #include "lardataalg/DetectorInfo/ElecClock.h"
 
+// C++ libraries
+#include <vector>
+#include <string>
+
+
 namespace detinfo{
 
   enum InheritConfigType_t {
