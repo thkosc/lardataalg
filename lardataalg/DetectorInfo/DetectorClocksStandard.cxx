@@ -7,6 +7,7 @@ detinfo::DetectorClocksStandard::DetectorClocksStandard()
     fInheritClockConfig(false),
     fTrigModuleName(""),
     fG4RefTime    (detinfo::kDEFAULT_MC_CLOCK_T0),
+    fG4RefTimeDefault    (fG4RefTime),
     fFramePeriod  (detinfo::kDEFAULT_FRAME_PERIOD),
     fTPCClock     (0,detinfo::kDEFAULT_FRAME_PERIOD,detinfo::kDEFAULT_FREQUENCY_TPC),
     fOpticalClock (0,detinfo::kDEFAULT_FRAME_PERIOD,detinfo::kDEFAULT_FREQUENCY_OPTICAL),
@@ -54,6 +55,7 @@ bool detinfo::DetectorClocksStandard::Configure(fhicl::ParameterSet const& pset)
   // Read fcl parameters
   fInheritClockConfig                 = pset.get< bool >( "InheritClockConfig" );
   fTrigModuleName                     = pset.get< std::string >( "TrigModuleName" );
+  fG4RefCorrTrigModuleName            = pset.get< std::string >( "G4RefCorrTrigModuleName","baddefault");
   fConfigValue.at(kG4RefTime)         = pset.get< double >( fConfigName.at(kG4RefTime).c_str() );
   fConfigValue.at(kFramePeriod)       = pset.get< double >( fConfigName.at(kFramePeriod).c_str() );
   fConfigValue.at(kTriggerOffsetTPC)  = pset.get< double >( fConfigName.at(kTriggerOffsetTPC).c_str());
@@ -74,6 +76,7 @@ void detinfo::DetectorClocksStandard::ApplyParams()
 {
 
   fG4RefTime   = fConfigValue.at(kG4RefTime);
+  fG4RefTimeDefault = fG4RefTime;
   fFramePeriod = fConfigValue.at(kFramePeriod);
   fTPCClock     = detinfo::ElecClock( fTriggerTime, fFramePeriod, fConfigValue.at( kClockSpeedTPC     ) );
   fOpticalClock = detinfo::ElecClock( fTriggerTime, fFramePeriod, fConfigValue.at( kClockSpeedOptical ) );
@@ -116,6 +119,7 @@ void detinfo::DetectorClocksStandard::debugReport() const
     << "BeamGate time @ " << fBeamGateTime      << std::endl
     << "TrigOffsetTPC @ " << TriggerOffsetTPC() << std::endl
     << "G4RefTime     @ " << fG4RefTime         << std::endl
+    << "G4RefTimeDefault @ " << fG4RefTimeDefault << std::endl
     << "TPC     Freq. @ " << fTPCClock.Frequency() << std::endl
     << "Optical Freq. @ " << fOpticalClock.Frequency() << std::endl
     << "Trigger Freq. @ " << fTriggerClock.Frequency() << std::endl

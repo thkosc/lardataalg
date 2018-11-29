@@ -152,6 +152,15 @@ namespace detinfo{
      */
     std::string TrigModuleName() const { return fTrigModuleName; }
     
+    /**
+     * @brief Returns the input tag of the trigger data product for G4Ref correctons.
+     * @return the input tag of the trigger data product (as string)
+     * 
+     * The trigger module name is set directly in the configuration as
+     * `G4RefCorrTrigModuleName`.
+     */
+    std::string G4RefCorrTrigModuleName() const { return fG4RefCorrTrigModuleName; }
+
     /// Sets trigger and beam gate time from default configuration values.
     void SetDefaultTriggerTime();
 
@@ -185,6 +194,18 @@ namespace detinfo{
       fTPCClock.SetTime(trig_time);
       fOpticalClock.SetTime(trig_time);
       fTriggerClock.SetTime(trig_time);
+    }
+
+    /**
+     * @brief Setter for correction the G4RefTime.
+     * @param sim_trig_time @ref DetectorClocksHardwareTrigger "hardware trigger time" in @ref DetectorClocksElectronicsTime "electronics time scale" from simulation
+     * 
+     * The G4RefTime is corrected to use the existing TriggerTime() as a base, rather than 
+     * the fcl parameter. This is done in particularly to accomodate matching in overlay (data+sim) samples.
+     */
+    virtual void RebaseG4RefTime(double sim_trig_time)
+    { 
+      fG4RefTime = fG4RefTimeDefault - TriggerTime() + sim_trig_time;
     }
 
     //
@@ -343,9 +364,14 @@ namespace detinfo{
     bool fInheritClockConfig;
 
     std::string fTrigModuleName;
+    std::string fG4RefCorrTrigModuleName;
 
-        /// Electronics clock counting start time in G4 time frame [us]
+    /// Electronics clock counting start time in G4 time frame [us]
     double fG4RefTime;
+
+    /// A default G4Reftime, typically coming from a FCL file.
+    /// Used to allow per event corrections to be applied.
+    double fG4RefTimeDefault;
 
     /// Frame period
     double fFramePeriod;
