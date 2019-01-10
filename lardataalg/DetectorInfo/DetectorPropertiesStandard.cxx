@@ -129,6 +129,8 @@ namespace detinfo{
     fSternheimerParameters.x1   = config.SternheimerX1();
     fSternheimerParameters.cbar = config.SternheimerCbar();
 
+    fMichelleFudgeFactor        = config.MichelleFudgeFactor();
+
     fSimpleBoundary = config.SimpleBoundary();
 
     DoUpdateClocks();
@@ -363,7 +365,7 @@ namespace detinfo{
 	       +P2W*(temperature-T0W));     
    }
 
-  vd /= 10.;
+  vd *= fMichelleFudgeFactor/10.;
 
   return vd; // in cm/us
 }
