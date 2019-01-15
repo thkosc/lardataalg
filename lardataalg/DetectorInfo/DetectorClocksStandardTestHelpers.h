@@ -54,7 +54,7 @@ namespace testing {
             ServiceProviderName.erase(0, iSlash + 1);
           
           if (ServiceProviderName == "DetectorClocksServiceStandard") {
-            LOG_TRACE("setupProvider")
+            MF_LOG_TRACE("setupProvider")
               << "Verified service implementation for DetectorClocksService: '"
               << ServiceProviderPath << "'";
           }
