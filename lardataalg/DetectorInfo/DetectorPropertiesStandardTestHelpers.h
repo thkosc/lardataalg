@@ -70,7 +70,7 @@ namespace testing {
             ServiceProviderName.erase(0, iSlash + 1);
           
           if (ServiceProviderName == "DetectorPropertiesServiceStandard") {
-            LOG_TRACE("ProviderSetup") << "Verified service implementation for "
+            MF_LOG_TRACE("ProviderSetup") << "Verified service implementation for "
               "DetectorPropertiesService"
               ": '" << ServiceProviderPath << "'";
           }

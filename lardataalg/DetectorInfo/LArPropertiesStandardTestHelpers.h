@@ -54,7 +54,7 @@ namespace testing {
             ServiceProviderName.erase(0, iSlash + 1);
           
           if (ServiceProviderName == "LArPropertiesServiceStandard") {
-            LOG_TRACE("setupProvider")
+            MF_LOG_TRACE("setupProvider")
               << "Verified service implementation for LArPropertiesService: '"
               << ServiceProviderPath << "'";
           }

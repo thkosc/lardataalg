@@ -29,6 +29,8 @@
 #ifndef LARDATAALG_UTILITIES_QUANTITIES_H
 #define LARDATAALG_UTILITIES_QUANTITIES_H
 
+// LArSoft libraries
+#include "lardataalg/Utilities/constexpr_math.h" // util::abs()
 
 // Boost libraries
 #include "boost/math/common_factor_rt.hpp" // boost::math::gcd()
@@ -40,7 +42,6 @@
 #include <ratio>
 #include <functional> // std::hash<>
 #include <type_traits> // std::is_same<>, std::enable_if_t<>, ...
-#include <cmath> // std::abs()
 
 
 /**
@@ -591,7 +592,8 @@ namespace util::quantities {
       constexpr quantity_t operator-() const { return quantity_t(-value()); }
       
       /// Returns a quantity with the absolute value of this one.
-      constexpr quantity_t abs() const { return quantity_t(std::abs(value())); }
+      constexpr quantity_t abs() const
+        { return quantity_t(util::abs(value())); }
       
       /// @}
       // -- END Asymmetric arithmetic operations -------------------------------
