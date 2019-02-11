@@ -113,9 +113,9 @@ namespace detinfo{
           Name("SternheimerCbar"),
           Comment("parameter cbar of Sternheimer correction delta = 2log(10) x - cbar + { a (x_1-x)^k } theta(x1-x), x = log10(p/m)")
         };
-        fhicl::Atom<double      > MichelleFudgeFactor         {
-          Name("MichelleFudgeFactor"),
-          Comment("Allows a scaling factor to fudge the drift velocity calculation (as suggested by Michelle Stancari")
+        fhicl::Atom<double      > DriftVelFudgeFactor         {
+          Name("DriftVelFudgeFactor"),
+          Comment("Allows a scaling factor to fudge the drift velocity calculation (as suggested by DriftVel Stancari")
         };
 
 	fhicl::Atom<bool> SimpleBoundary { Name("SimpleBoundaryProcess" ), Comment("") };
@@ -332,7 +332,7 @@ namespace detinfo{
       double                         fHasTimeOffsetZ = false; ///< whether time offset was configured for view Z
       double                         fHasTimeOffsetY = false; ///< whether time offset was configured for view Y
       double                         fHasTimeOffsetX = false; ///< whether time offset was configured for view X
-      double                         fMichelleFudgeFactor;    ///< Scaling factor to allow "fudging" of drift velocity
+      double                         fDriftVelFudgeFactor;    ///< Scaling factor to allow "fudging" of drift velocity
       
       SternheimerParameters_t fSternheimerParameters; ///< Sternheimer parameters
       

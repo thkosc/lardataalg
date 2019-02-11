@@ -129,7 +129,7 @@ namespace detinfo{
     fSternheimerParameters.x1   = config.SternheimerX1();
     fSternheimerParameters.cbar = config.SternheimerCbar();
 
-    fMichelleFudgeFactor        = config.MichelleFudgeFactor();
+    fDriftVelFudgeFactor        = config.DriftVelFudgeFactor();
 
     fSimpleBoundary = config.SimpleBoundary();
 
@@ -365,7 +365,7 @@ namespace detinfo{
 	       +P2W*(temperature-T0W));     
    }
 
-  vd *= fMichelleFudgeFactor/10.;
+  vd *= fDriftVelFudgeFactor/10.;
 
   return vd; // in cm/us
 }
