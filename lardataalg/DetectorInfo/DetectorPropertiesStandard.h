@@ -113,6 +113,10 @@ namespace detinfo{
           Name("SternheimerCbar"),
           Comment("parameter cbar of Sternheimer correction delta = 2log(10) x - cbar + { a (x_1-x)^k } theta(x1-x), x = log10(p/m)")
         };
+        fhicl::Atom<double      > DriftVelFudgeFactor         {
+          Name("DriftVelFudgeFactor"),
+          Comment("Allows a scaling factor to fudge the drift velocity calculation (as suggested by DriftVel Stancari")
+        };
 
 	fhicl::Atom<bool> SimpleBoundary { Name("SimpleBoundaryProcess" ), Comment("") };
       
@@ -311,23 +315,24 @@ namespace detinfo{
       const detinfo::DetectorClocks* fClocks;
       const geo::GeometryCore* fGeo;
       
-      std::vector< double >          fEfield;           ///< kV/cm (per inter-plane volume)
-      double                         fElectronlifetime; ///< microseconds
-      double                         fTemperature;      ///< kelvin
-      double       fSamplingRate;      ///< in ns
-      double 	   fElectronsToADC;    ///< conversion factor for # of ionization electrons to 1 ADC count
-      unsigned int fNumberTimeSamples; ///< number of clock ticks per event
-      unsigned int fReadOutWindowSize; ///< number of clock ticks per readout window
-      double       fTimeOffsetU;       ///< time offset to convert spacepoint coordinates to hit times on view U
-      double       fTimeOffsetV;       ///< time offset to convert spacepoint coordinates to hit times on view V
-      double       fTimeOffsetZ;       ///< time offset to convert spacepoint coordinates to hit times on view Z
-      double       fTimeOffsetY;       ///< time offset to convert spacepoint coordinates to hit times on view Y
-      double       fTimeOffsetX;       ///< time offset to convert spacepoint coordinates to hit times on view X
-      double       fHasTimeOffsetU = false; ///< whether time offset was configured for view U
-      double       fHasTimeOffsetV = false; ///< whether time offset was configured for view V
-      double       fHasTimeOffsetZ = false; ///< whether time offset was configured for view Z
-      double       fHasTimeOffsetY = false; ///< whether time offset was configured for view Y
-      double       fHasTimeOffsetX = false; ///< whether time offset was configured for view X
+      std::vector< double >          fEfield;                 ///< kV/cm (per inter-plane volume)
+      double                         fElectronlifetime;       ///< microseconds
+      double                         fTemperature;            ///< kelvin
+      double                         fSamplingRate;           ///< in ns
+      double 	                       fElectronsToADC;         ///< conversion factor for # of ionization electrons to 1 ADC count
+      unsigned int                   fNumberTimeSamples;      ///< number of clock ticks per event
+      unsigned int                   fReadOutWindowSize;      ///< number of clock ticks per readout window
+      double                         fTimeOffsetU;            ///< time offset to convert spacepoint coordinates to hit times on view U
+      double                         fTimeOffsetV;            ///< time offset to convert spacepoint coordinates to hit times on view V
+      double                         fTimeOffsetZ;            ///< time offset to convert spacepoint coordinates to hit times on view Z
+      double                         fTimeOffsetY;            ///< time offset to convert spacepoint coordinates to hit times on view Y
+      double                         fTimeOffsetX;            ///< time offset to convert spacepoint coordinates to hit times on view X
+      double                         fHasTimeOffsetU = false; ///< whether time offset was configured for view U
+      double                         fHasTimeOffsetV = false; ///< whether time offset was configured for view V
+      double                         fHasTimeOffsetZ = false; ///< whether time offset was configured for view Z
+      double                         fHasTimeOffsetY = false; ///< whether time offset was configured for view Y
+      double                         fHasTimeOffsetX = false; ///< whether time offset was configured for view X
+      double                         fDriftVelFudgeFactor;    ///< Scaling factor to allow "fudging" of drift velocity
       
       SternheimerParameters_t fSternheimerParameters; ///< Sternheimer parameters
       

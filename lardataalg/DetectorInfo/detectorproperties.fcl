@@ -14,6 +14,8 @@ standard_detproperties :
  SternheimerX0:    0.2000  # Ar Sternheimer parameter x0.
  SternheimerX1:    3.0000  # Ar Sternheimer parameter x0.
  SternheimerCbar:  5.2146  # Ar Sternheimer parameter Cbar.
+
+ DriftVelFudgeFactor: 1.
  
  ElectronsToADC:    1.208041e-3  # in ADC/e; 6241.5 electrons = 1fC = 7.54 ADC counts for ArgoNeuT
  NumberTimeSamples: 2048         # ticks of the clock per readout frame
