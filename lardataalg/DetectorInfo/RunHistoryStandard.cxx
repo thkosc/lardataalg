@@ -17,7 +17,6 @@
 #include "TMath.h"
 
 // Framework includes
-#include "messagefacility/MessageLogger/MessageLogger.h"
 #include "cetlib_except/exception.h"
 
 namespace detinfo {

@@ -20,7 +20,6 @@
 #include <Rtypes.h>
 
 // Framework includes
-#include "messagefacility/MessageLogger/MessageLogger.h"
 #include "cetlib_except/exception.h"
 //#include "fhiclcpp/types/detail/validationException.h"
 //#include "fhiclcpp/types/detail/validate_ParameterSet.h" // fhiclcpp::detail::fillMissingKeysMsg()

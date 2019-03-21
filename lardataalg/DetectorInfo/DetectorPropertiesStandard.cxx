@@ -6,7 +6,6 @@
 
 // Framework includes
 
-#include <cassert>
 
 // LArSoft includes
 #include "lardataalg/DetectorInfo/DetectorPropertiesStandard.h"
