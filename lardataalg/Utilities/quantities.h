@@ -33,7 +33,7 @@
 #include "lardataalg/Utilities/constexpr_math.h" // util::abs()
 
 // Boost libraries
-#include "boost/math/common_factor_rt.hpp" // boost::math::gcd()
+#include "boost/integer/common_factor_rt.hpp" // boost::integer::gcd()
 
 // C/C++ standard libraries
 #include <ostream>
@@ -896,7 +896,7 @@ namespace util::quantities::concepts::details {
   //----------------------------------------------------------------------------
   template <std::intmax_t Num, std::intmax_t Den>
   struct ratio_simplifier<std::ratio<Num, Den>> {
-    static constexpr auto gcd = boost::math::gcd(Num, Den);
+    static constexpr auto gcd = boost::integer::gcd(Num, Den);
     using type = std::ratio<Num / gcd, Den / gcd>;
   }; // ratio_simplifier
 

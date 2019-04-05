@@ -401,7 +401,7 @@ void test_constexpr_operations() {
   
   static_assert(t1 * 2.0 == 20.0, "scaling");
   static_assert(2.0 * t1 == 20.0, "scaling");
-  static_assert(t1 / 2.0 == 5.0, "scalirng");
+  static_assert(t1 / 2.0 == 5.0, "scaling");
   
   
   // ---------------------------------------------------------------------------
