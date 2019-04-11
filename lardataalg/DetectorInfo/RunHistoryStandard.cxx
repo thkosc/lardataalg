@@ -8,7 +8,6 @@
 // Framework includes
 
 // C++ language includes
-#include <iostream>
 
 // LArSoft includes
 #include "lardataalg/DetectorInfo/RunHistoryStandard.h"

@@ -17,7 +17,6 @@
 
 // C/C++ standard libraries
 #include <iomanip>
-#include <vector>
 #include <array>
 
 //------------------------------------------------------------------------------

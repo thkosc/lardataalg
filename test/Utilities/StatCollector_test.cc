@@ -14,7 +14,6 @@
 
 // C/C++ standard libraries
 #include <array>
-#include <vector>
 #include <valarray>
 #include <utility> // std::pair<>
 #include <memory> // std::unique_ptr<>
