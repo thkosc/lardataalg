@@ -46,7 +46,7 @@ using TestEnvironment = testing::GeometryTesterEnvironment<TesterConfiguration>;
  * @param argv arguments to the function
  * @return number of detected errors (0 on success)
  * @throw cet::exception most of error situations throw
- * 
+ *
  * The arguments in argv are:
  * 0. name of the executable ("DetectorPropertiesStandard_test")
  * 1. (mandatory) path to the FHiCL configuration file
@@ -54,18 +54,18 @@ using TestEnvironment = testing::GeometryTesterEnvironment<TesterConfiguration>;
  *    (default: physics.analyzers.larptest)
  * 3. FHiCL path to the configuration of DetectorProperties service
  *    (default: services.DetectorPropertiesService)
- * 
+ *
  */
 //------------------------------------------------------------------------------
 int main(int argc, char const** argv) {
-  
+
   TesterConfiguration config("detp_test");
-  
+
   //
   // parameter parsing
   //
   int iParam = 0;
-  
+
   // first argument: configuration file (mandatory)
   if (++iParam < argc) config.SetConfigurationPath(argv[iParam]);
   else {
@@ -73,25 +73,25 @@ int main(int argc, char const** argv) {
       << std::endl;
     return 1;
   }
-  
+
   // second argument: path of the parameter set for geometry test configuration
   // (optional; default does not have any tester)
   if (++iParam < argc) config.SetMainTesterParameterSetPath(argv[iParam]);
-  
+
   // third argument: path of the parameter set for DetectorProperties confi
   // (optional; default: "services.DetectorProperties" from inherited object)
   if (++iParam < argc) {
     config.SetServiceParameterSetPath
       ("DetectorPropertiesService", argv[iParam]);
   }
-  
+
   unsigned int nErrors = 0 /* Tester.Run() */ ;
-  
+
   //
   // testing environment setup
   //
   TestEnvironment TestEnv(config);
-  
+
   // DetectorPropertiesStandard and all its dependencies support the simple set
   // up (see testing::TesterEnvironment::SimpleProviderSetup()), except for
   // Geometry, that has been configured already in the geometry-aware
@@ -99,22 +99,22 @@ int main(int argc, char const** argv) {
   TestEnv.SimpleProviderSetup<detinfo::LArPropertiesStandard>();
   TestEnv.SimpleProviderSetup<detinfo::DetectorClocksStandard>();
   TestEnv.SimpleProviderSetup<detinfo::DetectorPropertiesStandard>();
-  
+
   //
   // run the test algorithm
   // (I leave it here for reference -- there is no test algorithm here)
   //
-  
+
   // 1. we initialize it from the configuration in the environment,
 //  MyTestAlgo Tester(TestEnv.TesterParameters());
-  
+
   // 2. we set it up with the geometry from the environment
 //  Tester.Setup(*(TestEnv.Provider<detinfo::DetectorProperties>()));
-  
+
   // 3. then we run it!
   auto const& geom = *(TestEnv.Provider<geo::GeometryCore>());
   auto const& detp = *(TestEnv.Provider<detinfo::DetectorProperties>());
-  
+
   auto const driftVelocity = detp.DriftVelocity();
   auto const TDCtick = detp.SamplingRate();
 
@@ -123,7 +123,7 @@ int main(int argc, char const** argv) {
     << "\nSampling rate:     " << TDCtick << " ns"
     << "\nArgon temperature: " << detp.Temperature() << " K"
     << "\nDrift velocity:    " << driftVelocity << " cm/us";
-  
+
   // accumulate the plane IDs; needed just for table formatting
   unsigned int const colWidth = 9U;
   unsigned int headerColWidth = 0U;
@@ -131,7 +131,7 @@ int main(int argc, char const** argv) {
     auto const l = std::string(planeID).length();
     if (headerColWidth < l) headerColWidth = l;
   }
-  
+
   // print drift distances
   // collect all drift distances, and check whether they are all equal
   bool allSameDrift = true;
@@ -143,7 +143,7 @@ int main(int argc, char const** argv) {
     allSameDrift
       = allSameDrift & check.equal(driftDistance, driftDistances.first());
   } // for
-  
+
   if (allSameDrift) {
     // print drift distance
     auto const driftDistance = driftDistances.first();
@@ -163,7 +163,7 @@ int main(int argc, char const** argv) {
       << " | " << std::setw(columnSizes[1]) << "time [us]"
       << " | " << std::setw(columnSizes[2]) << "distance [cm]"
       << " | " << std::setw(columnSizes[3]) << "ticks";
-    
+
     // print drift distances by TPC
     for (auto const& TPCID: geom.IterateTPCIDs()) {
       auto const driftDistance = driftDistances[TPCID];
@@ -175,7 +175,7 @@ int main(int argc, char const** argv) {
         ;
     } // for TPC
   }
-  
+
   // print tick number table header
   // number of ticks
   unsigned int const nTicks = detp.NumberTimeSamples();
@@ -183,31 +183,31 @@ int main(int argc, char const** argv) {
   mf::LogVerbatim("detp_test")
     << "Conversion of tick number to x position [cm]"
     " (detinfo::DetectorProperties::ConvertTicksToX()):";
-  
+
   std::array<double, nPrintedTicks> ticks;
   for (unsigned int iTick = 0; iTick < nPrintedTicks; ++iTick)
     ticks[iTick] = iTick * nTicks / (nPrintedTicks - 1);
-  
+
   {
     mf::LogVerbatim log("detp_test");
     log << std::setw(headerColWidth) << "tick #:";
     for (double tick: ticks) log << " | " << std::setw(colWidth) << tick;
   }
-  
+
   for (auto planeID: geom.IteratePlaneIDs()) {
     mf::LogVerbatim log("detp_test");
     log << std::setw(headerColWidth) << std::string(planeID);
-    
+
     for (double tick: ticks) {
       double const x = detp.ConvertTicksToX(tick, planeID);
       log << " | " << std::setw(colWidth) << x;
     } // for tick
   } // for planes
-  
+
   // 4. And finally we cross fingers.
   if (nErrors > 0) {
     mf::LogError("detp_test") << nErrors << " errors detected!";
   }
-  
+
   return nErrors;
 } // main()

@@ -42,7 +42,7 @@ detinfo::LArPropertiesStandard::LArPropertiesStandard(
 #if 0
 //------------------------------------------------
 bool detinfo::LArPropertiesStandard::Configure(fhicl::ParameterSet const& pset)
-{  
+{
   this->SetRadiationLength  (pset.get< double >("RadiationLength" ));
   this->SetAtomicNumber     (pset.get< double >("AtomicNumber"));
   this->SetAtomicMass       (pset.get< double >("AtomicMass"));
@@ -84,9 +84,9 @@ bool detinfo::LArPropertiesStandard::Configure(fhicl::ParameterSet const& pset)
     this->SetAlphaScintYield (pset.get<double>("AlphaScintYield"));
     this->SetAlphaScintYieldRatio    (pset.get<double>("AlphaScintYieldRatio"));
   }
-  
+
   this->SetEnableCerenkovLight  (pset.get<bool>("EnableCerenkovLight"));
-  
+
   this->SetReflectiveSurfaceNames(pset.get<std::vector<std::string> >("ReflectiveSurfaceNames"));
   this->SetReflectiveSurfaceEnergies(pset.get<std::vector<double> >("ReflectiveSurfaceEnergies"));
   this->SetReflectiveSurfaceReflectances(pset.get<std::vector<std::vector<double> > >("ReflectiveSurfaceReflectances"));
@@ -106,15 +106,15 @@ bool detinfo::LArPropertiesStandard::Configure(
 ) {
   // we need to know whether we require the additional ScintByParticleType parameters:
   const bool bScintByParticleType = pset.get<bool>("ScintByParticleType", false);
-  
+
   std::set<std::string> ignorable_keys = lar::IgnorableProviderConfigKeys();
   ignorable_keys.insert(ignore_params.begin(), ignore_params.end());
-  
+
 #if DETECTORINFO_LARPROPERTIESSTANDARD_HASOPTIONALATOM
   // validation happens here:
   fhicl::Table<Configuration_t> config_table { pset, lar::IgnorableProviderConfigKeys() };
   Configuration_t const& config = config_table();
-  
+
   if(bScintByParticleType) {
     double value;
     std::string errmsg;
@@ -149,10 +149,10 @@ bool detinfo::LArPropertiesStandard::Configure(
         ).c_str());
     } // if missing parameters
   } // if bScintByParticleType
-  
+
   // read parameters
 #else // !DETECTORINFO_LARPROPERTIESSTANDARD_HASOPTIONALATOM
-  
+
   if (!bScintByParticleType) { // ignore the following keys
     ConfigWithScintByType_t config; // to get the keys
     ignorable_keys.insert(config.ProtonScintYield       .key());
@@ -168,10 +168,10 @@ bool detinfo::LArPropertiesStandard::Configure(
     ignorable_keys.insert(config.AlphaScintYield        .key());
     ignorable_keys.insert(config.AlphaScintYieldRatio   .key());
   } // if !bScintByParticleType
-  
+
   // validation happens here:
   fhicl::Table<ConfigWithScintByType_t> config_table { pset, ignorable_keys };
-  
+
   // read parameters
   ConfigWithScintByType_t const& config = config_table();
   if (bScintByParticleType) {
@@ -189,9 +189,9 @@ bool detinfo::LArPropertiesStandard::Configure(
     SetAlphaScintYieldRatio   (config.AlphaScintYieldRatio   ());
   } // if ScintByParticleType
 #endif // DETECTORINFO_LARPROPERTIESSTANDARD_HASOPTIONALATOM??
-  
+
   SetRadiationLength      (config.RadiationLength());
-  
+
   SetAtomicNumber         (config.AtomicNumber());
   SetAtomicMass           (config.AtomicMass());
   SetMeanExcitationEnergy (config.MeanExcitationEnergy());
@@ -219,7 +219,7 @@ bool detinfo::LArPropertiesStandard::Configure(
   SetScintByParticleType (config.ScintByParticleType ());
 
   SetEnableCerenkovLight(config.EnableCerenkovLight());
-  
+
   SetReflectiveSurfaceNames           (config.ReflectiveSurfaceNames());
   SetReflectiveSurfaceEnergies        (config.ReflectiveSurfaceEnergies());
   SetReflectiveSurfaceReflectances    (config.ReflectiveSurfaceReflectances());
@@ -230,17 +230,17 @@ bool detinfo::LArPropertiesStandard::Configure(
   SetTpbAbsorptionEnergies(config.TpbAbsorptionEnergies());
   SetTpbAbsorptionSpectrum(config.TpbAbsorptionSpectrum());
 
-  SetExtraMatProperties (config.ExtraMatProperties ());  
+  SetExtraMatProperties (config.ExtraMatProperties ());
   SetTpbTimeConstant (config.TpbTimeConstant ());
 
-  
+
   fIsConfigured = true;
 
   return true;
 }
 
 //------------------------------------------------
-bool detinfo::LArPropertiesStandard::Update(uint64_t ts) 
+bool detinfo::LArPropertiesStandard::Update(uint64_t ts)
 {
   if (ts == 0) return false;
 
@@ -395,7 +395,7 @@ std::map<double, double> detinfo::LArPropertiesStandard::TpbAbs() const
 
   return ToReturn;
 }
-//--------------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------------
 std::map<double, double> detinfo::LArPropertiesStandard::TpbEm() const
 {
   if(fTpbEmmisionEnergies.size()!=fTpbEmmisionSpectrum.size()){
@@ -404,7 +404,7 @@ std::map<double, double> detinfo::LArPropertiesStandard::TpbEm() const
       << " different sizes - " << fTpbEmmisionEnergies.size()
       << " " << fTpbEmmisionSpectrum.size();
   }
-  //using interpolation for more smooth spectrum of TPB emmision - won't affect anything but the effective size of table passed to G4               
+  //using interpolation for more smooth spectrum of TPB emmision - won't affect anything but the effective size of table passed to G4
   Int_t tablesize=100;
   std::vector<double> new_x;
   double xrange=0.0;
@@ -418,9 +418,9 @@ std::map<double, double> detinfo::LArPropertiesStandard::TpbEm() const
     else{
       en[j]=fTpbEmmisionEnergies[j-1];
       spectr[j]=fTpbEmmisionSpectrum[j-1];
-      //if(j==int(fTpbEmmisionSpectrum.size())) spectr[j]=+0.5; 
+      //if(j==int(fTpbEmmisionSpectrum.size())) spectr[j]=+0.5;
     }
-    //std::cout<<j<<" "<<int(fTpbEmmisionSpectrum.size())<<" energiestpb "<<en[j]<<std::endl; 
+    //std::cout<<j<<" "<<int(fTpbEmmisionSpectrum.size())<<" energiestpb "<<en[j]<<std::endl;
   }
   TH1D *energyhist=new TH1D();
   energyhist->SetBins(int(fTpbEmmisionSpectrum.size()),en);
@@ -430,10 +430,10 @@ std::map<double, double> detinfo::LArPropertiesStandard::TpbEm() const
   for(int jj=0; jj<int(tablesize); jj++){
 
     new_x.push_back(jj*(xrange/double(tablesize)));
-    //std::cout<<"position "<<jj<<" "<<new_x[jj]<<" size of table "<<tablesize<<" range x "<<xrange<<std::endl;                        
+    //std::cout<<"position "<<jj<<" "<<new_x[jj]<<" size of table "<<tablesize<<" range x "<<xrange<<std::endl;
   }
   std::map<double, double> ToReturn;
-  //for(size_t i=0; i!=fTpbEmmisionSpectrum.size(); ++i)        
+  //for(size_t i=0; i!=fTpbEmmisionSpectrum.size(); ++i)
   //  ToReturn[fTpbEmmisionEnergies.at(i)]=fTpbEmmisionSpectrum.at(i);
   for(int i=0; i<tablesize; i++){
     ToReturn[new_x.at(i)]=energyhist->Interpolate(new_x[i]);
@@ -445,4 +445,4 @@ std::map<double, double> detinfo::LArPropertiesStandard::TpbEm() const
   delete[] spectr;
   return ToReturn;
 }
-//--------------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------------

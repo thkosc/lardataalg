@@ -3,15 +3,15 @@
  * @brief  Helpers for support of DetectorPropertiesService in LArSoft tests
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   May 6th, 2016
- * 
+ *
  * This library is a pure header.
  * It requires linkage with:
- * 
+ *
  * * `lardata_DetectorInfo`
  * * `mf_MessageLogger`
  * * `mf_Utilities`
  * * `fhiclcpp`
- * 
+ *
  */
 
 #ifndef LARDATA_DETECTORINFO_DETECTORPROPERTIESSTANDARDTESTHELPERS_H
@@ -31,21 +31,21 @@
 
 
 namespace testing {
-  
+
   /**
    * @brief Set up a detinfo::DetectorPropertiesStandard from a parameter set
    * @param pset parameter set for the configuration
    * @param providers pack of providers needed by DetectorPropertiesService
    * @return pointer to a newly created and set up DetectorPropertiesService
-   * 
+   *
    * This class specialisation enables the support of `SetupProvider()`
    * methods of `testing::TesterEnvironment`.
    * The resulting setup call will be something like:
-   *     
+   *
    *     env.SetupProviderFor
    *       <detinfo::DetectorPropertiesStandard, detinfo::DetectorProperties>
    *       (pset, env.ProviderPackFor<detinfo::DetectorPropertiesStandard>());
-   *     
+   *
    * (note the use of `SetupProviderFor()` to register the service also as an
    * implementation of DetectorProperties interface).
    * This implicitly assumes that whatever service providers
@@ -54,7 +54,7 @@ namespace testing {
    */
   template <>
   struct ProviderSetupClass<detinfo::DetectorPropertiesStandard> {
-    
+
     static std::unique_ptr<detinfo::DetectorPropertiesStandard> setup
       (
         fhicl::ParameterSet const& pset,
@@ -68,7 +68,7 @@ namespace testing {
           size_t iSlash = ServiceProviderPath.rfind('/');
           if (iSlash != std::string::npos)
             ServiceProviderName.erase(0, iSlash + 1);
-          
+
           if (ServiceProviderName == "DetectorPropertiesServiceStandard") {
             MF_LOG_TRACE("ProviderSetup") << "Verified service implementation for "
               "DetectorPropertiesService"
@@ -83,8 +83,8 @@ namespace testing {
               " that is not known to use that provider.";
           }
         }
-    
-        // 
+
+        //
         // create the new DetectorPropertiesStandard service provider
         //
         // we choose to ignore a configuration parameter that is known to be used
@@ -95,33 +95,33 @@ namespace testing {
         return std::make_unique<detinfo::DetectorPropertiesStandard>
           (pset, providers, ignore_keys);
       } // setup()
-      
+
   }; // ProviderSetupClass<DetectorPropertiesStandard>
-  
+
 
   /**
    * @brief Environment setup helper for DetectorPropertiesStandard
    * @tparam TestEnv type of environment to set up
    * @see simpleEnvironmentSetup()
-   * 
+   *
    * A service provider is set up in the environment, associated with the types
    * detinfo::DetectorPropertiesStandard and detinfo::DetectorProperties.
    * Its configuration is read from "services.DetectorPropertiesService".
-   * 
+   *
    * The environment is expected to expose an interface equivalent to the one
    * of `testing::TesterEnvironment`.
-   * 
+   *
    * This class specialisation enables the support of `SimpleProviderSetup()`
    * methods of `testing::TesterEnvironment`.
    * It should be possible to set up a testing environment by calling:
-   *     
+   *
    *     env.SimpleProviderSetup<detinfo::DetectorPropertiesStandard>();
-   *     
+   *
    * The provider will be available from any of these two calls:
-   *     
+   *
    *     env.Provider<detinfo::DetectorPropertiesStandard>();
    *     env.Provider<detinfo::DetectorProperties>();
-   *     
+   *
    * @note This function assumes there is a `DetectorPropertiesService` service
    * configuration available in the environment, and that the service providers
    * geo::GeometryCore, detinfo::LArProperties and detinfo::DetectorClocks are
@@ -141,11 +141,11 @@ namespace testing {
           );
         return detp;
       } // setup()
-    
+
   }; // SimpleEnvironmentSetupClass<detinfo::DetectorPropertiesStandard>
-  
+
 
 } // namespace testing
 
-  
+
 #endif // LARDATA_DETECTORINFO_DETECTORPROPERTIESSTANDARDTESTHELPERS_H

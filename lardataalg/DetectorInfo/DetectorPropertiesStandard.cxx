@@ -26,10 +26,10 @@
 
 
 namespace {
-  
+
   template <typename T>
   inline T sqr(T v) { return v*v; }
-  
+
 } // local namespace
 
 namespace detinfo{
@@ -40,7 +40,7 @@ namespace detinfo{
   {
 
   }
-  
+
   //--------------------------------------------------------------------
   DetectorPropertiesStandard::DetectorPropertiesStandard(fhicl::ParameterSet const& pset,
 					 const geo::GeometryCore* geo,
@@ -52,17 +52,17 @@ namespace detinfo{
   {
     {
        mf::LogInfo debug("setupProvider<DetectorPropertiesStandard>");
-       
+
        debug << "Asked to ignore " << ignore_params.size() << " keys:";
        for (auto const& key: ignore_params) debug << " '" << key << "'";
     }
-    
+
     ValidateAndConfigure(pset, ignore_params);
-    
+
     fTPCClock = fClocks->TPCClock();
     DoUpdateClocks();
   }
-    
+
   //--------------------------------------------------------------------
   DetectorPropertiesStandard::DetectorPropertiesStandard(fhicl::ParameterSet const& pset,
 					 providers_type providers,
@@ -75,9 +75,9 @@ namespace detinfo{
       ignore_params
       )
     {}
-  
+
   //--------------------------------------------------------------------
-  bool DetectorPropertiesStandard::Update(uint64_t) 
+  bool DetectorPropertiesStandard::Update(uint64_t)
   {
 
     DoUpdateClocks();
@@ -85,31 +85,31 @@ namespace detinfo{
   }
 
   //--------------------------------------------------------------------
-  bool DetectorPropertiesStandard::UpdateClocks(const detinfo::DetectorClocks* clks) 
+  bool DetectorPropertiesStandard::UpdateClocks(const detinfo::DetectorClocks* clks)
   {
     fClocks = clks;
-    
+
     fTPCClock = fClocks->TPCClock();
     DoUpdateClocks();
     return true;
   }
-  
+
   //------------------------------------------------------------
   double DetectorPropertiesStandard::ConvertTDCToTicks(double tdc) const
   {
     return fClocks->TPCTDC2Tick(tdc);
   }
-  
+
   //--------------------------------------------------------------
   double DetectorPropertiesStandard::ConvertTicksToTDC(double ticks) const
   {
     return fClocks->TPCTick2TDC(ticks);
   }
-  
- 
+
+
   //--------------------------------------------------------------------
   void DetectorPropertiesStandard::Configure(Configuration_t const& config) {
-    
+
     fEfield                     = config.Efield();
     fElectronlifetime           = config.Electronlifetime();
     fTemperature                = config.Temperature();
@@ -121,7 +121,7 @@ namespace detinfo{
     fHasTimeOffsetZ = config.TimeOffsetZ(fTimeOffsetZ);
     fHasTimeOffsetY = config.TimeOffsetY(fTimeOffsetY);
     fHasTimeOffsetX = config.TimeOffsetX(fTimeOffsetX);
-    
+
     fSternheimerParameters.a    = config.SternheimerA();
     fSternheimerParameters.k    = config.SternheimerK();
     fSternheimerParameters.x0   = config.SternheimerX0();
@@ -133,9 +133,9 @@ namespace detinfo{
     fSimpleBoundary = config.SimpleBoundary();
 
     DoUpdateClocks();
-    
+
   } // DetectorPropertiesStandard::Configure()
-  
+
   //--------------------------------------------------------------------
   DetectorPropertiesStandard::Configuration_t
   DetectorPropertiesStandard::ValidateConfiguration(
@@ -144,14 +144,14 @@ namespace detinfo{
   ) {
     std::set<std::string> ignorable_keys = lar::IgnorableProviderConfigKeys();
     ignorable_keys.insert(ignore_params.begin(), ignore_params.end());
-    
+
     // parses and validates the parameter set:
     fhicl::Table<Configuration_t> config_table { p, ignorable_keys };
-    
+
     return std::move(config_table());
-    
+
   } // DetectorPropertiesStandard::ValidateConfiguration()
-  
+
   //--------------------------------------------------------------------
   void DetectorPropertiesStandard::ValidateAndConfigure(
     fhicl::ParameterSet const& p,
@@ -159,43 +159,43 @@ namespace detinfo{
   ) {
     Configure(ValidateConfiguration(p, ignore_params));
   } // ValidateAndConfigure()
-  
-  
+
+
   //------------------------------------------------------------------------------------//
   void DetectorPropertiesStandard::Setup(providers_type providers) {
-    
+
     SetGeometry(providers.get<geo::GeometryCore>());
     SetLArProperties(providers.get<detinfo::LArProperties>());
     SetDetectorClocks(providers.get<detinfo::DetectorClocks>());
-    
+
     CheckConfigurationAfterSetup();
-    
+
   } // DetectorPropertiesStandard::Setup()
-  
-  
+
+
   //------------------------------------------------------------------------------------//
   double DetectorPropertiesStandard::Efield(unsigned int planegap) const
   {
     if(planegap >= fEfield.size())
       throw cet::exception("DetectorPropertiesStandard") << "requesting Electric field in a plane gap that is not defined\n";
-    
+
     return fEfield[planegap];
   }
-  
-  
+
+
   //------------------------------------------------
   double DetectorPropertiesStandard::Density(double temperature) const
   {
     // Default temperature use internal value.
     if(temperature == 0.)
       temperature = Temperature();
-  
+
     double density = -0.00615*temperature + 1.928;
-  
+
     return density;
   } // DetectorPropertiesStandard::Density()
-  
-  
+
+
   //----------------------------------------------------------------------------------
   // Restricted mean energy loss (dE/dx) in units of MeV/cm.
   //
@@ -216,25 +216,25 @@ namespace detinfo{
   double DetectorPropertiesStandard::Eloss(double mom, double mass, double tcut) const
   {
     // Some constants.
-  
+
     double K = 0.307075;     // 4 pi N_A r_e^2 m_e c^2 (MeV cm^2/mol).
     double me = 0.510998918; // Electron mass (MeV/c^2).
-  
+
     // Calculate kinematic quantities.
-  
+
     double bg = mom / mass;           // beta*gamma.
     double gamma = sqrt(1. + bg*bg);  // gamma.
     double beta = bg / gamma;         // beta (velocity).
     double mer = 0.001 * me / mass;   // electron mass / mass of incident particle.
     double tmax = 2.*me* bg*bg / (1. + 2.*gamma*mer + mer*mer);  // Maximum delta ray energy (MeV).
-  
+
     // Make sure tcut does not exceed tmax.
-  
+
     if(tcut == 0. || tcut > tmax)
       tcut = tmax;
-  
+
     // Calculate density effect correction (delta).
-  
+
     double x = std::log10(bg);
     double delta = 0.;
     if(x >= fSternheimerParameters.x0) {
@@ -242,42 +242,42 @@ namespace detinfo{
       if(x < fSternheimerParameters.x1)
         delta += fSternheimerParameters.a * std::pow(fSternheimerParameters.x1 - x, fSternheimerParameters.k);
     }
-  
+
     // Calculate stopping number.
-  
+
     double B = 0.5 * std::log(2.*me*bg*bg*tcut / (1.e-12 * sqr(fLP->ExcitationEnergy())))
       - 0.5 * beta*beta * (1. + tcut / tmax) - 0.5 * delta;
-  
+
     // Don't let the stopping number become negative.
-  
+
     if(B < 1.)
       B = 1.;
-  
+
     // Calculate dE/dx.
-  
+
     double dedx = Density() * K*fLP->AtomicNumber()*B / (fLP->AtomicMass() * beta*beta);
-  
+
     // Done.
-  
+
     return dedx;
   } // DetectorPropertiesStandard::Eloss()
-  
+
   //----------------------------------------------------------------------------------
   double DetectorPropertiesStandard::ElossVar(double mom, double mass) const
   {
     // Some constants.
-  
+
     double K = 0.307075;     // 4 pi N_A r_e^2 m_e c^2 (MeV cm^2/mol).
     double me = 0.510998918; // Electron mass (MeV/c^2).
-  
+
     // Calculate kinematic quantities.
-  
+
     double bg = mom / mass;          // beta*gamma.
     double gamma2 = 1. + bg*bg;      // gamma^2.
     double beta2 = bg*bg / gamma2;   // beta^2.
-  
+
     // Calculate final result.
-  
+
     double result = gamma2 * (1. - 0.5 * beta2) * me * (fLP->AtomicNumber() / fLP->AtomicMass()) * K * Density();
     return result;
   } // DetectorPropertiesStandard::ElossVar()
@@ -342,10 +342,10 @@ namespace detinfo{
   double   T0W =  90.371;  // K
 
 // From Craig Thorne . . . currently not documented
-// smooth transition from linear at small fields to 
+// smooth transition from linear at small fields to
 //     icarus fit at most fields to Walkowiak at very high fields
    if (efield < xFit) vd=efield*uFit;
-   else if (efield<0.619) { 
+   else if (efield<0.619) {
      vd = ((P1*(temperature-T0)+1)
 	       *(P3*efield*std::log(1+P4/efield) + P5*std::pow(efield,P6))
 	       +P2*(temperature-T0));
@@ -361,7 +361,7 @@ namespace detinfo{
    else {
      vd = ((P1W*(temperature-T0W)+1)
 	       *(P3W*efield*std::log(1+P4W/efield) + P5W*std::pow(efield,P6W))
-	       +P2W*(temperature-T0W));     
+	       +P2W*(temperature-T0W));
    }
 
   vd *= fDriftVelFudgeFactor/10.;
@@ -381,7 +381,7 @@ namespace detinfo{
   {
     // Correction for charge quenching using parameterization from
     // S.Amoruso et al., NIM A 523 (2004) 275
-    
+
     double  A3t    = util::kRecombA;
     double  K3t    = util::kRecombk;                     // in KV/cm*(g/cm^2)/MeV
     double  rho    = Density();                    // LAr density in g/cm^3
@@ -389,12 +389,12 @@ namespace detinfo{
     double E_field  = Efield();                           // Electric Field in the drift region in KV/cm
     K3t           /= rho;                                // KV/MeV
     double dEdx    = dQdx/(A3t/Wion-K3t/E_field*dQdx);    //MeV/cm
-    
+
     return dEdx;
-  }  
-  
+  }
+
   //----------------------------------------------------------------------------------
-  // Modified Box model correction 
+  // Modified Box model correction
   double DetectorPropertiesStandard::ModBoxCorrection(double dQdx) const
   {
     // Modified Box model correction has better behavior than the Birks
@@ -405,48 +405,48 @@ namespace detinfo{
     double Beta    = util::kModBoxB / (rho * E_field);
     double Alpha   = util::kModBoxA;
     double dEdx = (exp(Beta * Wion * dQdx ) - Alpha) / Beta;
-    
+
     return dEdx;
-    
+
   }
-  
+
   //------------------------------------------------------------------------------------//
-  int  DetectorPropertiesStandard::TriggerOffset()     const 
+  int  DetectorPropertiesStandard::TriggerOffset()     const
   {
     return fTPCClock.Ticks(fClocks->TriggerOffsetTPC() * -1.);
   }
-  
-  
+
+
   //--------------------------------------------------------------------
-  //  x<--> ticks conversion methods 
+  //  x<--> ticks conversion methods
   //
-  //  Ben Jones April 2012, 
+  //  Ben Jones April 2012,
   //  based on code by Herb Greenlee in SpacePointService
-  //  
-  
-  
+  //
+
+
 
 
   //--------------------------------------------------------------------
   // Take an X coordinate, and convert to a number of ticks, the
   // charge deposit occured at t=0
- 
+
   double DetectorPropertiesStandard::ConvertXToTicks(double X, int p, int t, int c) const
   {
     return (X / (fXTicksCoefficient * fDriftDirection.at(c).at(t)) +  fXTicksOffsets.at(c).at(t).at(p) );
   }
-  
+
 
 
   //-------------------------------------------------------------------
   // Take a cooridnate in ticks, and convert to an x position
   // assuming event deposit occured at t=0
- 
+
   double  DetectorPropertiesStandard::ConvertTicksToX(double ticks, int p, int t, int c) const
   {
-    return (ticks - fXTicksOffsets.at(c).at(t).at(p)) * fXTicksCoefficient * fDriftDirection.at(c).at(t);  
+    return (ticks - fXTicksOffsets.at(c).at(t).at(p)) * fXTicksCoefficient * fDriftDirection.at(c).at(t);
   }
-  
+
 
   //--------------------------------------------------------------------
   void DetectorPropertiesStandard::CheckIfConfigured() const
@@ -455,20 +455,20 @@ namespace detinfo{
     if (!fLP) throw cet::exception(__FUNCTION__) << "LArPropertiesStandard is uninitialized!";
     if (!fClocks) throw cet::exception(__FUNCTION__) << "DetectorClocks is uninitialized!";
   }
-  
-  
+
+
   //--------------------------------------------------------------------
   // Recalculte x<-->ticks conversion parameters from detector constants
-  
+
   void DetectorPropertiesStandard::CalculateXTicksParams()
   {
     CheckIfConfigured();
-    
+
     double samplingRate   = SamplingRate();
     double efield         = Efield();
     double temperature    = Temperature();
     double driftVelocity  = DriftVelocity(efield, temperature);
-    
+
     fXTicksCoefficient    = 0.001 * driftVelocity * samplingRate;
 
     double triggerOffset  = TriggerOffset();
@@ -493,8 +493,8 @@ namespace detinfo{
 	fXTicksOffsets[cstat][tpc].resize(nplane, 0.);
 	for(int plane = 0; plane < nplane; ++plane) {
 	  const geo::PlaneGeo& pgeom = tpcgeom.Plane(plane);
-	  
-	  
+
+
 	  // Get field in gap between planes
 	  double efieldgap[3];
 	  double driftVelocitygap[3];
@@ -504,11 +504,11 @@ namespace detinfo{
 	    driftVelocitygap[igap] = DriftVelocity(efieldgap[igap], temperature);
 	    fXTicksCoefficientgap[igap] = 0.001 * driftVelocitygap[igap] * samplingRate;
 	  }
-	  
+
 	  // Calculate geometric time offset.
 	  // only works if xyz[0]<=0
 	  const double* xyz = tpcgeom.PlaneLocation(0);
-	  
+
 	  fXTicksOffsets[cstat][tpc][plane] = -xyz[0]/(dir * fXTicksCoefficient) + triggerOffset;
 
 	  if (nplane==3){
@@ -525,7 +525,7 @@ namespace detinfo{
 	    for (int ip = 0; ip < plane; ++ip){
 	      fXTicksOffsets[cstat][tpc][plane] += tpcgeom.PlanePitch(ip,ip+1)/fXTicksCoefficientgap[ip+1];
 	    }
-	  }	  
+	  }
 	  else if (nplane==2){ ///< special case for ArgoNeuT
 	    /*
 	 |    ---------- plane = 1 (collection)
@@ -542,7 +542,7 @@ For plane = 0, t offset is pitch/Coeff[1] - (pitch+xyz[0])/Coeff[0]
 	    }
 	    fXTicksOffsets[cstat][tpc][plane] -= tpcgeom.PlanePitch()*(1/fXTicksCoefficient-1/fXTicksCoefficientgap[1]);
 	  }
-	  
+
 	  // Add view dependent offset
 	  // FIXME the offset should be plane-dependent
 	  geo::View_t view = pgeom.View();
@@ -593,18 +593,18 @@ For plane = 0, t offset is pitch/Coeff[1] - (pitch+xyz[0])/Coeff[0]
 
   double DetectorPropertiesStandard::GetXTicksOffset(int p, int t, int c) const
   {
-    return fXTicksOffsets.at(c).at(t).at(p);	
+    return fXTicksOffsets.at(c).at(t).at(p);
   }
 
-  
+
   //--------------------------------------------------------------------
   std::string DetectorPropertiesStandard::CheckTimeOffsetConfigurationAfterSetup
     () const
   {
-    
+
     std::ostringstream errors;
     auto const views = fGeo->Views();
-    
+
     if ((views.count(geo::kU) != 0) != fHasTimeOffsetU) {
       if (fHasTimeOffsetU)
         errors << "TimeOffsetU has been specified, but no U view is present.\n";
@@ -635,32 +635,32 @@ For plane = 0, t offset is pitch/Coeff[1] - (pitch+xyz[0])/Coeff[0]
       else
         errors << "TimeOffsetX missing for view X.\n";
     }
-    
+
     return errors.str();
-    
+
   } // DetectorPropertiesStandard::CheckTimeOffsetConfigurationAfterSetup()
-  
+
   //--------------------------------------------------------------------
   void DetectorPropertiesStandard::CheckConfigurationAfterSetup() const {
-    
+
     std::string errors;
-    
+
     errors += CheckTimeOffsetConfigurationAfterSetup();
-    
+
     if (!errors.empty()) {
       throw cet::exception("DetectorPropertiesStandard")
         << "Detected configuration errors: \n" << errors;
     }
-    
+
   } // DetectorPropertiesStandard::CheckConfigurationAfterSetup()
-  
+
   //--------------------------------------------------------------------
-  void DetectorPropertiesStandard::DoUpdateClocks() 
+  void DetectorPropertiesStandard::DoUpdateClocks()
   {
     CalculateXTicksParams();
   }
 
   //--------------------------------------------------------------------
-  
-  
+
+
 } // namespace

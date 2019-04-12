@@ -2,7 +2,7 @@
  * \file DetectorClocksException.h
  *
  * \ingroup DetectorClocks
- * 
+ *
  * \brief Class def header for exception classes in DetectorClocks data provider
  *
  * @author kazuhiro
@@ -30,7 +30,7 @@ namespace detinfo {
     {}
 
     virtual ~DetectorClocksException() throw(){};
-    virtual const char* msg() const throw() 
+    virtual const char* msg() const throw()
     {return _msg.c_str(); }
 
   private:
@@ -40,5 +40,5 @@ namespace detinfo {
 
 }
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

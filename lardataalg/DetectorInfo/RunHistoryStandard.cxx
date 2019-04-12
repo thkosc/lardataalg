@@ -24,20 +24,20 @@ namespace detinfo {
     fRun(-1), fNSubruns(0), fRunType(kUnknownRunType)
   {
   }
-  
+
   //-----------------------------------------------
   RunHistoryStandard::RunHistoryStandard(int run)
   {
     fRun=run;
   }
-  
+
   //------------------------------------------------
   RunHistoryStandard::~RunHistoryStandard()
   {
   }
 
   //------------------------------------------------
-  bool RunHistoryStandard::Update(uint64_t ts) 
+  bool RunHistoryStandard::Update(uint64_t ts)
   {
     if (ts == 0) return false;
 

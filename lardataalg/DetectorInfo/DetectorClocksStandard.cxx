@@ -17,7 +17,7 @@ detinfo::DetectorClocksStandard::DetectorClocksStandard()
     fTriggerTime(detinfo::kDEFAULT_TRIG_TIME),
     fBeamGateTime(detinfo::kDEFAULT_BEAM_TIME)
 {
-  
+
   fConfigName.at(detinfo::kG4RefTime)         = "G4RefTime";
   fConfigName.at(detinfo::kTriggerOffsetTPC)  = "TriggerOffsetTPC";
   fConfigName.at(detinfo::kFramePeriod)       = "FramePeriod";
@@ -93,7 +93,7 @@ bool detinfo::DetectorClocksStandard::IsRightConfig(const fhicl::ParameterSet& p
 {
   std::string s;
   double d;
-  
+
   // TODO replace with has_key()
   bool result = !ps.get_if_present("module_label", s);
   for(size_t i=0; result && i<kInheritConfigTypeMax; ++i)
@@ -113,8 +113,8 @@ void detinfo::DetectorClocksStandard::debugReport() const
     std::cout<<"    "<<fConfigName.at(i).c_str()<<" ... "<<fConfigValue.at(i)<<std::endl;
 
   std::cout<<std::endl;
-  
-  std::cout 
+
+  std::cout
     << "Trigger  time @ " << fTriggerTime       << std::endl
     << "BeamGate time @ " << fBeamGateTime      << std::endl
     << "TrigOffsetTPC @ " << TriggerOffsetTPC() << std::endl
@@ -131,7 +131,7 @@ void detinfo::DetectorClocksStandard::debugReport() const
     << "TPC G4 time 0 in tick : " << TPCG4Time2Tick(0) << std::endl
     << "Trigger in TPC tick   : " << Time2Tick(TriggerTime()) << std::endl
     << std::endl;
-  
+
 }
 
 //-----------------------------------------
@@ -139,12 +139,12 @@ void detinfo::DetectorClocksStandard::SetDefaultTriggerTime()
 //-----------------------------------------
 {
   std::vector<double> const& cfgValues = ConfigValues();
-  
+
   SetTriggerTime(
     cfgValues.at(detinfo::kDefaultTrigTime),
 		cfgValues.at(detinfo::kDefaultBeamTime)
     );
-  
+
 } // detinfo::DetectorClocksStandard::SetDefaultTriggerTime()
 
 

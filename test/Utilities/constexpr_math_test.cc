@@ -20,14 +20,14 @@
 
 // -----------------------------------------------------------------------------
 void test_abs() {
-  
+
   static_assert(util::abs(-0.0) == 0.0);
   static_assert(util::abs(-2.0) == 2.0);
   static_assert(util::abs(-2.0F) == 2.0F);
   static_assert(util::abs(-2) == 2);
   static_assert(util::abs(-2L) == 2L);
   static_assert(util::abs(-2LL) == 2LL);
-  
+
 } // test_abs()
 
 
@@ -35,9 +35,9 @@ void test_abs() {
 // BEGIN Test cases  -----------------------------------------------------------
 // -----------------------------------------------------------------------------
 BOOST_AUTO_TEST_CASE(constexpr_math_testcase) {
-  
+
   test_abs();
-  
+
 } // BOOST_AUTO_TEST_CASE(constexpr_math_testcase)
 
 

@@ -22,15 +22,15 @@
 
 // -----------------------------------------------------------------------------
 void test_datasize_literals() {
-  
+
   using namespace util::quantities::datasize_literals;
-  
+
   constexpr auto s_B = 256_B;
   static_assert(std::is_same<decltype(s_B), util::quantities::byte const>());
   static_assert(s_B == 256);
   static_assert(s_B == 256_B);
   std::cout << "Tested " << s_B << std::endl;
-  
+
   constexpr auto s_kiB = 4_kiB;
   static_assert
     (std::is_same<decltype(s_kiB), util::quantities::kibibyte const>());
@@ -38,7 +38,7 @@ void test_datasize_literals() {
   static_assert(s_kiB == 4);
   static_assert(s_kiB == 4096_B);
   std::cout << "Tested " << s_kiB << std::endl;
-  
+
   constexpr auto s_MiB = 4_MiB;
   static_assert
     (std::is_same<decltype(s_MiB), util::quantities::mebibyte const>());
@@ -46,7 +46,7 @@ void test_datasize_literals() {
   static_assert(s_MiB == 4);
   static_assert(s_MiB == 4096_kiB);
   std::cout << "Tested " << s_MiB << std::endl;
-  
+
   constexpr auto s_GiB = 4_GiB;
   static_assert
     (std::is_same<decltype(s_GiB), util::quantities::gibibyte const>());
@@ -54,7 +54,7 @@ void test_datasize_literals() {
   static_assert(s_GiB == 4);
   static_assert(s_GiB == 4096_MiB);
   std::cout << "Tested " << s_GiB << std::endl;
-  
+
   constexpr auto s_TiB = 4_TiB;
   static_assert
     (std::is_same<decltype(s_TiB), util::quantities::tebibyte const>());
@@ -62,7 +62,7 @@ void test_datasize_literals() {
   static_assert(s_TiB == 4);
   static_assert(s_TiB == 4096_GiB);
   std::cout << "Tested " << s_TiB << std::endl;
-  
+
   constexpr auto s_PiB = 4_PiB;
   static_assert
     (std::is_same<decltype(s_PiB), util::quantities::pebibyte const>());
@@ -70,7 +70,7 @@ void test_datasize_literals() {
   static_assert(s_PiB == 4);
   static_assert(s_PiB == 4096_TiB);
   std::cout << "Tested " << s_PiB << std::endl;
-  
+
   constexpr auto s_EiB = 4_EiB;
   static_assert
     (std::is_same<decltype(s_EiB), util::quantities::exbibyte const>());
@@ -78,7 +78,7 @@ void test_datasize_literals() {
   static_assert(s_EiB == 4);
   static_assert(s_EiB == 4096_PiB);
   std::cout << "Tested " << s_EiB << std::endl;
-  
+
 } // test_datasize_literals()
 
 
@@ -86,9 +86,9 @@ void test_datasize_literals() {
 // BEGIN Test cases  -----------------------------------------------------------
 // -----------------------------------------------------------------------------
 BOOST_AUTO_TEST_CASE(datasize_testcase) {
-  
+
   test_datasize_literals();
-  
+
 } // BOOST_AUTO_TEST_CASE(datasize_testcase)
 
 

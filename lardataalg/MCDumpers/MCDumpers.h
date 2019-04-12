@@ -3,9 +3,9 @@
  * @brief  Utility functions to print MC truth information.
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 2, 2017
- * 
+ *
  * Functions dumping Monte Carlo data product objects (`sim::dump` namespace).
- * 
+ *
  */
 
 #ifndef LARDATAALG_MCDUMPERS_MCDUMPERS_H
@@ -31,10 +31,10 @@
 
 
 namespace sim {
-  
+
   /// Functions to dump Monte Carlo object information into a stream.
   namespace dump {
-    
+
     //--------------------------------------------------------------------------
     //@{
     /**
@@ -44,10 +44,10 @@ namespace sim {
      * @param particle the particle to be dumped
      * @param indent base indentation string (default: none)
      * @param firstIndent indentation of first line (default: as `indent`)
-     * 
+     *
      * The `indent` string is prepended to every line of output, except for
      * the first one, where `firstIndent` is used.
-     * 
+     *
      * The output starts on the current line, and the last line is NOT broken.
      */
     template <typename Stream>
@@ -55,15 +55,15 @@ namespace sim {
       Stream&& out, simb::MCParticle const& particle,
       std::string indent, std::string firstIndent
       );
-    
+
     template <typename Stream>
     void DumpMCParticle
       (Stream&& out, simb::MCParticle const& particle, std::string indent = "")
       { DumpMCParticle(std::forward<Stream>(out), particle, indent, indent); }
-    
+
     //@}
-    
-    
+
+
     //--------------------------------------------------------------------------
     //@{
     /**
@@ -73,14 +73,14 @@ namespace sim {
      * @param trajectory the particle trajectory to be dumped
      * @param pointsPerLine number of points dumped per line (default: all)
      * @param indent base indentation string (default: none)
-     * 
+     *
      * All points of the specified Monte Carlo `trajectory` are printed
      * on screen, `pointsPerLine` on each line.
      * The points are printed starting on a new line, and each line is applied
      * the same indentation string (`indent`).
      * As an exception, if `pointsPerLine` is not specified, all points are
      * printed on the current line and `indent` is ignored.
-     * 
+     *
      * The last line of the output is NOT broken.
      */
     template <typename Stream>
@@ -88,17 +88,17 @@ namespace sim {
       Stream&& out, simb::MCTrajectory const& trajectory,
       unsigned int pointsPerLine, std::string indent
       );
-    
+
     template <typename Stream>
     void DumpMCParticleTrajectory
       (Stream&& out, simb::MCTrajectory const& trajectory)
       {
         DumpMCParticleTrajectory(std::forward<Stream>(out), trajectory, 0U, "");
       }
-    
+
     // @}
-    
-    
+
+
     //--------------------------------------------------------------------------
     // @{
     /**
@@ -109,10 +109,10 @@ namespace sim {
      * @param indent base indentation string (default: none)
      * @param firstIndent string to be used for indentation of the first line
      *                    (default: as `indent`)
-     * 
+     *
      * The `indent` string is prepended to every line of output, except for
      * the first one, where `firstIndent` is used.
-     * 
+     *
      * The output starts on the current line, and the last line is NOT broken.
      */
     template <typename Stream>
@@ -120,15 +120,15 @@ namespace sim {
       Stream&& out, simb::MCNeutrino const& neutrino,
       std::string indent, std::string firstIndent
       );
-    
+
     template <typename Stream>
     void DumpMCNeutrino
       (Stream&& out, simb::MCNeutrino const& neutrino, std::string indent = "")
       { DumpMCNeutrino(std::forward<Stream>(out), neutrino, indent, indent); }
-    
+
     // @}
-    
-    
+
+
     //--------------------------------------------------------------------------
     // @{
     /**
@@ -141,16 +141,16 @@ namespace sim {
      * @param indent base indentation string (default: none)
      * @param firstIndent string to be used for indentation of the first line
      *                    (default: same as `indent`)
-     * 
+     *
      * The `indent` string is prepended to every line of output, except for
      * the first one, where `firstIndent` is used.
-     * 
+     *
      * The argument `pointsPerLine` regulates the dump of trajectory points from
      * all the particles in the record (except the ones stored in the neutrino
      * object). Setting it to `0`, or leaving it out, will suppress the dump of
      * particle trajectories completely. There is no option to reduce the number
      * of printed trajectory points: it's just all or none.
-     * 
+     *
      * The output starts on the current line, and the last line is NOT broken.
      */
     template <typename Stream>
@@ -158,7 +158,7 @@ namespace sim {
       Stream&& out, simb::MCTruth const& truth, unsigned int pointsPerLine,
       std::string indent, std::string firstIndent
       );
-    
+
     template <typename Stream>
     void DumpMCTruth(
       Stream&& out, simb::MCTruth const& truth, unsigned int pointsPerLine,
@@ -168,23 +168,23 @@ namespace sim {
         DumpMCTruth
           (std::forward<Stream>(out), truth, pointsPerLine, indent, indent);
       }
-    
+
     template <typename Stream>
     void DumpMCTruth(
       Stream&& out, simb::MCTruth const& truth,
       std::string indent, std::string firstIndent
       )
       { DumpMCTruth(std::forward<Stream>(out), truth, 0, indent, firstIndent); }
-    
+
     template <typename Stream>
     void DumpMCTruth(
       Stream&& out, simb::MCTruth const& truth, std::string indent = ""
       )
       { DumpMCTruth(std::forward<Stream>(out), truth, indent, indent); }
-    
+
     // @}
-    
-    
+
+
     //--------------------------------------------------------------------------
     // @{
     /**
@@ -195,10 +195,10 @@ namespace sim {
      * @param indent base indentation string (default: none)
      * @param firstIndent string to be used for indentation of the first line
      *                    (default: as `indent`)
-     * 
+     *
      * The `indent` string is prepended to every line of output, except for
      * the first one, where `firstIndent` is used.
-     * 
+     *
      * The output starts on the current line, and the last line is NOT broken.
      */
     template <typename Stream>
@@ -206,18 +206,18 @@ namespace sim {
       Stream&& out, simb::GTruth const& truth,
       std::string indent, std::string firstIndent
       );
-    
+
     template <typename Stream>
     void DumpGTruth
       (Stream&& out, simb::GTruth const& truth, std::string indent = "")
       { DumpGTruth(std::forward<Stream>(out), truth, indent, indent); }
-    
+
     // @}
-    
+
     //--------------------------------------------------------------------------
-    
+
   } // namespace dump
-  
+
 } // namespace sim
 
 
@@ -244,7 +244,7 @@ void sim::dump::DumpMCParticle(
     << (particle.Process().empty()? "magics": particle.Process());
   if (particle.Mother() == 0) out << " by the gods";
   else                        out << " from ID=" << particle.Mother();
-  
+
   const unsigned int nDaughters = particle.NumberDaughters();
   const unsigned int nPoints = particle.NumberTrajectoryPoints();
   if (nPoints > 0) {
@@ -280,7 +280,7 @@ void sim::dump::DumpMCParticle(
     out << "\n" << indent << "comes with a trajectory " << traj.TotalLength()
       << " cm long in " << nPoints << " points";
   } // if has points
- 
+
 } // sim::dump::DumpMCParticle()
 
 
@@ -297,11 +297,11 @@ void sim::dump::DumpMCParticleTrajectory(
       page = pointsPerLine - 1;
     }
     else out << " -- ";
-    
+
     TLorentzVector const& pos = pair.first;
     out << pos;
   } // for trajectory points
-  
+
 } // sim::dump::DumpMCParticleTrajectory()
 
 
@@ -337,7 +337,7 @@ void sim::dump::DumpMCNeutrino(
   DumpMCParticle(std::forward<Stream>(out), nu.Nu(), indent + "  ", "");
   out << '\n' << indent << "outgoing lepton: ";
   DumpMCParticle(std::forward<Stream>(out), nu.Lepton(), indent + "  ", "");
-  
+
 } // sim::dump::DumpMCNeutrino()
 
 
@@ -360,7 +360,7 @@ void sim::dump::DumpMCTruth(
     out << '\n' << indent << "[#" << i << "] ";
     simb::MCParticle const& particle = truth.GetParticle(i);
     DumpMCParticle(std::forward<Stream>(out), particle, indent + "  ", "");
-    
+
     const unsigned int nPoints = particle.NumberTrajectoryPoints();
     if ((nPoints > 0) && (pointsPerLine > 0)) {
       out << ":";
@@ -370,7 +370,7 @@ void sim::dump::DumpMCTruth(
         );
     } // if has points
   } // for all particles
-  
+
 } // sim::dump::DumpMCTruth()
 
 
@@ -380,7 +380,7 @@ void sim::dump::DumpGTruth(
   Stream&& out, simb::GTruth const& truth,
   std::string indent, std::string firstIndent
 ) {
-  
+
   unsigned int const nCharged
     = truth.fNumPiPlus + truth.fNumPiMinus + truth.fNumProton;
   unsigned int const nNeutral = truth.fNumPi0 + truth.fNumNeutron;
@@ -388,19 +388,19 @@ void sim::dump::DumpGTruth(
     = truth.fNumPiPlus + truth.fNumPiMinus + truth.fNumPi0;
   unsigned int const nNucleons = truth.fNumProton + truth.fNumNeutron;
   unsigned int const nTotalParticles = nCharged + nNeutral;
-  
+
   out << firstIndent
       << "interaction code: " << truth.fGint
       << ", neutrino scattering code: " << truth.fGscatter
       << " at " << truth.fVertex
-    << "\n" << indent 
+    << "\n" << indent
       << "probe: " << ParticleName(truth.fProbePDG)
       << " with cp=" << truth.fProbeP4
       << " hit nucleon with cp=" << truth.fHitNucP4 << " GeV"
       << " (" << (truth.fIsSeaQuark? "": "not a ") << "sea quark)"
       << " in target: " << ParticleName(truth.ftgtPDG)
       << " (Z: " << truth.ftgtZ << ", A: " << truth.ftgtA << ")"
-    << "\n" << indent 
+    << "\n" << indent
       << "event interaction weight (genie internal): " << truth.fweight
       << ", interaction probability: " << truth.fprobability
       << ", cross section: " << truth.fXsec
@@ -431,7 +431,7 @@ void sim::dump::DumpGTruth(
     << "\n" << indent
       << "FShadSyst: " << truth.fFShadSystP4
     ;
-  
+
 } // sim::DumpGTruth::DumpTruth()
 
 

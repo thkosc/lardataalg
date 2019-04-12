@@ -7,7 +7,7 @@
  * @see     StatCollector.h
  *
  * See http://www.boost.org/libs/test for the Boost test library home page.
- * 
+ *
  * Timing:
  * not given yet
  */
@@ -53,9 +53,9 @@ void CheckStats(
   W sumsq,
   W rms // might as well compute it myself...
 ) {
-  
+
   using Weight_t = W;
-  
+
   BOOST_CHECK_EQUAL(stats.N(),       n);
   if (n == 0) {
     BOOST_CHECK_THROW(stats.AverageWeight(), std::range_error);
@@ -99,9 +99,9 @@ void CheckStats(
   W cov,
   W lin_corr
 ) {
-  
+
   using Weight_t = W;
-  
+
   BOOST_CHECK_EQUAL(stats.N(),       n);
   if (n == 0) {
     BOOST_CHECK_THROW(stats.AverageWeight(), std::range_error);
@@ -110,7 +110,7 @@ void CheckStats(
     const Weight_t average = weights / n;
     BOOST_CHECK_CLOSE(double(stats.AverageWeight()), double(average), 0.1);
   }
-  
+
   if (weights == 0.) {
     BOOST_CHECK_SMALL(double(stats.Weights()),  0.01);
     BOOST_CHECK_SMALL(double(stats.SumX()),     0.01);
@@ -146,7 +146,7 @@ void CheckStats(
     BOOST_CHECK_CLOSE(double(stats.Covariance()),        double(cov),       0.1);
     BOOST_CHECK_CLOSE(double(stats.LinearCorrelation()), double(lin_corr),  0.1);
   }
-  
+
 } // CheckStats<>(StatCollector2D)
 
 
@@ -157,12 +157,12 @@ void CheckStats(
  */
 template <typename T, typename W = T>
 void StatCollectorTest() {
-  
+
   using Data_t = T;
   using Weight_t = W;
-  
+
   using WeightedData_t = std::vector<std::pair<Data_t, Weight_t>>;
-  
+
   // prepare input data
   std::valarray<Data_t> unweighted_data{
     Data_t(5), Data_t(7), Data_t(7), Data_t(13)
@@ -178,7 +178,7 @@ void StatCollectorTest() {
   Weight_t uw_sum     = Weight_t( 32.);
   Weight_t uw_sumsq   = Weight_t(292.);
   Weight_t uw_rms     = Weight_t(  3.);
-  
+
   WeightedData_t weighted_data({
     { Data_t(5), Weight_t(1) },
     { Data_t(7), Weight_t(2) },
@@ -189,15 +189,15 @@ void StatCollectorTest() {
   Weight_t w_sum     = Weight_t( 32.);
   Weight_t w_sumsq   = Weight_t(292.);
   Weight_t w_rms     = Weight_t(  3.);
-  
+
   //
   // part I: construction
   //
   lar::util::StatCollector<Data_t, Weight_t> stats;
-  
+
   // check that everything is 0 or NaN-like
   CheckStats<Data_t, Weight_t>(stats, 0, 0., 0., 0., 0. /* should not be used */);
-  
+
   //
   // part II: add elements one by one
   //
@@ -205,27 +205,27 @@ void StatCollectorTest() {
   stats.add(5);    // w =   1   sum =    5   sum2 =     25
   stats.add(7, 2); // w =   3   sum =   19   sum2 =    123
   stats.add(13);   // w =   4   sum =   32   sum2 =    292
-  
+
   CheckStats<Data_t, Weight_t>(stats, w_n, w_weights, w_sum, w_sumsq, w_rms);
-  
-  
+
+
   //
   // part III: add unweighted elements by bulk
   //
-  
+
   // - III.1: clear the statistics
   stats.clear();
   CheckStats<Data_t, Weight_t>(stats, 0, 0., 0., 0., 0. /* should not be used */);
-  
+
   // - III.2: fill by iterators
   stats.add_unweighted(std::begin(unweighted_data), std::end(unweighted_data));
   CheckStats(stats, uw_n, uw_weights, uw_sum, uw_sumsq, uw_rms);
-  
+
   // - III.3: fill by container
   stats.clear();
   stats.add_unweighted(unweighted_data);
   CheckStats(stats, uw_n, uw_weights, uw_sum, uw_sumsq, uw_rms);
-  
+
   // - III.4: fill by iterators and extractor
   stats.clear();
   stats.add_unweighted(
@@ -233,30 +233,30 @@ void StatCollectorTest() {
     [](std::pair<Data_t, Weight_t> d){ return d.first; }
     );
   CheckStats(stats, uw_n, uw_weights, uw_sum, uw_sumsq, uw_rms);
-  
+
   // - III.5: fill by container and extractor
   stats.clear();
   stats.add_unweighted(unweighted_data_weight,
     [](std::pair<Data_t, Weight_t> d){ return d.first; }
     );
   CheckStats(stats, uw_n, uw_weights, uw_sum, uw_sumsq, uw_rms);
-  
-  
+
+
   //
   // part IV: add weighted elements by bulk
   //
-  
+
   // - IV.1: fill by iterators
   stats.clear();
   stats.add_weighted(weighted_data.begin(), weighted_data.end());
   CheckStats(stats, w_n, w_weights, w_sum, w_sumsq, w_rms);
-  
+
   // - IV.2: fill by container
   stats.clear();
   stats.add_weighted(weighted_data);
   CheckStats(stats, w_n, w_weights, w_sum, w_sumsq, w_rms);
-  
-  
+
+
 } // StatCollectorTest()
 
 
@@ -267,17 +267,17 @@ void StatCollectorTest() {
  */
 template <typename T, typename W = T>
 void StatCollector2DTest() {
-  
+
   using Data_t = T;
   using Weight_t = W;
-  
-  
+
+
   using UnweightedItem_t = std::pair<Data_t, Data_t>;
   using WeightedItem_t = std::tuple<Data_t, Data_t, Weight_t>;
-  
+
 //  using UnweightedData_t = std::vector<std::pair<Data_t, Data_t>>;
   using WeightedData_t = std::vector<WeightedItem_t>;
-  
+
   // prepare input data
   std::vector<UnweightedItem_t> unweighted_data{
     { Data_t(5),  Data_t(10) },
@@ -305,7 +305,7 @@ void StatCollector2DTest() {
   Weight_t uw_sumXY    = Weight_t(  584.);
   Weight_t uw_cov      = Weight_t(   18.);
   Weight_t uw_lin_corr = Weight_t(    1.);
-  
+
   WeightedData_t weighted_data({
     WeightedItem_t{ Data_t(5),  Data_t(10), Weight_t(1) },
     WeightedItem_t{ Data_t(7),  Data_t(14), Weight_t(2) },
@@ -322,19 +322,19 @@ void StatCollector2DTest() {
   Weight_t w_sumXY    = Weight_t(  584.);
   Weight_t w_cov      = Weight_t(   18.);
   Weight_t w_lin_corr = Weight_t(    1.);
-  
+
   //
   // part I: construction
   //
   lar::util::StatCollector2D<Data_t, Weight_t> stats;
-  
+
   // check that everything is 0 or NaN-like
   CheckStats<Data_t, Weight_t>(stats, 0, 0.,
     0., 0., 0. /* should not be used */,
     0., 0., 0. /* should not be used */,
     0., 0. /* should not be used */, 0. /* should not be used */
     );
-  
+
   //
   // part II: add elements one by one
   //
@@ -347,19 +347,19 @@ void StatCollector2DTest() {
     else
       stats.add(std::get<0>(data), std::get<1>(data), std::get<2>(data));
   } // for
-  
+
   // by construction of the input, the statistics for X and Y are the same
   CheckStats<Data_t, Weight_t>(stats, w_n, w_weights,
     w_sumX, w_sumsqX, w_rmsX,
     w_sumY, w_sumsqY, w_rmsY,
     w_sumXY, w_cov, w_lin_corr
     );
-  
-  
+
+
   //
   // part III: add unweighted elements by bulk
   //
-  
+
   // - III.1: clear the statistics
   stats.clear();
   CheckStats<Data_t, Weight_t>(stats, 0, 0.,
@@ -367,7 +367,7 @@ void StatCollector2DTest() {
     0., 0., 0. /* should not be used */,
     0., 0. /* should not be used */, 0. /* should not be used */
     );
-  
+
   // - III.2: fill by iterators
   stats.add_unweighted(std::begin(unweighted_data), std::end(unweighted_data));
   CheckStats<Data_t, Weight_t>(stats, uw_n, uw_weights,
@@ -375,7 +375,7 @@ void StatCollector2DTest() {
     uw_sumY, uw_sumsqY, uw_rmsY,
     uw_sumXY, uw_cov, uw_lin_corr
     );
-  
+
   // - III.3: fill by container
   stats.clear();
   stats.add_unweighted(unweighted_data);
@@ -384,7 +384,7 @@ void StatCollector2DTest() {
     uw_sumY, uw_sumsqY, uw_rmsY,
     uw_sumXY, uw_cov, uw_lin_corr
     );
-  
+
   // - III.4: fill by iterators and extractor
   stats.clear();
   stats.add_unweighted(
@@ -397,7 +397,7 @@ void StatCollector2DTest() {
     uw_sumY, uw_sumsqY, uw_rmsY,
     uw_sumXY, uw_cov, uw_lin_corr
     );
-  
+
   // - III.5: fill by container and extractor
   stats.clear();
   stats.add_unweighted(unweighted_data_weight,
@@ -409,12 +409,12 @@ void StatCollector2DTest() {
     uw_sumY, uw_sumsqY, uw_rmsY,
     uw_sumXY, uw_cov, uw_lin_corr
     );
-  
-  
+
+
   //
   // part IV: add weighted elements by bulk
   //
-  
+
   // - IV.1: fill by iterators
   stats.clear();
   stats.add_weighted(weighted_data.begin(), weighted_data.end());
@@ -423,7 +423,7 @@ void StatCollector2DTest() {
     w_sumY, w_sumsqY, w_rmsY,
     w_sumXY, w_cov, w_lin_corr
     );
-  
+
   // - IV.2: fill by container
   stats.clear();
   stats.add_weighted(weighted_data);
@@ -432,75 +432,75 @@ void StatCollector2DTest() {
     w_sumY, w_sumsqY, w_rmsY,
     w_sumXY, w_cov, w_lin_corr
     );
-  
-  
+
+
 } // StatCollectorTest2D()
 
 
 /**
  * @brief Tests MinMaxCollector object with a known input
- * 
+ *
  */
 template <typename T>
 void MinMaxCollectorTest() {
-  
+
   using Data_t = T;
-  
+
   std::initializer_list<Data_t> more_data{ 7, -20,  44, 78, 121 }; // [-20,121]
   // BUG the double brace syntax is required to work around clang bug 21629
   // (https://bugs.llvm.org/show_bug.cgi?id=21629)
   std::array<Data_t, 5> even_more_data   {{ 7,  -2, 123, 78, 121 }}; // [-2,123]
-  
+
   // for easier notation
   std::unique_ptr<lar::util::MinMaxCollector<Data_t>> collector;
-  
+
   //
   // 1. from default constructor
   //
   collector.reset(new lar::util::MinMaxCollector<Data_t>);
-  
+
   // there should be no data now
   BOOST_CHECK(!collector->has_data());
-  
+
   collector->add(Data_t(10));
   // there should be some data now
   BOOST_CHECK(collector->has_data());
-  
+
   BOOST_CHECK_EQUAL(collector->min(), Data_t(  10));
   BOOST_CHECK_EQUAL(collector->max(), Data_t(  10));
-  
+
   collector->add(more_data);
   BOOST_CHECK_EQUAL(collector->min(), Data_t( -20));
   BOOST_CHECK_EQUAL(collector->max(), Data_t( 121));
-  
+
   collector->add(even_more_data.begin(), even_more_data.end());
   BOOST_CHECK_EQUAL(collector->min(), Data_t( -20));
   BOOST_CHECK_EQUAL(collector->max(), Data_t( 123));
-  
+
   //
   // 2. from initializer list constructor
   //
   collector.reset(new lar::util::MinMaxCollector<Data_t>{ -25, 3, 1 });
-  
+
   // there should be data already
   BOOST_CHECK(collector->has_data());
-  
+
   collector->add(Data_t(10));
   // there should still be some data
   BOOST_CHECK(collector->has_data());
-  
+
   BOOST_CHECK_EQUAL(collector->min(), Data_t(  -25));
   BOOST_CHECK_EQUAL(collector->max(), Data_t(  10));
-  
+
   collector->add(more_data);
   BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
   BOOST_CHECK_EQUAL(collector->max(), Data_t( 121));
-  
+
   collector->add(even_more_data.begin(), even_more_data.end());
   BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
   BOOST_CHECK_EQUAL(collector->max(), Data_t( 123));
-  
-  
+
+
   //
   // 3. from initializer list constructor
   //
@@ -510,25 +510,25 @@ void MinMaxCollectorTest() {
   collector.reset(
     new lar::util::MinMaxCollector<Data_t>(init_data.begin(), init_data.end())
     );
-  
+
   // there should be data already
   BOOST_CHECK(collector->has_data());
-  
+
   collector->add(Data_t(10));
   // there should still be some data
   BOOST_CHECK(collector->has_data());
-  
+
   BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
   BOOST_CHECK_EQUAL(collector->max(), Data_t(  10));
-  
+
   collector->add(more_data);
   BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
   BOOST_CHECK_EQUAL(collector->max(), Data_t( 121));
-  
+
   collector->add(even_more_data.begin(), even_more_data.end());
   BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
   BOOST_CHECK_EQUAL(collector->max(), Data_t( 123));
-  
+
 } // MinMaxCollectorTest()
 
 

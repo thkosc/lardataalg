@@ -4,7 +4,7 @@
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 2, 2017
  * @see    lardataalg/MCDumpers/MCDumpersUtils.h
- * 
+ *
  */
 
 // library header
@@ -40,7 +40,7 @@ std::string sim::TruthCCNCname(int ccnc) {
 
 //------------------------------------------------------------------------------
 std::string sim::TruthReactionMode(int mode) {
-  
+
   switch (mode) {
     case  0: return "quasi-elastic";
     case  1: return "resonant";
@@ -48,7 +48,7 @@ std::string sim::TruthReactionMode(int mode) {
     case  3: return "coherent";
     default: return "unknown mode";
   } // switch
-  
+
 } // sim::TruthReactionMode()
 
 
@@ -139,7 +139,7 @@ std::string sim::ParticleStatusName(int code) {
     case 16: return "nucleon cluster target";
     default: return "unknown";
   } // switch
-  
+
 } // sim::ParticleStatusName
 
 
@@ -149,5 +149,5 @@ std::string sim::ParticleName(int pigid) {
   return PDGinfo? PDGinfo->GetTitle(): ("PDG ID " + std::to_string(pigid));
 } // sim::ParticleName()
 
-  
+
 //------------------------------------------------------------------------------

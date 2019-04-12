@@ -5,20 +5,20 @@
  * @date   October 30, 2018
  * @see    lardataalg/Utilities/quantities.h,
  *         lardataalg/Utilities/quantities/spacetime.h
- * 
+ *
  * Set of quantities related to frequency (inverse of time). Currently,
  * quantities are defined based on the following units:
  * * hertz (Hz, kHz, MHz, GHz)
- * 
+ *
  * Also, special operations with units from`util::quantities::unit::Second` are
  * supported:
  * * _t_ x _f_ = _s_
  * * _s_ / _t_ = _f_
  * * _s_ / _f_ = _t_
  * where _t_ is a time, _f_ a frequency and _s_ a pure number.
- * 
+ *
  * This is a header-only library.
- * 
+ *
  */
 
 #ifndef LARDATAALG_UTILITIES_QUANTITIES_FREQUENCY_H
@@ -36,99 +36,99 @@
 
 //------------------------------------------------------------------------------
 namespace util::quantities {
-  
+
   namespace units {
-    
+
     using namespace std::string_view_literals; // for operator""sv()
-    
+
     struct Hertz: public concepts::UnitBase {
       static constexpr auto symbol = "Hz"sv;
       static constexpr auto name   = "hertz"sv;
     };
-    
+
   } // namespace units
-  
-  
+
+
   // -- BEGIN Frequency --------------------------------------------------------
   /**
    * @name Frequency quantities
-   * 
+   *
    * These frequency quantities are tied to `util::quantities::units::Hertz`.
    * A few options are provided:
-   * 
+   *
    * * most general template, `scaled_hertz`, allowing to choose both the scale
    *     of the unit (e.g. `std::kilo` for kilohertz) and the type of the
    *     numerical representation
    * * generic template (e.g. `hertz_as`), allowing to choose which numerical
    *     representation to use
    * * double precision (e.g. `hertz`), ready for use
-   * 
+   *
    */
   /// @{
-  
+
   /// The most generic `units::Hertz`-based quantity.
   template <typename R, typename T = double>
   using scaled_hertz = concepts::scaled_quantity<units::Hertz, R, T>;
-  
+
   //
   // hertz
   //
   /// Type of frequency stored in hertz.
   template <typename T = double>
   using hertz_as = scaled_hertz<std::ratio<1>, T>;
-  
+
   /// Type of frequency stored in hertz, in double precision.
   using hertz = hertz_as<>;
-  
+
   //
   // kilohertz
   //
   /// Type of frequency stored in kilohertz.
   template <typename T = double>
   using kilohertz_as = concepts::rescale<hertz_as<T>, std::kilo>;
-  
+
   /// Type of frequency stored in kilohertz, in double precision.
   using kilohertz = kilohertz_as<>;
-  
+
   //
   // megahertz
   //
   /// Type of frequency stored in megahertz.
   template <typename T = double>
   using megahertz_as = concepts::rescale<hertz_as<T>, std::mega>;
-  
+
   /// Type of frequency stored in megahertz, in double precision.
   using megahertz = megahertz_as<>;
-  
+
   //
   // gigahertz
   //
   /// Type of frequency stored in gigahertz.
   template <typename T = double>
   using gigahertz_as = concepts::rescale<hertz_as<T>, std::giga>;
-  
+
   /// Type of frequency stored in gigahertz, in double precision.
   using gigahertz = gigahertz_as<>;
-  
-  
+
+
   /**
    * @brief Literal constants for frequency quantities.
-   * 
+   *
    * These functions allow a simplified syntax for specifying a frequency
    * quantity. In order to use these, their namespace must be used:
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
    * using namespace util::quantities::frequency_literals;
-   * 
+   *
    * // definition of `util::quantities::hertz` constant:
    * constexpr auto f_Hz = 12_Hz;
-   * 
+   *
    * // assignment (likely to a quantity) of `util::quantities::megahertz{50.0}`
    * f_Hz = 50_MHz;
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   * 
+   *
    */
   namespace frequency_literals {
-    
+
     // @{
     /// Literal hertz value.
     constexpr hertz operator""_Hz (long double v)
@@ -136,7 +136,7 @@ namespace util::quantities {
     constexpr hertz operator""_Hz (unsigned long long int v)
       { return hertz{ static_cast<double>(v) }; }
     // @}
-    
+
     // @{
     /// Literal kilohertz value.
     constexpr kilohertz operator""_kHz (long double v)
@@ -144,7 +144,7 @@ namespace util::quantities {
     constexpr kilohertz operator""_kHz (unsigned long long int v)
       { return kilohertz{ static_cast<double>(v) }; }
     // @}
-    
+
     // @{
     /// Literal megahertz value.
     constexpr megahertz operator""_MHz (long double v)
@@ -152,7 +152,7 @@ namespace util::quantities {
     constexpr megahertz operator""_MHz (unsigned long long int v)
       { return megahertz{ static_cast<double>(v) }; }
     // @}
-    
+
     // @{
     /// Literal gigahertz value.
     constexpr gigahertz operator""_GHz (long double v)
@@ -160,27 +160,27 @@ namespace util::quantities {
     constexpr gigahertz operator""_GHz (unsigned long long int v)
       { return gigahertz{ static_cast<double>(v) }; }
     // @}
-    
+
   } // namespace frequency_literals
-  
-  
+
+
   /// @}
   // -- END Frequency ----------------------------------------------------------
-  
-  
+
+
   // -- BEGIN Special operations between Second and Hertz units ----------------
   /**
    * @name Special operations between Second and Hertz units.
-   * 
+   *
    * The following operations are supported:
    * * _t_ x _f_ = _s_
    * * _s_ / _t_ = _f_ // TODO
    * * _s_ / _f_ = _t_ // TODO
    * where _t_ is a time, _f_ a frequency and _s_ a pure number.
-   * 
+   *
    */
   /// @{
-  
+
   namespace concepts {
     //@{
     /**
@@ -192,7 +192,7 @@ namespace util::quantities {
      * @param t time quantity, based on `util::quantities::units::Second`
      * @param f frequency quantity, based on `util::quantities::units::Hertz`
      * @return the product of the two (using the C++ type of `TT * FT`)
-     * 
+     *
      */
     template <typename TR, typename TT, typename FR, typename FT>
     constexpr auto operator*(
@@ -208,8 +208,8 @@ namespace util::quantities {
       )
       { return t * f; }
     //@}
-    
-    
+
+
     /**
      * @brief Returns a frequency as the inverse of a time.
      * @tparam T type of pure number
@@ -218,7 +218,7 @@ namespace util::quantities {
      * @param v scalar value to be divided
      * @param t time quantity, based on `util::quantities::unit::Second`
      * @return a frequency _f_ so that `f * t` equals `v`
-     * 
+     *
      * The scale of the frequency unit is the inverse of the time one (e.g.,
      * a division by `util::quantities::millisecond` gives
      * `util::quantities::kilohertz`).
@@ -237,8 +237,8 @@ namespace util::quantities {
         >
         >
       ;
-    
-    
+
+
     /**
      * @brief Returns a time as the inverse of a frequency.
      * @tparam T type of pure number
@@ -247,7 +247,7 @@ namespace util::quantities {
      * @param v scalar value to be divided
      * @param t frequency quantity, based on `util::quantities::unit::Hertz`
      * @return a time _t_ so that `t * f` equals `v`
-     * 
+     *
      * The scale of the time unit is the inverse of the frequency one (e.g.,
      * a division by `util::quantities::kilohertz` gives
      * `util::quantities::millisecond`).
@@ -266,14 +266,14 @@ namespace util::quantities {
         >
         >
       ;
-    
-    
+
+
   } // namespace concepts
-  
+
   /// @}
   // -- END Special operations between Second and Hertz units ------------------
 
-  
+
 } // namespace util::quantities
 
 //------------------------------------------------------------------------------
