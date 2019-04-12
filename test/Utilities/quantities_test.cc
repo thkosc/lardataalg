@@ -17,7 +17,6 @@
 #include "lardataalg/Utilities/quantities/frequency.h"
 
 // C/C++ standard libraries
-#include <string>
 #include <type_traits> // std::decay_t<>
 
 // -----------------------------------------------------------------------------

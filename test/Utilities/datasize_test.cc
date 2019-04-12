@@ -16,7 +16,6 @@
 #include "lardataalg/Utilities/quantities/datasize.h"
 
 // C/C++ standard libraries
-#include <string>
 #include <iostream>
 #include <type_traits> // std::decay_t<>
 
