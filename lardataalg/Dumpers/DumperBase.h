@@ -22,7 +22,8 @@
 #include <algorithm> // std::min()
 #include <ios> // std::fixed
 #include <iomanip> // std::setprecision(), std::setw()
-#include <utility> // std::forward(), std::swap()
+#include <utility> // std::forward(), std::swap(), std::move()
+#include <cassert>
 
 
 /// Collection of utilities for dumping data on screen.
@@ -36,14 +37,28 @@ namespace dump {
    *
    */
   class DumperBase {
-
-    std::string fIndent = ""; ///< Default indentation string.
-    std::string fFirstIndent = ""; ///< Indentation string for the first line.
-
+    
+    struct IndentSettings {
+      std::string indent = ""; ///< Default indentation string.
+      std::string firstIndent = ""; ///< Indentation string for the first line.
+      
+      void set(std::string const& newIndent, std::string const& newFirstIndent)
+        { indent = newIndent; firstIndent = newFirstIndent; }
+      void set(std::string&& newIndent, std::string&& newFirstIndent)
+        { 
+          indent = std::move(newIndent); 
+          firstIndent = std::move(newFirstIndent); 
+        }
+      void set(std::string const& newIndent) { set(newIndent, newIndent); }
+      
+    }; // struct IndentSettings
+    
+    std::vector<IndentSettings> fIndentSettings; ///< All indentation settings.
+    
       public:
 
     /// Default constructor: no indentation.
-    DumperBase() = default;
+    DumperBase(): fIndentSettings{ {} } {}
 
     /**
      * @brief Constructor: sets indentation.
@@ -52,7 +67,7 @@ namespace dump {
      * @param firstIndent indentation for the first line (see `firstIndent()`)
      */
     DumperBase(std::string const& indent, std::string const& firstIndent)
-      : fIndent(indent), fFirstIndent(firstIndent)
+      : fIndentSettings{ { indent, firstIndent } }
       {}
 
     /**
@@ -78,14 +93,15 @@ namespace dump {
     /// @{
 
     /// Returns the indentation string currently configured for all lines.
-    std::string const& indent() const { return fIndent; }
+    std::string const& indent() const { return indentSettings().indent; }
 
     /// Returns the indentation string currently configured for the first line.
-    std::string const& firstIndent() const { return fFirstIndent; }
+    std::string const& firstIndent() const
+      { return indentSettings().firstIndent; }
 
     /// Sets indentation strings to the specified values.
     void setIndent(std::string const& indent, std::string const& firstIndent)
-      { fIndent = indent; fFirstIndent = firstIndent; }
+      { indentSettings() = { indent, firstIndent }; }
 
     /// Sets both indentation strings to the same specified value.
     void setIndent(std::string const& indent) { setIndent(indent, indent); }
@@ -119,6 +135,11 @@ namespace dump {
      * It does not attempt to keep track of whether the output line is the
      * first or not, and it does not try to detect end-of-line characters
      * in the passed strings to insert internal indentation.
+     *
+     * Each object is tied to a `dump::DumperBase` object and it reflects its
+     * indentation settings, i.e. if indentation settings of the
+     * `dump::DumperBase` object are changed, the tied `Indenter` object will
+     * reflect the new settings.
      *
      * Example of usage:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
@@ -171,7 +192,8 @@ namespace dump {
       /// Inserts a first-line indentation and returns the indenter for further
       /// output.
       indenter_t& start() { return indent(true); }
-
+      
+      
     }; // Indenter<>
 
 
@@ -180,6 +202,28 @@ namespace dump {
     decltype(auto) indenter(Stream&& out) const
       { return Indenter<Stream>(std::forward<Stream>(out), *this); }
 
+      protected:
+    
+    IndentSettings& indentSettings() { return fIndentSettings.back(); }
+    IndentSettings const& indentSettings() const
+      { return fIndentSettings.back(); }
+    
+    /// Stacks a copy of the current settings, and returns the "new" ones.
+    IndentSettings& saveIndentSettings()
+      {
+        auto oldSettings = indentSettings();
+        fIndentSettings.push_back(std::move(oldSettings));
+        return indentSettings(); 
+      }
+    
+    /// Restores and returns the last saved settings.
+    IndentSettings& restoreIndentSettings()
+      {
+        if (fIndentSettings.size() > 1U) fIndentSettings.pop_back();
+        assert(!fIndentSettings.empty());
+        return indentSettings(); 
+      }
+    
   }; // DumperBase
 
 
