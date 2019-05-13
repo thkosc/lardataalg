@@ -236,10 +236,10 @@ void sim::dump::DumpMCParticle(
       << " (" << ParticleStatusName(particle.StatusCode()) << ")"
     ;
   if (particle.Weight() != 1.0) out << " weight=" << particle.Weight();
-  if (particle.Rescatter()) {
-    out << " rescattered (" << particle.Rescatter()
-      << ") at vertex " << particle.GetGvtx();
+  if (particle.Rescatter() != simb::MCParticle::s_uninitialized) {
+    out << " rescattered (" << particle.Rescatter() << ")";
   }
+  out << "; generator vertex " << particle.GetGvtx();
   out << "\n" << indent << "created via "
     << (particle.Process().empty()? "magics": particle.Process());
   if (particle.Mother() == 0) out << " by the gods";
