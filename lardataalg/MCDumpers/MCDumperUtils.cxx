@@ -10,6 +10,14 @@
 // library header
 #include "lardataalg/MCDumpers/MCDumperUtils.h"
 
+// nutools
+#include "nusimdata/SimulationBase/MCParticle.h"
+
+// GENIE headers
+#ifdef HAS_GENIE // does not happen in LArSoft
+# include "GENIE/HadronTransport/INukeHadroFates.h"
+#endif // HAS_GENIE
+
 // ROOT
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"
@@ -149,5 +157,67 @@ std::string sim::ParticleName(int pigid) {
   return PDGinfo? PDGinfo->GetTitle(): ("PDG ID " + std::to_string(pigid));
 } // sim::ParticleName()
 
+
+//------------------------------------------------------------------------------
+std::string sim::RescatteringName
+  (int code, RescatterCategory cat /* = RescatterCategory::LArSoftDefault */)
+{
+  using namespace std::string_literals;
+  
+  if (code == simb::MCParticle::s_uninitialized) return "(unset)"s;
+  
+  switch (cat) {
+    case RescatterCategory::GENIE_INukeFateHA:
+      return GENIE_INukeFateHA_RescatteringName(code);
+    default:
+      return "unknown category "s + std::to_string(static_cast<int>(cat))
+        + " (code: "s + std::to_string(code) + ")"s;
+  } // switch(code)
+  
+} // sim::RescatteringName()
+
+
+//------------------------------------------------------------------------------
+std::string sim::GENIE_INukeFateHA_RescatteringName(int code) {
+  
+#ifdef _INTRANUKE_FATES_H_ // from GENIE
+  
+  return 
+    genie::INukeHadroFates::AsString(static_cast<genie::INukeFateHA_t>(code));
+  
+#else // !_INTRANUKE_FATES_H_:
+  
+  using namespace std::string_literals;
+  
+  /*
+   * Here we do an horrible thing, that is to copy GENIE code into LArSoft.
+   * By defining `HAS_GENIE`, the proper code branch would be taken instead,
+   * which directly refers to GENIE.
+   * But LArSoft does not do that, because we don't want to be forced to have
+   * GENIE around all the time we use `simb::MCParticle`.
+   * 
+   */
+  switch (code) {
+    // from Fermilab UPS GENIE v3_0_0_b4a, `Physics/HadronTransport/INukeHadroFates.h`:
+    case  0 /* kIHAFtUndefined     */ : return "** Undefined HA-mode fate **"s; break;
+    case  1 /* kIHAFtNoInteraction */ : return "HA-mode / no interaction"s;     break;
+    case  2 /* kIHAFtCEx           */ : return "HA-mode / cex"s;                break;
+    case  3 /* kIHAFtElas          */ : return "HA-mode / elas"s;               break;
+    case  4 /* kIHAFtInelas        */ : return "HA-mode / inelas"s;             break;
+    case  5 /* kIHAFtAbs           */ : return "HA-mode / abs"s;                break;
+    case  6 /* kIHAFtKo            */ : return "HA-mode / knock-out"s;          break;
+    case  7 /* kIHAFtCmp           */ : return "HA-mode / compound"s;           break;
+    case  8 /* kIHAFtPiProd        */ : return "HA-mode / pi-production"s ;     break;
+    case  9 /* kIHAFtInclPip       */ : return "HA-mode / pi-prod incl pi+"s;   break;
+    case 10 /* kIHAFtInclPim       */ : return "HA-mode / pi-prod incl pi-"s;   break;
+    case 11 /* kIHAFtInclPi0       */ : return "HA-mode / pi-prod incl pi0"s;   break;
+    case 12 /* kIHAFtDCEx          */ : return "HA-mode / dcex"s;               break;
+    default:
+      return "unknown ("s + std::to_string(code) + ")"s;
+  } // switch(code)
+  
+#endif // ?_INTRANUKE_FATES_H_
+  
+} // sim::GENIE_INukeFateHA_RescatteringName()
 
 //------------------------------------------------------------------------------
