@@ -120,7 +120,7 @@ namespace dump::raw {
     /// An alias of `dump()`.
     template <typename Stream>
     void operator()(Stream&& stream, raw::OpDetWaveform const& waveform)
-      { dump(std::forward<Stream>(stream), waveform); }
+      { dump(stream, waveform); }
 
 
     /// Pads the specified string to the right, truncating its right if needed.
