@@ -40,6 +40,7 @@
 #include <string>
 #include <string_view>
 #include <ratio>
+#include <limits>
 #include <functional> // std::hash<>
 #include <type_traits> // std::is_same<>, std::enable_if_t<>, ...
 
@@ -261,8 +262,12 @@ namespace util::quantities {
       // yet
 
       //------------------------------------------------------------------------
-
-
+      template <typename Q>
+      class numeric_limits;
+      
+      
+      //------------------------------------------------------------------------
+      
     } // namespace details
 
 
@@ -661,7 +666,31 @@ namespace util::quantities {
       /// Convert this quantity into the specified one.
       template <typename OQ>
       OQ convertInto() { return OQ(*this); }
-
+      
+      /**
+       * @brief Returns a new quantity initialized with the specified value
+       * @tparam U type to initialize the quantity with
+       * @param value the value to initialize the quantity with
+       * @return a new `Quantity` object initialized with `value`
+       * 
+       * The `value` is cast into `value_t` via `static_cast()`.
+       * 
+       * Example: be `Tick` a quantity based on an integral value, like
+       * `util::quantities::tick`, and `detClocks` an instance of
+       * `detinfo::DetectorClocks`:
+       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
+       * double const tickDuration = detClocks.OpticalClock().TickPeriod();
+       * 
+       * auto const triggerTick
+       *   = Tick::castFrom(detClocks.TriggerTime() / tickDuration);
+       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       * `triggerTick` will be of type `Tick` and will denote the number of the
+       * tick (0-based) within which `detClocks.TriggerTime()` fell.
+       */
+      template <typename U>
+      static quantity_t castFrom(U value)
+        { return quantity_t{ static_cast<value_t>(value) }; }
+      
 
         private:
       value_t fValue; ///< Stored value.
@@ -856,40 +885,6 @@ namespace util::quantities {
 
 
 //------------------------------------------------------------------------------
-//---  Standard library extensions
-//------------------------------------------------------------------------------
-namespace std {
-
-  template <typename... Args>
-  std::string to_string
-    (util::quantities::concepts::ScaledUnit<Args...> const& unit)
-    {
-      return
-        std::string(unit.prefix().symbol()) + unit.baseUnit().symbol.data();
-    }
-
-  template <typename... Args>
-  std::string to_string(util::quantities::concepts::Quantity<Args...> const& q)
-    { return std::to_string(q.value()) + ' ' + std::to_string(q.unit()); }
-
-
-  /// Hash function of a quantity is delegated to its value
-  template <typename... Args>
-  struct hash<util::quantities::concepts::Quantity<Args...>> {
-      private:
-    using quantity_t = util::quantities::concepts::Quantity<Args...>;
-    using value_t = typename quantity_t::value_t;
-
-      public:
-    constexpr auto operator()(quantity_t key) const
-      { return std::hash<value_t>()(key.value()); }
-  };
-
-
-} // namespace std
-
-
-//------------------------------------------------------------------------------
 //---  template implementation
 //------------------------------------------------------------------------------
 namespace util::quantities::concepts::details {
@@ -916,6 +911,39 @@ namespace util::quantities::concepts::details {
   struct is_quantity<Quantity<Args...>>: public std::true_type {};
 
 
+  //----------------------------------------------------------------------------
+  /// Limits of a quantity are the same as the underlying type.
+  template <typename Q>
+  class numeric_limits: public std::numeric_limits<typename Q::value_t> {
+    
+    static_assert(is_quantity_v<Q>);
+    
+    using quantity_t = Q;
+    using value_traits_t = std::numeric_limits<typename quantity_t::value_t>;
+    
+      public:
+    
+    static constexpr quantity_t min() noexcept
+      { return quantity_t{ value_traits_t::min() }; }
+    static constexpr quantity_t max() noexcept
+      { return quantity_t{ value_traits_t::max() }; }
+    static constexpr quantity_t lowest() noexcept
+      { return quantity_t{ value_traits_t::lowest() }; }
+    static constexpr quantity_t epsilon() noexcept
+      { return quantity_t{ value_traits_t::epsilon() }; }
+    static constexpr quantity_t round_error() noexcept
+      { return quantity_t{ value_traits_t::round_error() }; }
+    static constexpr quantity_t infinity() noexcept
+      { return quantity_t{ value_traits_t::infinity() }; }
+    static constexpr quantity_t quiet_NaN() noexcept
+      { return quantity_t{ value_traits_t::quiet_NaN() }; }
+    static constexpr quantity_t signaling_NaN() noexcept
+      { return quantity_t{ value_traits_t::signaling_NaN() }; }
+    static constexpr quantity_t denorm_min() noexcept
+      { return quantity_t{ value_traits_t::denorm_min() }; }
+    
+  }; // numeric_limits<Quantity>
+  
   //----------------------------------------------------------------------------
 
 } // namespace util::quantities::concepts::details
@@ -1194,6 +1222,73 @@ constexpr bool util::quantities::concepts::Quantity<U, T>::operator>
 } // util::quantities::concepts::Quantity<>::operator>()
 
 
+
+//------------------------------------------------------------------------------
+//---  Standard library extensions
+//------------------------------------------------------------------------------
+namespace std {
+  
+  // ---------------------------------------------------------------------------
+  template <typename... Args>
+  std::string to_string
+    (util::quantities::concepts::ScaledUnit<Args...> const& unit)
+    {
+      return
+        std::string(unit.prefix().symbol()) + unit.baseUnit().symbol.data();
+    }
+
+  template <typename... Args>
+  std::string to_string(util::quantities::concepts::Quantity<Args...> const& q)
+    { return std::to_string(q.value()) + ' ' + std::to_string(q.unit()); }
+
+
+  // ---------------------------------------------------------------------------
+  /// Hash function of a quantity is delegated to its value
+  template <typename... Args>
+  struct hash<util::quantities::concepts::Quantity<Args...>> {
+      private:
+    using quantity_t = util::quantities::concepts::Quantity<Args...>;
+    using value_t = typename quantity_t::value_t;
+
+      public:
+    constexpr auto operator()(quantity_t key) const
+      { return std::hash<value_t>()(key.value()); }
+  };
+  
+  
+  // ---------------------------------------------------------------------------
+  /// Limits of a quantity are the same as the underlying type.
+  template <typename Unit, typename T>
+  class numeric_limits<util::quantities::concepts::Quantity<Unit, T>>
+    : public util::quantities::concepts::details::numeric_limits
+      <util::quantities::concepts::Quantity<Unit, T>>
+  {};
+  
+  template <typename Unit, typename T>
+  class numeric_limits
+    <util::quantities::concepts::Quantity<Unit, T> const>
+    : public util::quantities::concepts::details::numeric_limits
+      <util::quantities::concepts::Quantity<Unit, T> const>
+  {};
+  
+  template <typename Unit, typename T>
+  class numeric_limits
+    <util::quantities::concepts::Quantity<Unit, T> volatile>
+    : public util::quantities::concepts::details::numeric_limits
+      <util::quantities::concepts::Quantity<Unit, T> volatile>
+  {};
+  
+  template <typename Unit, typename T>
+  class numeric_limits
+    <util::quantities::concepts::Quantity<Unit, T> const volatile>
+    : public util::quantities::concepts::details::numeric_limits
+      <util::quantities::concepts::Quantity<Unit, T> const volatile>
+  {};
+  
+  
+  // ---------------------------------------------------------------------------
+  
+} // namespace std
 
 
 //------------------------------------------------------------------------------
