@@ -687,18 +687,25 @@ namespace util::quantities {
     /// @{
 
     //@{
-    /// Addition and subtraction of a quantity and a plain number are forbidden.
+    /**
+     * Addition and subtraction of a quantity and a plain number are forbidden.
+     * 
+     * The rationale is that it is not acceptable to support `position + 2_m`
+     * but not `2_m + position`, and that it is not acceptable to have
+     * `2_m + 50_cm` yield a type different than `50_cm + 2_m` (i.e. should
+     * both return centimeters, or meters?).
+     */
     template <typename U, typename T>
-    constexpr Quantity<U, T> operator+ (Quantity<U, T> const q, T factor)
+    constexpr Quantity<U, T> operator+ (Quantity<U, T> const q, T shift)
       = delete;
     template <typename U, typename T>
-    constexpr Quantity<U, T> operator+ (T factor, Quantity<U, T> const q)
+    constexpr Quantity<U, T> operator+ (T shift, Quantity<U, T> const q)
       = delete;
     template <typename U, typename T>
-    constexpr Quantity<U, T> operator- (Quantity<U, T> const q, T factor)
+    constexpr Quantity<U, T> operator- (Quantity<U, T> const q, T shift)
       = delete;
     template <typename U, typename T>
-    constexpr Quantity<U, T> operator- (T factor, Quantity<U, T> const q)
+    constexpr Quantity<U, T> operator- (T shift, Quantity<U, T> const q)
       = delete;
     //@}
 
