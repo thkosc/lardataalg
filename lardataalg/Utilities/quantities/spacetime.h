@@ -7,7 +7,7 @@
  *
  * Set of basic quantities related to space and time. Currently, quantities are
  * defined based on the following units:
- * * seconds (ps, ns, us, ms, s)
+ * * seconds (ps, ns, us, ms, s), with intervals in `intervals` namespace
  *
  * This is a header-only library.
  *
@@ -17,6 +17,7 @@
 #define LARDATAALG_UTILITIES_QUANTITIES_SPACETIME_H
 
 // LArSoft libraries
+#include "lardataalg/Utilities/intervals.h"
 #include "lardataalg/Utilities/quantities.h"
 
 // C/C++ standard libraries
@@ -211,9 +212,81 @@ namespace util::quantities {
   } // time_literals
 
 
+  // --- BEGIN Time intervals --------------------------------------------------
+  
+  namespace intervals {
+    
+    /// The most generic `units::Second`-based interval.
+    template <typename R, typename T = double>
+    using scaled_seconds
+      = concepts::Interval<util::quantities::scaled_second<R, T>>;
+
+    //
+    // seconds
+    //
+    /// Type of time interval stored in seconds.
+    template <typename T = double>
+    using seconds_as = scaled_seconds<std::ratio<1>, T>;
+
+    /// Type of time stored in seconds, in double precision.
+    using seconds = seconds_as<>;
+
+    //
+    // milliseconds
+    //
+    
+    /// Type of time interval stored in milliseconds.
+    template <typename T = double>
+    using milliseconds_as = scaled_seconds<std::milli, T>;
+
+    /// Type of time interval stored in milliseconds, in double precision.
+    using milliseconds = milliseconds_as<>;
+
+    //
+    // microseconds
+    //
+    
+    /// Type of time interval stored in microseconds.
+    template <typename T = double>
+    using microseconds_as = scaled_seconds<std::micro, T>;
+
+    /// Type of time interval stored in microseconds, in double precision.
+    using microseconds = microseconds_as<>;
+
+    //
+    // nanoseconds
+    //
+    
+    /// Type of time interval stored in nanoseconds.
+    template <typename T = double>
+    using nanoseconds_as = scaled_seconds<std::nano, T>;
+
+    /// Type of time interval stored in nanoseconds, in double precision.
+    using nanoseconds = nanoseconds_as<>;
+
+    //
+    // picoseconds
+    //
+    
+    /// Type of time interval stored in picoseconds.
+    template <typename T = double>
+    using picoseconds_as = scaled_seconds<std::pico, T>;
+
+    /// Type of time interval stored in picoseconds, in double precision.
+    using picoseconds = picoseconds_as<>;
+
+  
+  } // namespace intervals
+  
+  // --- END Time intervals ----------------------------------------------------
+  
+  
   /// @}
   // -- END Time ---------------------------------------------------------------
-
+  
+  
+  
+  
 } // namespace util::quantities
 
 //------------------------------------------------------------------------------
