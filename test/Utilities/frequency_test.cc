@@ -26,25 +26,25 @@ void test_frequency_literals() {
 
   constexpr auto f_Hz = 2_Hz;
   static_assert(std::is_same<decltype(f_Hz), util::quantities::hertz const>());
-  static_assert(f_Hz == 2.0);
+  static_assert(double(f_Hz) == 2.0);
   static_assert(f_Hz == 2.0_Hz);
 
   constexpr auto f_kHz = 20_kHz;
   static_assert
     (std::is_same<decltype(f_kHz), util::quantities::kilohertz const>());
-  static_assert(f_kHz == 20.0);
+  static_assert(double(f_kHz) == 20.0);
   static_assert(f_kHz == 20.0_kHz);
 
   constexpr auto f_MHz = 200_MHz;
   static_assert
     (std::is_same<decltype(f_MHz), util::quantities::megahertz const>());
-  static_assert(f_MHz == 200.0);
+  static_assert(double(f_MHz) == 200.0);
   static_assert(f_MHz == 200.0_MHz);
 
   constexpr auto f_GHz = 5_GHz;
   static_assert
     (std::is_same<decltype(f_GHz), util::quantities::gigahertz const>());
-  static_assert(f_GHz == 5.0);
+  static_assert(double(f_GHz) == 5.0);
   static_assert(f_GHz == 5.0_GHz);
 
 } // test_frequency_literals()

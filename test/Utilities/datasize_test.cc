@@ -27,7 +27,7 @@ void test_datasize_literals() {
 
   constexpr auto s_B = 256_B;
   static_assert(std::is_same<decltype(s_B), util::quantities::byte const>());
-  static_assert(s_B == 256);
+  static_assert(s_B.value() == 256U);
   static_assert(s_B == 256_B);
   std::cout << "Tested " << s_B << std::endl;
 
@@ -35,7 +35,7 @@ void test_datasize_literals() {
   static_assert
     (std::is_same<decltype(s_kiB), util::quantities::kibibyte const>());
   static_assert(s_kiB == 4_kiB);
-  static_assert(s_kiB == 4);
+  static_assert(s_kiB.value() == 4U);
   static_assert(s_kiB == 4096_B);
   std::cout << "Tested " << s_kiB << std::endl;
 
@@ -43,7 +43,7 @@ void test_datasize_literals() {
   static_assert
     (std::is_same<decltype(s_MiB), util::quantities::mebibyte const>());
   static_assert(s_MiB == 4_MiB);
-  static_assert(s_MiB == 4);
+  static_assert(s_MiB.value() == 4U);
   static_assert(s_MiB == 4096_kiB);
   std::cout << "Tested " << s_MiB << std::endl;
 
@@ -51,7 +51,7 @@ void test_datasize_literals() {
   static_assert
     (std::is_same<decltype(s_GiB), util::quantities::gibibyte const>());
   static_assert(s_GiB == 4_GiB);
-  static_assert(s_GiB == 4);
+  static_assert(s_GiB.value() == 4U);
   static_assert(s_GiB == 4096_MiB);
   std::cout << "Tested " << s_GiB << std::endl;
 
@@ -59,7 +59,7 @@ void test_datasize_literals() {
   static_assert
     (std::is_same<decltype(s_TiB), util::quantities::tebibyte const>());
   static_assert(s_TiB == 4_TiB);
-  static_assert(s_TiB == 4);
+  static_assert(s_TiB.value() == 4U);
   static_assert(s_TiB == 4096_GiB);
   std::cout << "Tested " << s_TiB << std::endl;
 
@@ -67,7 +67,7 @@ void test_datasize_literals() {
   static_assert
     (std::is_same<decltype(s_PiB), util::quantities::pebibyte const>());
   static_assert(s_PiB == 4_PiB);
-  static_assert(s_PiB == 4);
+  static_assert(s_PiB.value() == 4U);
   static_assert(s_PiB == 4096_TiB);
   std::cout << "Tested " << s_PiB << std::endl;
 
@@ -75,7 +75,7 @@ void test_datasize_literals() {
   static_assert
     (std::is_same<decltype(s_EiB), util::quantities::exbibyte const>());
   static_assert(s_EiB == 4_EiB);
-  static_assert(s_EiB == 4);
+  static_assert(s_EiB.value() == 4U);
   static_assert(s_EiB == 4096_PiB);
   std::cout << "Tested " << s_EiB << std::endl;
 

@@ -224,14 +224,10 @@ namespace util::quantities {
      * `util::quantities::kilohertz`).
      */
     template <typename T, typename TR, typename TT>
-    constexpr auto operator/(
-      T v,
-      scaled_quantity<util::quantities::units::Second, TR, TT> t
-      )
+    constexpr auto operator/(T v, scaled_second<TR, TT> t)
       -> std::enable_if_t<
-        std::is_fundamental_v<T> && std::is_arithmetic_v<T>,
-        scaled_quantity<
-          util::quantities::units::Hertz,
+        std::is_convertible_v<T, TT>,
+        scaled_hertz<
           details::invert_t<TR>,
           decltype(std::declval<T>() / std::declval<TT>())
         >
@@ -253,14 +249,10 @@ namespace util::quantities {
      * `util::quantities::millisecond`).
      */
     template <typename T, typename FR, typename FT>
-    constexpr auto operator/(
-      T v,
-      scaled_quantity<util::quantities::units::Hertz, FR, FT> f
-      )
+    constexpr auto operator/(T v, scaled_hertz<FR, FT> f)
       -> std::enable_if_t<
-        std::is_fundamental_v<T> && std::is_arithmetic_v<T>,
-        scaled_quantity<
-          util::quantities::units::Second,
+        std::is_convertible_v<T, FT>,
+        scaled_second<
           details::invert_t<FR>,
           decltype(std::declval<T>() / std::declval<FT>())
         >
@@ -292,49 +284,33 @@ constexpr auto util::quantities::concepts::operator*(
 
 //------------------------------------------------------------------------------
 template <typename T, typename TR, typename TT>
-constexpr auto util::quantities::concepts::operator/(
-  T v,
-  scaled_quantity<util::quantities::units::Second, TR, TT> t
-  )
+constexpr auto util::quantities::concepts::operator/
+  (T v, scaled_second<TR, TT> t)
   -> std::enable_if_t<
-    std::is_fundamental_v<T> && std::is_arithmetic_v<T>,
-    scaled_quantity<
-      util::quantities::units::Hertz,
-      details::invert_t<TR>,
-      decltype(std::declval<T>() / std::declval<TT>())
-    >
+    std::is_convertible_v<T, TT>,
+    scaled_hertz
+      <details::invert_t<TR>, decltype(std::declval<T>() / std::declval<TT>())>
     >
 {
-  return scaled_quantity<
-    util::quantities::units::Hertz,
-    details::invert_t<TR>,
-    decltype(std::declval<T>() / std::declval<TT>())
-    >
-    { v / t.value() };
+  return scaled_hertz
+    <details::invert_t<TR>, decltype(std::declval<T>() / std::declval<TT>())>
+    ::castFrom(v / t.value());
 } // util::quantities::operator/(Second)
 
 
 //------------------------------------------------------------------------------
 template <typename T, typename FR, typename FT>
-constexpr auto util::quantities::concepts::operator/(
-  T v,
-  scaled_quantity<util::quantities::units::Hertz, FR, FT> f
-  )
+constexpr auto util::quantities::concepts::operator/
+  (T v, scaled_hertz<FR, FT> f)
   -> std::enable_if_t<
-    std::is_fundamental_v<T> && std::is_arithmetic_v<T>,
-    scaled_quantity<
-      util::quantities::units::Second,
-      details::invert_t<FR>,
-      decltype(std::declval<T>() / std::declval<FT>())
-    >
+    std::is_convertible_v<T, FT>,
+    scaled_second
+      <details::invert_t<FR>, decltype(std::declval<T>() / std::declval<FT>())>
     >
 {
-  return scaled_quantity<
-    util::quantities::units::Second,
-    details::invert_t<FR>,
-    decltype(std::declval<T>() / std::declval<FT>())
-    >
-    { v / f.value() };
+  return scaled_second
+    <details::invert_t<FR>, decltype(std::declval<T>() / std::declval<FT>())>
+    ::castFrom( v / f.value() );
 } // util::quantities::operator/(Hertz)
 
 
