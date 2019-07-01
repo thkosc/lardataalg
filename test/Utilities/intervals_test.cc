@@ -15,6 +15,8 @@
 // LArSoft libraries
 #include "lardataalg/Utilities/intervals.h"
 #include "lardataalg/Utilities/quantities/spacetime.h"
+#include "larcorealg/CoreUtils/DebugUtils.h" // lar::debug::static_assert_on<>()
+
 
 // C/C++ standard libraries
 #include <type_traits> // std::decay_t<>
@@ -23,7 +25,24 @@
 // -----------------------------------------------------------------------------
 // --- implementation detail tests
 // -----------------------------------------------------------------------------
+struct ObjectWithoutCategory {};
+struct ObjectWithCategory {
+  using category_t = void;
+};
 
+static_assert
+  (!util::quantities::concepts::details::has_category_v<ObjectWithoutCategory>);
+static_assert
+  ( util::quantities::concepts::details::has_category_v<ObjectWithCategory>);
+static_assert(!util::quantities::concepts::details::has_category_v
+  <util::quantities::intervals::seconds>
+  );
+static_assert(util::quantities::concepts::details::has_category_v
+  <util::quantities::points::second>
+  );
+
+
+// -----------------------------------------------------------------------------
 static_assert( util::quantities::concepts::details::has_unit_v
   <util::quantities::intervals::seconds>
   );

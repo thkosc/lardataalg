@@ -201,8 +201,11 @@ namespace util::quantities {
   namespace points {
     
     /// A `units::Ticks`-based point.
-    template <typename T = util::quantities::tick_as<>::value_t>
-    using tick_as = concepts::Point<util::quantities::tick_as<T>>;
+    template <
+      typename T = util::quantities::tick_as<>::value_t,
+      typename Cat = NoCategory
+      >
+    using tick_as = concepts::Point<util::quantities::tick_as<T>, Cat>;
 
     /// A tick value based on `std::ptrdiff_t`.
     using tick = tick_as<>;
