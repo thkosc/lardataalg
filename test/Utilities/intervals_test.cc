@@ -104,6 +104,49 @@ static_assert( util::quantities::concepts::details::has_quantity_v
   );
 
 
+// -----------------------------------------------------------------------------
+// --- is_point, is_interval etc.
+// -----------------------------------------------------------------------------
+static_assert(!util::quantities::concepts::is_interval_v<double>);
+static_assert
+  (!util::quantities::concepts::is_interval_v<ObjectWithoutCategory>);
+static_assert(!util::quantities::concepts::is_interval_v<ObjectWithCategory>);
+static_assert(
+  util::quantities::concepts::is_interval_v
+    <util::quantities::intervals::seconds>
+  );
+static_assert(
+  !util::quantities::concepts::is_interval_v
+    <util::quantities::points::second>
+  );
+
+static_assert(!util::quantities::concepts::is_point_v<double>);
+static_assert
+  (!util::quantities::concepts::is_point_v<ObjectWithoutCategory>);
+static_assert(!util::quantities::concepts::is_point_v<ObjectWithCategory>);
+static_assert(
+  !util::quantities::concepts::is_point_v
+    <util::quantities::intervals::seconds>
+  );
+static_assert(
+  util::quantities::concepts::is_point_v
+    <util::quantities::points::second>
+  );
+
+static_assert(!util::quantities::concepts::is_interval_or_point_v<double>);
+static_assert
+  (!util::quantities::concepts::is_interval_or_point_v<ObjectWithoutCategory>);
+static_assert(!util::quantities::concepts::is_interval_or_point_v<ObjectWithCategory>);
+static_assert(
+  util::quantities::concepts::is_interval_or_point_v
+    <util::quantities::intervals::seconds>
+  );
+static_assert(
+  util::quantities::concepts::is_interval_or_point_v
+    <util::quantities::points::second>
+  );
+
+
 //------------------------------------------------------------------------------
 //--- Interval tests
 //------------------------------------------------------------------------------

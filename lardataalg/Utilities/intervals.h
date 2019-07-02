@@ -52,26 +52,6 @@ namespace util::quantities {
     namespace details {
 
       //------------------------------------------------------------------------
-      //--- Unit-related
-      //------------------------------------------------------------------------
-      /// Trait: `true_type` if `IV` is a `Interval` specialization.
-      template <typename IV>
-      struct is_interval;
-
-      /// Trait: `true` if `IV` is a `Interval` specialization.
-      template <typename IV>
-      constexpr bool is_interval_v = is_interval<IV>();
-
-      //------------------------------------------------------------------------
-      /// Trait: `true_type` if `PT` is a `Point` specialization.
-      template <typename PT>
-      struct is_point;
-
-      /// Trait: `true` if `PT` is a `Point` specialization.
-      template <typename PT>
-      constexpr bool is_point_v = is_point<PT>();
-
-      //------------------------------------------------------------------------
       /// An object belonging to a category `Cat`.
       template <typename Cat>
       struct WithCategory;
@@ -88,6 +68,38 @@ namespace util::quantities {
       /// Returns the name of this category. Optional.
       static std::string name() = delete;
     }; // struct CategoryBase
+    
+    
+    //--------------------------------------------------------------------------
+    //--- traits
+    //--------------------------------------------------------------------------
+    /// Trait: `true_type` if `IV` is a `Interval` specialization.
+    template <typename IV>
+    struct is_interval;
+
+    /// Trait: `true` if `IV` is a `Interval` specialization.
+    template <typename IV>
+    constexpr bool is_interval_v = is_interval<IV>();
+
+
+    //--------------------------------------------------------------------------
+    /// Trait: `true_type` if `PT` is a `Point` specialization.
+    template <typename PT>
+    struct is_point;
+
+    /// Trait: `true` if `PT` is a `Point` specialization.
+    template <typename PT>
+    constexpr bool is_point_v = is_point<PT>();
+    
+    
+    //--------------------------------------------------------------------------
+    /// Trait: `true_type` if `PT` is a specialization of `Interval` or `Point`.
+    template <typename T>
+    using is_interval_or_point = std::disjunction<is_interval<T>, is_point<T>>;
+    
+    /// Trait: `true` if `PT` is a specialization of `Interval` or `Point`.
+    template <typename T>
+    constexpr bool is_interval_or_point_v = is_interval_or_point<T>();
     
     
     //--------------------------------------------------------------------------
@@ -169,10 +181,8 @@ namespace util::quantities {
        * The value in `iv` is converted from its native scale into the one of
        * this interval.
        */
-      template <
-        typename IV,
-        typename std::enable_if_t<details::is_interval_v<IV>>* = nullptr
-        >
+      template
+        <typename IV, typename std::enable_if_t<is_interval_v<IV>>* = nullptr>
       constexpr Interval(IV iv): Interval(quantity_t { iv.quantity() }) {}
       
       /// Returns the value of the interval as a quantity.
@@ -734,10 +744,8 @@ namespace util::quantities {
        * The value in `p` is converted from its native scale into the one of
        * this point.
        */
-      template <
-        typename PT,
-        typename std::enable_if_t<details::is_point_v<PT>>* = nullptr
-        >
+      template
+        <typename PT, typename std::enable_if_t<is_point_v<PT>>* = nullptr>
       constexpr Point(PT const p): Point(quantity_t{ p.quantity() }) {}
       
       /// Returns the value of the interval as a quantity.
@@ -897,8 +905,7 @@ namespace util::quantities {
 
       /// Convert this interval into the specified one.
       template <typename PT>
-      std::enable_if_t<details::is_point_v<PT>, PT>
-      convertInto() { return PT(*this); }
+      std::enable_if_t<is_point_v<PT>, PT> convertInto() { return PT(*this); }
       
       /**
        * @brief Returns a new point initialized with the specified value.
@@ -1263,21 +1270,6 @@ namespace util::quantities::concepts::details {
   
   
   //----------------------------------------------------------------------------
-  template <typename>
-  struct is_interval: public std::false_type {};
-
-  template <typename... Args>
-  struct is_interval<Interval<Args...>>: public std::true_type {};
-
-  //----------------------------------------------------------------------------
-  template <typename>
-  struct is_point: public std::false_type {};
-
-  template <typename... Args>
-  struct is_point<Point<Args...>>: public std::true_type {};
-
-  
-  //----------------------------------------------------------------------------
   //--- WithCategory
   //----------------------------------------------------------------------------
   template <typename Cat>
@@ -1319,6 +1311,22 @@ namespace util::quantities::concepts::details {
 //--- template implementation
 //------------------------------------------------------------------------------
 namespace util::quantities::concepts {
+  
+  //----------------------------------------------------------------------------
+  template <typename>
+  struct is_interval: public std::false_type {};
+  
+  template <typename... Args>
+  struct is_interval<Interval<Args...>>: public std::true_type {};
+  
+  
+  //----------------------------------------------------------------------------
+  template <typename>
+  struct is_point: public std::false_type {};
+  
+  template <typename... Args>
+  struct is_point<Point<Args...>>: public std::true_type {};
+  
   
   //----------------------------------------------------------------------------
   
