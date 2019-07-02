@@ -33,6 +33,16 @@ cet_test( DetectorClocksStandard_test
   INSTALL_SOURCE
 )
 
+cet_test( DetectorTimingsStandard_test
+  LIBRARIES
+  lardataalg_DetectorInfo
+  cetlib
+  DATAFILES clockstest_standard.fcl
+  TEST_ARGS ./clockstest_standard.fcl
+  INSTALL_BIN
+  INSTALL_SOURCE
+)
+
 cet_test( DetectorClocksLArTPCdetector_test
   HANDBUILT
   DATAFILES clockstest_lartpcdetector.fcl
