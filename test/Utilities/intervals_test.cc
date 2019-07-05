@@ -34,7 +34,7 @@ static_assert
   (!util::quantities::concepts::details::has_category_v<ObjectWithoutCategory>);
 static_assert
   ( util::quantities::concepts::details::has_category_v<ObjectWithCategory>);
-static_assert(!util::quantities::concepts::details::has_category_v
+static_assert(util::quantities::concepts::details::has_category_v
   <util::quantities::intervals::seconds>
   );
 static_assert(util::quantities::concepts::details::has_category_v
