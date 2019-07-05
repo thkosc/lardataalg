@@ -116,24 +116,32 @@ namespace detinfo::timescales {
       /// The category this time scale belongs to.
       using category_t = Cat;
       
-      /// Type of a point on this time scale.
-      using time_point_t
-        = util::quantities::concepts::Point<TimeUnit, category_t>;
-      
       /// Type of a time interval in this scale.
       using time_interval_t = time_interval;
+      
+      /// Type of a point on this time scale.
+      using time_point_t = util::quantities::concepts::Point
+        <TimeUnit, category_t, time_interval_t>;
       
       /// Type of frequency for this time scale.
       using frequency_t
         = decltype(1.0 / std::declval<typename time_interval_t::quantity_t>());
       
+      /// An interval on this time scale expressed in its ticks (integral).
+      using tick_interval_t = util::quantities::concepts::Interval
+        <util::quantities::tick, category_t>;
+      
+      /// An interval on this time scale expressed in its ticks (real).
+      using tick_interval_d_t = util::quantities::concepts::Interval
+        <util::quantities::tick_d, category_t>;
+      
       /// A point on this time scale expressed in its ticks.
-      using tick_t
-        = util::quantities::concepts::Point<util::quantities::tick, category_t>;
+      using tick_t = util::quantities::concepts::Point
+        <util::quantities::tick, category_t, tick_interval_t>;
       
       /// A point on this time scale expressed in its ticks (real).
-      using tick_d_t =
-        util::quantities::concepts::Point<util::quantities::tick_d, category_t>;
+      using tick_d_t = util::quantities::concepts::Point
+        <util::quantities::tick_d, category_t, tick_interval_d_t>;
       
       /// Name of this time scale.
       static std::string name() { return category_t::name(); }
@@ -381,8 +389,16 @@ namespace detinfo::timescales {
   using electronics_tick_d
     = timescale_traits<ElectronicsTimeCategory>::tick_d_t;
   
+  /// An interval on the electronics time scale expressed in its ticks.
+  using electronics_time_ticks
+    = timescale_traits<ElectronicsTimeCategory>::tick_interval_t;
   
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /// Category for TPC electronics time scale.
+  /// An interval on the electronics time scale expressed in its ticks (real).
+  using electronics_time_ticks_d
+    = timescale_traits<ElectronicsTimeCategory>::tick_interval_d_t;
+  
+  
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   
   /// A point on the TPC electronics time scale expressed in its ticks.
   using TPCelectronics_tick
@@ -392,9 +408,18 @@ namespace detinfo::timescales {
   using TPCelectronics_tick_d
     = timescale_traits<TPCelectronicsTimeCategory>::tick_d_t;
   
+  /// An interval on the TPC electronics time scale expressed in its ticks.
+  using TPCelectronics_time_ticks
+    = timescale_traits<TPCelectronicsTimeCategory>::tick_interval_t;
   
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /// Category for optical electronics time scale.
+  /// An interval on the TPC electronics time scale expressed in its ticks
+  /// (real).
+  using TPCelectronics_time_ticks_d
+    = timescale_traits<TPCelectronicsTimeCategory>::tick_interval_d_t;
   
+  
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ 
   /// A point on the optical detector electronics time scale expressed in its
   /// ticks.
   using optical_tick = timescale_traits<OpticalTimeCategory>::tick_t;
@@ -403,8 +428,18 @@ namespace detinfo::timescales {
   /// ticks (real).
   using optical_tick_d = timescale_traits<OpticalTimeCategory>::tick_d_t;
   
+  /// An interval on the optical detector electronics time scale expressed in
+  /// its ticks.
+  using optical_time_ticks
+    = timescale_traits<OpticalTimeCategory>::tick_interval_t;
   
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /// Category for optical electronics time scale.
+  /// An interval on the optical detector electronics time scale expressed in
+  /// its ticks (real).
+  using optical_time_ticks_d
+    = timescale_traits<OpticalTimeCategory>::tick_interval_d_t;
+  
+  
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   
   /// A point on the trigger time scale expressed in its ticks.
   using trigger_tick = timescale_traits<TriggerTimeCategory>::tick_t;
@@ -412,19 +447,13 @@ namespace detinfo::timescales {
   /// A point on the trigger time scale expressed in its ticks (real).
   using trigger_tick_d = timescale_traits<TriggerTimeCategory>::tick_d_t;
   
+  /// An interval on the trigger time scale expressed in its ticks.
+  using trigger_time_ticks
+    = timescale_traits<TriggerTimeCategory>::tick_interval_t;
   
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  /// A time interval expressed in electronics ticks.
-  struct electronics_time_ticks;
-  
-  /// A time interval expressed in TPC electronics ticks.
-  struct TPCelectronics_time_ticks;
-  
-  /// A time interval expressed in optical detector electronics ticks.
-  struct optical_time_ticks;
-  
-  /// A time interval expressed in trigger ticks.
-  struct trigger_time_ticks;
+  /// An interval on the trigger time scale expressed in its ticks (real).
+  using trigger_time_ticks_d
+    = timescale_traits<TriggerTimeCategory>::tick_interval_d_t;
   
   
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -445,26 +474,6 @@ namespace detinfo::timescales {
 
 
 //------------------------------------------------------------------------------
-
-/*
- * aaand we resort to C preprocessor macros for a load of boilerplate; sad!!
- */
-
-#define LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TIMECLASS(NAME, BASENS, BASE) \
-  struct NAME: BASENS::BASE {                             \
-    using BASENS::BASE::BASE;                             \
-    NAME(BASENS::BASE const& from): BASENS::BASE(from) {} \
-  }
-
-/// Creates a new time tick interval unit (std::ptrdiff_t-based) named NAME
-#define LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TICK_INTERVAL(NAME) \
-  LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TIMECLASS(NAME, util::quantities::intervals, ticks)
-
-/// Creates a new time tick interval unit (double-based) named NAME
-#define LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TICK_D_INTERVAL(NAME) \
-  LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TIMECLASS(NAME, util::quantities::intervals, ticks_d)
-
-
 
 /// Namespace including different time scales as defined in LArSoft.
 namespace detinfo::timescales {
@@ -505,20 +514,6 @@ namespace detinfo::timescales {
   
   } // namespace details
   
-  
-  // ---------------------------------------------------------------------------
-  
-  LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TICK_INTERVAL(electronics_time_ticks);
-  
-  LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TICK_INTERVAL(TPCelectronics_time_ticks);
-  
-  LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TICK_INTERVAL(optical_time_ticks);
-  
-  LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TICK_D_INTERVAL(electronics_time_ticks_d);
-  
-  LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TICK_D_INTERVAL(TPCelectronics_time_ticks_d);
-  
-  LARDATAALG_DETECTORINFO_DETECTORTIMINGTYPES_TICK_D_INTERVAL(optical_time_ticks_d);
   
   // ---------------------------------------------------------------------------
   

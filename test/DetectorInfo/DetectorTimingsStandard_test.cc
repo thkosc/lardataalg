@@ -551,6 +551,58 @@ unsigned int testOpticalClockTimings(detinfo::DetectorTimings const& timings) {
       << ", but got " << trigTick << " instead";
   }
   
+  //
+  // interval to ticks
+  //
+  
+  double const inputInterval_us = 200.008;
+  
+  time_interval const inputInterval { inputInterval_us };
+  static_assert(util::is_same_decay_v
+    <decltype(inputInterval.quantity()), util::quantities::microsecond>);
+  
+  // real
+  double const expectedTicksD
+    = inputInterval_us / timings.detClocks().OpticalClock().TickPeriod();
+  
+  auto const ticks_d = timings.toTicks<optical_time_ticks_d>(inputInterval);
+  static_assert(util::is_same_decay_v
+    <decltype(ticks_d.quantity()), util::quantities::tick_d>);
+  
+  if (ticks_d.value() == expectedTicksD) {
+    mf::LogVerbatim("DetectorTimingsStandard_test")
+      << "DetectorTimings::toTicks<optical_time_ticks_d>(" << inputInterval
+      << ") => " << ticks_d;
+  }
+  else {
+    ++nErrors;
+    mf::LogProblem("DetectorTimingsStandard_test")
+      << "Time interval " << inputInterval
+      << " is expected to last " << expectedTicksD
+      << " optical ticks, but got " << ticks_d << " instead";
+  }
+  
+  // integer
+  int const expectedTicks = static_cast<int>(expectedTicksD);
+  
+  auto const ticks = timings.toTicks<optical_time_ticks>(inputInterval);
+  static_assert(util::is_same_decay_v
+    <decltype(ticks.quantity()), util::quantities::tick>);
+  
+  if (ticks.value() == expectedTicks) {
+    mf::LogVerbatim("DetectorTimingsStandard_test")
+      << "DetectorTimings::toTicks<optical_time_ticks>(" << inputInterval
+      << ") => " << ticks;
+  }
+  else {
+    ++nErrors;
+    mf::LogProblem("DetectorTimingsStandard_test")
+      << "Time interval " << inputInterval
+      << " is expected to last " << expectedTicks
+      << " optical integer ticks, but got " << ticks << " instead";
+  }
+  
+  
   return nErrors;
 } // testOpticalClockTimings()
 
