@@ -33,6 +33,8 @@ cet_test( DetectorClocksStandard_test
   INSTALL_SOURCE
 )
 
+cet_test( DetectorTimingTypes_test USE_BOOST_UNIT)
+
 cet_test( DetectorTimingsStandard_test
   LIBRARIES
   lardataalg_DetectorInfo

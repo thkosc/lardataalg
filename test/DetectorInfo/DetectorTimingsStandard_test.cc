@@ -21,43 +21,6 @@
 
 
 //------------------------------------------------------------------------------
-//--- static tests
-//------------------------------------------------------------------------------
-
-static_assert(!detinfo::timescales::is_tick_v<double>);
-static_assert
-  (!detinfo::timescales::is_tick_v<util::quantities::second>);
-static_assert
-  ( detinfo::timescales::is_tick_v<util::quantities::tick>);
-static_assert
-  ( detinfo::timescales::is_tick_v<util::quantities::tick_d>);
-static_assert
-  (!detinfo::timescales::is_tick_v<detinfo::timescales::optical_time>);
-static_assert
-  ( detinfo::timescales::is_tick_v<detinfo::timescales::optical_tick>);
-static_assert
-  ( detinfo::timescales::is_tick_v<detinfo::timescales::optical_time_ticks>);
-
-//------------------------------------------------------------------------------
-static_assert(
-  detinfo::timescales::timescale_traits<detinfo::timescales::optical_time>
-    ::same_category_as<detinfo::timescales::optical_time>
-  );
-static_assert(
-  detinfo::timescales::timescale_traits<detinfo::timescales::optical_time>
-    ::category_compatible_with<detinfo::timescales::optical_time>
-  );
-static_assert(
-  detinfo::timescales::timescale_traits<detinfo::timescales::optical_time>
-    ::same_category_as<detinfo::timescales::optical_tick>
-  );
-static_assert(
-  detinfo::timescales::timescale_traits<detinfo::timescales::optical_time>
-    ::category_compatible_with<detinfo::timescales::optical_tick>
-  );
-
-
-//------------------------------------------------------------------------------
 //---  The test environment
 //---
 
