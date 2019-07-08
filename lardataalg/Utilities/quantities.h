@@ -435,7 +435,7 @@ namespace util::quantities {
       /// Returns full name of the unit (e.g. "nanoseconds") as a string-like
       /// object.
       static auto name()
-        { return std::string(prefix().name()) + baseUnit().symbol.data(); }
+        { return std::string(prefix().name()) + baseUnit().name.data(); }
 
       /// @}
       // -- END Conversion to string -------------------------------------------
