@@ -41,13 +41,13 @@
 #include "lardataalg/DetectorInfo/LArProperties.h"
 
 // FHiCL libraries
-#include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/types/Atom.h"
 #if DETECTORINFO_LARPROPERTIESSTANDARD_HASOPTIONALATOM
 #	include "fhiclcpp/types/OptionalAtom.h"
 #endif
 #include "fhiclcpp/types/Sequence.h"
-#include "fhiclcpp/types/Table.h"
+
+namespace fhicl { class ParameterSet; }
 
 // C/C++ standard libraries
 #include <string>

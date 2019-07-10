@@ -1,4 +1,7 @@
+#include "fhiclcpp/ParameterSet.h"
 #include "lardataalg/DetectorInfo/DetectorClocksStandard.h"
+
+#include <iostream>
 
 //-------------------------------------------------------------------------
 detinfo::DetectorClocksStandard::DetectorClocksStandard()
@@ -146,5 +149,3 @@ void detinfo::DetectorClocksStandard::SetDefaultTriggerTime()
     );
 
 } // detinfo::DetectorClocksStandard::SetDefaultTriggerTime()
-
-

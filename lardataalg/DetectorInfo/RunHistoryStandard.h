@@ -11,9 +11,7 @@
 
 #include <string>
 #include <vector>
-#include <map>
 
-#include "fhiclcpp/ParameterSet.h"
 #include "lardataalg/DetectorInfo/RunHistory.h"
 
 ///General LArSoft Utilities

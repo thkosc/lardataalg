@@ -12,12 +12,6 @@
 // LArSoft includes
 #include "lardataalg/DetectorInfo/RunHistoryStandard.h"
 
-// ROOT includes
-#include "TMath.h"
-
-// Framework includes
-#include "cetlib_except/exception.h"
-
 namespace detinfo {
   //-----------------------------------------------
   RunHistoryStandard::RunHistoryStandard() :

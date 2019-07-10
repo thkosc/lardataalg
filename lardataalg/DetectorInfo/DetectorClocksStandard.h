@@ -13,9 +13,15 @@
 #ifndef LARDATAALG_DETECTORINFO_DETECTORCLOCKSSTANDARD_H
 #define LARDATAALG_DETECTORINFO_DETECTORCLOCKSSTANDARD_H
 
-#include "fhiclcpp/ParameterSet.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <string>
+#include <vector>
 
+#include "lardataalg/DetectorInfo/ElecClock.h"
 #include "lardataalg/DetectorInfo/DetectorClocks.h"
+
+namespace fhicl { class ParameterSet; }
 
 namespace detinfo{
 
@@ -410,4 +416,3 @@ namespace detinfo{
 
 
 #endif // LARDATAALG_DETECTORINFO_DETECTORCLOCKSSTANDARD_H
-

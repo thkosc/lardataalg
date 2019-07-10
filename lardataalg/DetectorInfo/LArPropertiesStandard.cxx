@@ -3,26 +3,19 @@
 //  LArProperties
 //
 ////////////////////////////////////////////////////////////////////////
-// Framework includes
-
-// C++ language includes
-#include <cmath>
-#include <iostream>
 
 // LArSoft includes
 #include "lardataalg/DetectorInfo/LArPropertiesStandard.h"
 #include "larcorealg/CoreUtils/ProviderUtil.h" // lar::IgnorableProviderConfigKeys()
-#include "larcoreobj/SimpleTypesAndConstants/PhysicalConstants.h"
 
 // ROOT includes
-#include "TMath.h"
 #include "TH1.h"
-#include <Rtypes.h>
+#include <RtypesCore.h>
 
 // Framework includes
 #include "cetlib_except/exception.h"
-//#include "fhiclcpp/types/detail/validationException.h"
-//#include "fhiclcpp/types/detail/validate_ParameterSet.h" // fhiclcpp::detail::fillMissingKeysMsg()
+#include "fhiclcpp/ParameterSet.h"
+#include "fhiclcpp/types/Table.h"
 
 //-----------------------------------------------
 detinfo::LArPropertiesStandard::LArPropertiesStandard()

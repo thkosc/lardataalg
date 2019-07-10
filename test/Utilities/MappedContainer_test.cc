@@ -14,7 +14,6 @@
 
 // LArSoft libraries
 #include "lardataalg/Utilities/MappedContainer.h"
-#include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
 #include "larcorealg/CoreUtils/ContainerMeta.h" // util::collection_value_t<>
 
 // C/C++ standard libraries
@@ -25,7 +24,7 @@
 #include <iterator> // std::back_inserter()
 #include <type_traits> // std::is_copy_assignable_v<>...
 #include <cstddef> // std::size_t
-#include <cmath> // std::nan()
+#include <limits>
 
 
 //------------------------------------------------------------------------------
@@ -420,4 +419,3 @@ BOOST_AUTO_TEST_CASE(TestCase) {
 BOOST_AUTO_TEST_CASE(DocumentationTestCase) {
   classDoc1Test();
 } // DocumentationTestCase
-

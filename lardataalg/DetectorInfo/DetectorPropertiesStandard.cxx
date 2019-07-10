@@ -19,11 +19,10 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // Art includes
-#include "fhiclcpp/make_ParameterSet.h"
+#include "fhiclcpp/types/Table.h"
 
 // C/C++ libraries
 #include <sstream> // std::ostringstream
-
 
 namespace {
 

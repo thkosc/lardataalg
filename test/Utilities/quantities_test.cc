@@ -14,7 +14,6 @@
 
 // LArSoft libraries
 #include "lardataalg/Utilities/quantities/spacetime.h"
-#include "lardataalg/Utilities/quantities/frequency.h"
 #include "lardataalg/Utilities/quantities.h"
 #include "larcorealg/CoreUtils/StdUtils.h" // util::to_string()
 
@@ -117,9 +116,9 @@ static_assert
 
 // -----------------------------------------------------------------------------
 void test_quantities_sign() {
-  
+
   using namespace util::quantities::time_literals;
-  
+
   util::quantities::microseconds t { -4.0 };
 
   BOOST_CHECK_EQUAL(t, -4_us); // just to be safe
@@ -144,14 +143,14 @@ void test_quantities_sign() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void test_quantities_conversions() {
-  
+
   using namespace util::quantities::time_literals;
-  
+
   //
   // conversions to other scales
   //
   util::quantities::seconds t_s { 7.0 };
-  
+
   BOOST_CHECK_EQUAL(t_s.value(), 7.0);
 
   util::quantities::microseconds t_us(t_s);
@@ -210,9 +209,9 @@ void test_quantities_comparisons() {
   BOOST_CHECK( (t_ns <= t2_ns));
   BOOST_CHECK(!(t_ns >  t2_ns));
   BOOST_CHECK( (t_ns <  t2_ns));
-  
+
 #ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-  
+
   //
   // comparisons between quantity and base value number
   //
@@ -310,7 +309,7 @@ void test_quantities_comparisons() {
   BOOST_CHECK( (6 <  t_us));
 
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-  
+
 } // test_quantities_conversions()
 
 
@@ -374,7 +373,7 @@ void test_quantities_addition() {
 
 //  5_s + 700_ms; // ERROR!
 //  5_s + 0.7; // ERROR!
-  
+
 
   static_assert(
     std::is_same<std::decay_t<decltype(45_s + 5_s)>, util::quantities::seconds>(),
@@ -387,8 +386,8 @@ void test_quantities_addition() {
     "Subtraction converts to a different type!"
     );
   BOOST_CHECK_EQUAL(5_s - 55_s, -50_s);
-  
-  
+
+
   constexpr util::quantities::seconds t = 45_s;
   static_assert(
     std::is_same
@@ -452,9 +451,9 @@ void test_quantities_increment() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void test_quantities_scale() {
-  
+
   using namespace util::quantities::time_literals;
-  
+
   util::quantities::microseconds t { 11.0 };
   //
   // scaling
@@ -501,7 +500,7 @@ void test_quantities_literals() {
 void test_quantities() {
 
   using namespace util::quantities::time_literals;
-  
+
   // ---------------------------------------------------------------------------
   // default constructor
   //
@@ -531,9 +530,9 @@ void test_quantities() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void test_constexpr_operations() {
-  
+
   using namespace util::quantities::time_literals;
-  
+
   constexpr util::quantities::microseconds t1 { 10.0 };
   constexpr util::quantities::microseconds t2 { 20.0 };
   constexpr util::quantities::nanoseconds t_ns { 500.0 };

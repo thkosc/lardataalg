@@ -10,7 +10,6 @@
 #include "lardataalg/DetectorInfo/DetectorClocksStandard.h"
 #include "lardataalg/DetectorInfo/DetectorClocksStandardTestHelpers.h"
 
-
 //------------------------------------------------------------------------------
 //---  The test environment
 //---
