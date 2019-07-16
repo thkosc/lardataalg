@@ -18,9 +18,6 @@
 /// Namespace including different time scales as defined in LArSoft.
 namespace detinfo::timescales {
   
-//   namespace points = util::quantities::points;
-//   namespace intervals = util::quantities::intervals;
-  
   
   /**
    * @brief A collection of traits for a time scale.
