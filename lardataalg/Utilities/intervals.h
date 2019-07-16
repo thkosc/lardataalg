@@ -224,7 +224,7 @@ namespace util::quantities {
       /// Returns the value of the interval as plain value.
       using quantity_t::value;
       
-      /// Implicit conversion to the base quantity.
+      /// Conversion to the base quantity.
 #ifndef LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
       explicit
 #endif // !LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
@@ -694,6 +694,12 @@ namespace util::quantities {
 
 
     // -------------------------------------------------------------------------
+    template <typename Q, typename Cat>
+    std::string to_string(Interval<Q, Cat> const& iv)
+      { return util::to_string(iv.quantity()); }
+
+
+    // -------------------------------------------------------------------------
     
     /** ************************************************************************
      * @brief A quantity point.
@@ -809,13 +815,14 @@ namespace util::quantities {
 
       /// Returns the value of the interval as plain value.
       using quantity_t::value;
-
+      
       /// Conversion to the base quantity.
 #ifndef LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
       explicit
 #endif // LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
       constexpr operator value_t() const
         { return value(); }
+      
       
 
       // -- BEGIN Asymmetric arithmetic operations -----------------------------
@@ -1240,9 +1247,11 @@ namespace util::quantities {
       = delete; // use `point + interval`, not `interval + point`
     
     // two different points but with the same interval type
-    template <typename Q, typename Cat, typename IV, typename OQ, typename OCat>
+    template
+      <typename Q, typename Cat, typename IV, typename OQ, typename OCat>
     constexpr
-    Point<Q, Cat, IV>::template enable_if_compatible_t<Point<OQ, OCat, IV>, IV>
+    typename Point<Q, Cat, IV>
+      ::template enable_if_compatible_t<Point<OQ, OCat, IV>, IV>
     operator- (Point<Q, Cat, IV> const a, Point<OQ, OCat, IV> const b)
       { return IV(a.quantity() - b.quantity()); }
     
@@ -1257,6 +1266,11 @@ namespace util::quantities {
       = Point<rescale<typename PT::quantity_t, R, T>, typename PT::category_t>;
 
 
+    // -------------------------------------------------------------------------
+    template <typename Q, typename Cat, typename IV>
+    std::string to_string(Point<Q, Cat, IV> const& p)
+      { return util::to_string(p.quantity()); }
+    
     // -------------------------------------------------------------------------
 
   } // namespace concepts
@@ -1446,17 +1460,6 @@ namespace util::quantities::concepts {
 //------------------------------------------------------------------------------
 namespace std {
   
-  // ---------------------------------------------------------------------------
-  template <typename Q, typename Cat>
-  std::string to_string(util::quantities::concepts::Interval<Q, Cat> const& iv)
-    noexcept(noexcept(std::to_string(iv.quantity())))
-    { return std::to_string(iv.quantity()); }
-
-  template <typename Q, typename Cat, typename IV>
-  std::string to_string(util::quantities::concepts::Point<Q, Cat, IV> const& p)
-    noexcept(noexcept(std::to_string(p.quantity())))
-    { return std::to_string(p.quantity()); }
-
   // ---------------------------------------------------------------------------
   /// Hash function of a interval or point is delegated to its quantity.
   template <typename Q, typename Cat>

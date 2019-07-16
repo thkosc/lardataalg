@@ -32,6 +32,7 @@
 // LArSoft libraries
 #include "lardataalg/Utilities/constexpr_math.h" // util::abs()
 #include "larcorealg/CoreUtils/MetaUtils.h" // util::always_true_v<>
+#include "larcorealg/CoreUtils/StdUtils.h" // util::to_string()
 
 // Boost libraries
 #include "boost/integer/common_factor_rt.hpp" // boost::integer::gcd()
@@ -1108,6 +1109,29 @@ namespace util::quantities {
 
 
     // -------------------------------------------------------------------------
+    
+    //
+    // extensions STL-style
+    // (can't be put in `std` since they are not specializations)
+    //
+    
+    /// Converts a unit into a string.
+    /// @see `util::to_string()`
+    template <typename... Args>
+    std::string to_string(ScaledUnit<Args...> const& unit)
+      {
+        return
+          std::string(unit.prefix().symbol()) + unit.baseUnit().symbol.data();
+      }
+    
+    /// Converts a quantity into a string.
+    /// @see `util::to_string()`
+    template <typename... Args>
+    std::string to_string(Quantity<Args...> const& q)
+      { return util::to_string(q.value()) + ' ' + util::to_string(q.unit()); }
+
+
+    // -------------------------------------------------------------------------
 
   } // namespace concepts
 
@@ -1638,20 +1662,6 @@ constexpr bool util::quantities::concepts::Quantity<U, T>::operator>
 //------------------------------------------------------------------------------
 namespace std {
   
-  // ---------------------------------------------------------------------------
-  template <typename... Args>
-  std::string to_string
-    (util::quantities::concepts::ScaledUnit<Args...> const& unit)
-    {
-      return
-        std::string(unit.prefix().symbol()) + unit.baseUnit().symbol.data();
-    }
-
-  template <typename... Args>
-  std::string to_string(util::quantities::concepts::Quantity<Args...> const& q)
-    { return std::to_string(q.value()) + ' ' + std::to_string(q.unit()); }
-
-
   // ---------------------------------------------------------------------------
   /// Hash function of a quantity is delegated to its value
   template <typename... Args>

@@ -16,6 +16,7 @@
 #include "lardataalg/Utilities/quantities/spacetime.h"
 #include "lardataalg/Utilities/quantities/frequency.h"
 #include "lardataalg/Utilities/quantities.h"
+#include "larcorealg/CoreUtils/StdUtils.h" // util::to_string()
 
 // C/C++ standard libraries
 #include <type_traits> // std::decay_t<>
@@ -512,8 +513,8 @@ void test_quantities() {
   //
 //  t1 = 4.0; // error!
   t1 = util::quantities::microseconds { 4.0 };
-  BOOST_CHECK_EQUAL(std::to_string(t1.unit()), "us");
-  BOOST_CHECK_EQUAL(std::to_string(t1), "4.000000 us");
+  BOOST_CHECK_EQUAL(util::to_string(t1.unit()), "us");
+  BOOST_CHECK_EQUAL(util::to_string(t1), "4.000000 us");
   BOOST_CHECK_EQUAL(t1.value(), 4.0);
 
   // ---------------------------------------------------------------------------
