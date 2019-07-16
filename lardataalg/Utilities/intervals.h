@@ -113,6 +113,12 @@ namespace util::quantities {
     
     //--------------------------------------------------------------------------
     
+    /// Type of interval contained in specified type `T`.
+    template <typename T>
+    using interval_of = typename T::interval_t;
+    
+    //--------------------------------------------------------------------------
+    
     /** ************************************************************************
      * @brief An interval (duration, length, distance) between two
      *        quantity points.
