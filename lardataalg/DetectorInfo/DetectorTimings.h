@@ -117,7 +117,7 @@ namespace detinfo {
   
   /// Transforms a `detinfo::DetectorClocks` into a
   /// `detinfo::DetectorClocksWithUnits`.
-  detinfo::DetectorClocksWithUnits makeDetectorClocksWithUnits
+  inline detinfo::DetectorClocksWithUnits makeDetectorClocksWithUnits
     (detinfo::DetectorClocks const& detClocks)
     { return { detClocks }; }
   
@@ -621,18 +621,18 @@ namespace detinfo {
   
   
   /// Returns `DetectorTimings` object from specified `detinfo::DetectorClocks`.
-  detinfo::DetectorTimings makeDetectorTimings
+  inline detinfo::DetectorTimings makeDetectorTimings
     (detinfo::DetectorClocks const& detClocks)
     { return { detClocks }; }
   
   /// Returns `DetectorTimings` object from specified `detinfo::DetectorClocks`.
-  detinfo::DetectorTimings makeDetectorTimings
+  inline detinfo::DetectorTimings makeDetectorTimings
     (detinfo::DetectorClocks const* detClocks)
     { return makeDetectorTimings(*detClocks); }
   
   /// Returns `DetectorTimings` object from specified
   /// `detinfo::DetectorClocksWithUnits`.
-  detinfo::DetectorTimings makeDetectorTimings
+  inline detinfo::DetectorTimings makeDetectorTimings
     (detinfo::DetectorClocksWithUnits const& detClocksWU)
     { return static_cast<detinfo::DetectorTimings const&>(detClocksWU); }
   
