@@ -117,12 +117,20 @@ int main(int argc, char const** argv) {
 
   auto const driftVelocity = detp.DriftVelocity();
   auto const TDCtick = detp.SamplingRate();
+  unsigned int const nWaveformTicks = detp.NumberTimeSamples();
+  unsigned int const nReadoutWindowTicks = detp.ReadOutWindowSize();
+
 
   mf::LogVerbatim("detp_test")
     <<   "Electric field in the active volume: " << detp.Efield() << " kV/cm"
-    << "\nSampling rate:     " << TDCtick << " ns"
-    << "\nArgon temperature: " << detp.Temperature() << " K"
-    << "\nDrift velocity:    " << driftVelocity << " cm/us";
+    << "\nSampling rate:       " << TDCtick << " ns"
+    << "\nArgon temperature:   " << detp.Temperature() << " K"
+    << "\nDrift velocity:      " << driftVelocity << " cm/us"
+    << "\nReadout window:      " << nReadoutWindowTicks << " ticks ("
+      << (nReadoutWindowTicks * TDCtick / 1000) << " us)"
+    << "\nTPC waveform length: " << nWaveformTicks << " ticks ("
+      << (nWaveformTicks * TDCtick / 1000) << " us)"
+    ;
 
   // accumulate the plane IDs; needed just for table formatting
   unsigned int const colWidth = 9U;
@@ -178,7 +186,6 @@ int main(int argc, char const** argv) {
 
   // print tick number table header
   // number of ticks
-  unsigned int const nTicks = detp.NumberTimeSamples();
   constexpr unsigned int nPrintedTicks = 11;
   mf::LogVerbatim("detp_test")
     << "Conversion of tick number to x position [cm]"
@@ -186,7 +193,7 @@ int main(int argc, char const** argv) {
 
   std::array<double, nPrintedTicks> ticks;
   for (unsigned int iTick = 0; iTick < nPrintedTicks; ++iTick)
-    ticks[iTick] = iTick * nTicks / (nPrintedTicks - 1);
+    ticks[iTick] = iTick * nWaveformTicks / (nPrintedTicks - 1);
 
   {
     mf::LogVerbatim log("detp_test");
