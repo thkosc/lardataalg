@@ -13,6 +13,7 @@
 #include "larcorealg/TestUtils/unit_test_base.h"
 #include "lardataalg/Utilities/quantities/frequency.h" // megahertz
 #include "lardataalg/Utilities/quantities/spacetime.h" // microsecond, ...
+#include "larcorealg/CoreUtils/RealComparisons.h"
 #include "larcorealg/CoreUtils/DebugUtils.h" // lar::debug::static_assert_on<>()
 #include "larcorealg/CoreUtils/MetaUtils.h" // util::is_same_decay_v
 
@@ -100,10 +101,12 @@ unsigned int testBeamGateTime(detinfo::DetectorTimings const& timings) {
 //------------------------------------------------------------------------------
 unsigned int testSimulationTimes(detinfo::DetectorTimings const& timings) {
   
-  using namespace detinfo::timescales; // simulation_time, electronics_time
+  using namespace detinfo::timescales; // simulation_time, electronics_time, ...
   using util::quantities::microsecond;
   
   unsigned int nErrors = 0U;
+  
+  constexpr lar::util::RealComparisons cmp(1e-4);
   
   //
   // start time
@@ -198,8 +201,50 @@ unsigned int testSimulationTimes(detinfo::DetectorTimings const& timings) {
       << " in simulation time, but got " << simulTime << " instead";
   }
   
+  // to TPC electronics ticks:
+  double const expectedTPCtick
+    = timings.detClocks().TPCG4Time2Tick(inputTime_ns);
+  
+  auto const TPCtick = timings.toTick<TPCelectronics_tick_d>(inputTime);
+  if (cmp.equal(TPCtick.value(), expectedTPCtick)) {
+    mf::LogVerbatim("DetectorTimingsStandard_test")
+      << "DetectorTimings::toTick<TPCelectronics_tick_d>("
+      << inputTime << ") => " << TPCtick;
+  }
+  else {
+    ++nErrors;
+    mf::LogProblem("DetectorTimingsStandard_test")
+      << "A simulation time of " << inputTime
+      << " is expected to be at " << expectedTPCtick
+      << " TPC electronics tick, but got " << TPCtick << " instead";
+  }
   
   
+  // let's try some more complex transformations...
+
+  // which simulation times is the trigger time plus 100 TPC ticks?
+  auto const trigTime = timings.TriggerTime();
+  electronics_time_ticks const tickOffset { 100 };
+  simulation_time const expectedSimulTick = 
+    timings.toTimeScale<simulation_time>(trigTime)
+    + tickOffset.value() * timings.ClockPeriodFor<electronics_time>();
+  auto const tick = timings.toTick<electronics_tick>(trigTime) + tickOffset;
+  auto const simulTick = timings.toTimeScale<simulation_time>(tick);
+
+  if (simulTick == expectedSimulTick) {
+    mf::LogVerbatim("DetectorTimingsStandard_test")
+      << "DetectorTimings::toTimeScale<simulation_time>("
+      << trigTime << " + " << tickOffset << " = " << tick << ") => "
+      << simulTick;
+  }
+  else {
+    ++nErrors;
+    mf::LogProblem("DetectorTimingsStandard_test")
+      << "An offset of " << tickOffset << " on trigger time (" << trigTime
+      << ") is expected to be " << expectedSimulTick
+      << " in simulation time, but got " << simulTick << " instead";
+  }  
+
   return nErrors;
 } // testSimulationTimes()
   
@@ -660,7 +705,12 @@ int main(int argc, char const** argv) {
       << "Can't run DetectorClocksStandard-specific diagnostics.";
   }
   
+  using namespace detinfo::timescales; // electronics_time
   detinfo::DetectorTimings timings(*detClocks);
+  
+  mf::LogVerbatim("DetectorTimingsStandard_test")
+    << "Electronics clock: " << timings.ClockPeriodFor<electronics_time>()
+    << ", " << timings.ClockFrequencyFor<electronics_time>();
   
   nErrors += testTriggerTime(*detClocks);
   nErrors += testBeamGateTime(*detClocks);
