@@ -11,7 +11,7 @@
 #ifndef LARDATAALG_MCDUMPERS_MCDUMPERUTILS_H
 #define LARDATAALG_MCDUMPERS_MCDUMPERUTILS_H
 
-// nutools libraries
+// nusimdata libraries
 #include "nusimdata/SimulationBase/MCTruth.h" // simb::Origin_t
 
 // C/C++ standard libraries

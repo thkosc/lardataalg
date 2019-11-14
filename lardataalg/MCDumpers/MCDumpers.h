@@ -16,7 +16,7 @@
 #include "larcorealg/CoreUtils/DumpUtils.h" // lar::dump namespace
 #include "larcorealg/Geometry/geo_vectors_utils_TVector.h" // geo::vect::dump
 
-// nutools libraries
+// nusimdata libraries
 #include "nusimdata/SimulationBase/MCTrajectory.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "nusimdata/SimulationBase/GTruth.h"

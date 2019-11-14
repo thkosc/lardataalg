@@ -10,7 +10,7 @@
 // library header
 #include "lardataalg/MCDumpers/MCDumperUtils.h"
 
-// nutools
+// nusimdata
 #include "nusimdata/SimulationBase/MCParticle.h"
 
 // GENIE headers
