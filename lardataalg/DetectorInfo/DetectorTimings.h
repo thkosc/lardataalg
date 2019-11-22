@@ -274,7 +274,7 @@ namespace detinfo {
     // @}
     
     
-    /// --- BEGIN -- Access to underlying service providers --------------------
+    // --- BEGIN -- Access to underlying service providers ---------------------
     /// @name Access to underlying service providers.
     /// @{
     
@@ -287,7 +287,7 @@ namespace detinfo {
       { return detClocksUnits().detClocks(); }
     
     /// @}
-    /// --- END -- Access to underlying service providers ----------------------
+    // --- END -- Access to underlying service providers -----------------------
     
     
     // --- BEGIN -- Electronics times ------------------------------------------
