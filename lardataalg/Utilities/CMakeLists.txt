@@ -1,4 +1,2 @@
-add_subdirectory(quantities)
-
-install_headers()
-install_source()
+install_headers(SUBDIRS "quantities")
+install_source(SUBDIRS "quantities")

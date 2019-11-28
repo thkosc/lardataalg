@@ -587,6 +587,64 @@ void test_constexpr_operations() {
 } // test_constexpr_operations()
 
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void test_makeQuantity() {
+  
+  using namespace util::quantities::time_literals;
+  using util::quantities::milliseconds;
+  
+  constexpr auto expected = 3.0_ms;
+  static_assert(std::is_same<std::decay_t<decltype(expected)>, milliseconds>());
+  
+  auto q = util::quantities::makeQuantity<milliseconds>("3.0 ms");
+  static_assert(std::is_same<std::decay_t<decltype(q)>, milliseconds>());
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  q = util::quantities::makeQuantity<milliseconds>("  3.0ms  ");
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  q = util::quantities::makeQuantity<milliseconds>("3ms");
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  q = util::quantities::makeQuantity<milliseconds>("3000 us");
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  q = util::quantities::makeQuantity<milliseconds>("0.03e+2 ms");
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  q = util::quantities::makeQuantity<milliseconds>("+3ms");
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  q = util::quantities::makeQuantity<milliseconds>("+3E-3s");
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  q = util::quantities::makeQuantity<milliseconds>("3", true);
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  q = util::quantities::makeQuantity<milliseconds>("3.0", true);
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  q = util::quantities::makeQuantity<milliseconds>("30e-1", true);
+  BOOST_CHECK_CLOSE(q.value(), expected.value(), 1e-7);
+  
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<milliseconds>("3"),
+                    util::quantities::MissingUnit);
+  
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<milliseconds>("3 kg"),
+                    util::quantities::MissingUnit);
+  
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<milliseconds>("3 dumbs"),
+                    util::quantities::ExtraCharactersError);
+  
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<milliseconds>("three ms"),
+                    util::quantities::ValueError);
+  
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<milliseconds>("3.zero ms"),
+                    util::quantities::ExtraCharactersError);
+  
+} // test_makeQuantity()
+
+
 // -----------------------------------------------------------------------------
 // BEGIN Test cases  -----------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -604,6 +662,8 @@ BOOST_AUTO_TEST_CASE(quantities_testcase) {
   test_quantities_literals();
 
   test_constexpr_operations();
+  
+  test_makeQuantity();
 
 } // BOOST_AUTO_TEST_CASE(quantities_testcase)
 
