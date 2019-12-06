@@ -622,7 +622,6 @@ void test_point_operations() {
   using util::quantities::points::nanosecond;
   
   constexpr microsecond cp1 {    +6.0_us };
-  constexpr microsecond cp2 { -4000.0_ns };
   constexpr util::quantities::intervals::microseconds ct { 3.0_us };
   
   static_assert(std::is_same_v<decltype(cp1 + 3000_ns), microsecond>);
