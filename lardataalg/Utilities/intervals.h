@@ -21,7 +21,7 @@
  * @def LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
  * @brief Enable implicit conversions of `Point` and `Interval` into `value_t`.
  * @see LARDATAALG_UTILITIES_QUANTITIES_ENABLE_IMPLICIT_CONVERSION
- * 
+ *
  * This is likely going to break a number of features, and enabling it should
  * be followed by intense scrutiny of the tests.
  */
@@ -31,7 +31,7 @@
  * @def LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
  * @brief Enable comparisons of `Point` and `Interval` with `value_t`.
  * @see LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
- * 
+ *
  * This is likely going to break some code, and it is dangerous in that a
  * statement like `t > 5` does not really make sure `5` is the right unit.
  * With this feature disabled (which is recommended), the same comparison would
@@ -42,43 +42,43 @@
 
 
 namespace util::quantities {
-  
+
   /// Category type for intervals and point not belonging to any category.
   struct NoCategory;
-  
-  
+
+
   namespace concepts {
 
     namespace details {
 
       //------------------------------------------------------------------------
-      
+
       template <typename Cat, typename = void>
       struct category_of_type;
-      
+
       template <typename Cat>
       using category_of = typename category_of_type<Cat>::type;
-      
-      
+
+
       //------------------------------------------------------------------------
       /// An object belonging to a category `Cat`.
       template <typename Cat>
       struct WithCategory;
-      
-      
+
+
       //------------------------------------------------------------------------
-      
+
     } // namespace details
-    
-    
+
+
     //--------------------------------------------------------------------------
     /// An non-mandatory base class for interval and point categories.
     struct CategoryBase {
       /// Returns the name of this category. Optional.
       static std::string name() = delete;
     }; // struct CategoryBase
-    
-    
+
+
     //--------------------------------------------------------------------------
     //--- traits
     //--------------------------------------------------------------------------
@@ -99,26 +99,26 @@ namespace util::quantities {
     /// Trait: `true` if `PT` is a `Point` specialization.
     template <typename PT>
     constexpr bool is_point_v = is_point<PT>();
-    
-    
+
+
     //--------------------------------------------------------------------------
     /// Trait: `true_type` if `PT` is a specialization of `Interval` or `Point`.
     template <typename T>
     using is_interval_or_point = std::disjunction<is_interval<T>, is_point<T>>;
-    
+
     /// Trait: `true` if `PT` is a specialization of `Interval` or `Point`.
     template <typename T>
     constexpr bool is_interval_or_point_v = is_interval_or_point<T>();
-    
-    
+
+
     //--------------------------------------------------------------------------
-    
+
     /// Type of interval contained in specified type `T`.
     template <typename T>
     using interval_of = typename T::interval_t;
-    
+
     //--------------------------------------------------------------------------
-    
+
     /** ************************************************************************
      * @brief An interval (duration, length, distance) between two
      *        quantity points.
@@ -136,49 +136,49 @@ namespace util::quantities {
      */
     template <typename Q, typename Cat = NoCategory>
     struct Interval: private Q, public details::WithCategory<Cat> {
-      
+
       using category_base_t = details::WithCategory<Cat>;
-      
+
       /// Traits of the category.
       using traits_t = typename category_base_t::traits_t;
-      
+
       template <typename OC, typename Type = void>
       using enable_if_compatible_t
        = std::enable_if_t
          <category_base_t::template category_compatible_with<OC>(), Type>
        ;
-      
+
         public:
-      
+
       using interval_t = Interval<Q, Cat>; ///< This type.
-      
-      
+
+
       // --- BEGIN -- Types from the base quantity -----------------------------
       /// @name Types from the base quantity
       /// @{
-          
+
       using quantity_t = Q; /// Quantity the interval is based on.
-      
+
       /// The category this point belongs to.
       using category_t = typename category_base_t::category_t;
-      
+
       /// A quantity in the same unit, but possibly a different scale.
       template <typename R>
       using scaled_quantity_t = rescale<quantity_t, R>;
-      
+
       /// Type of the stored value.
       using value_t = typename quantity_t::value_t;
-      
+
       /// Description of the scaled unit.
       using unit_t = typename quantity_t::unit_t;
 
       /// Description of the unscaled unit.
       using baseunit_t = typename quantity_t::baseunit_t;
-      
+
       /// An interval based on a different quantity but with the same category.
       template <typename OQ, typename OI>
       using other_interval_t = Interval<OQ, category_t>;
-      
+
       /// @}
       // --- END -- Types from the base quantity -------------------------------
 
@@ -186,10 +186,10 @@ namespace util::quantities {
       // NOTE: this is not `constexpr` because using it in a constexpr would
       //       yield an uninitialized constant
       explicit Interval() = default;
-      
+
       /// Constructor: takes a value in the intended representation.
       explicit constexpr Interval(value_t v): Interval(quantity_t{ v }) {}
-      
+
       /**
        * @brief Constructor: converts from a quantity.
        * @tparam OQ type of the quantity
@@ -204,7 +204,7 @@ namespace util::quantities {
       constexpr Interval(Quantity<Args...> const& q)
         : quantity_t(quantity_t{ q })
         {}
-      
+
       /**
        * @brief Constructor: converts from another interval.
        * @tparam I type of the other interval
@@ -217,13 +217,13 @@ namespace util::quantities {
       template
         <typename IV, typename std::enable_if_t<is_interval_v<IV>>* = nullptr>
       constexpr Interval(IV iv): Interval(quantity_t { iv.quantity() }) {}
-      
+
       /// Returns the value of the interval as a quantity.
       constexpr quantity_t const& quantity() const { return *this; }
 
       /// Returns the value of the interval as plain value.
       using quantity_t::value;
-      
+
       /// Conversion to the base quantity.
 #ifndef LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
       explicit
@@ -235,12 +235,12 @@ namespace util::quantities {
       // -- BEGIN Access to the scaled unit ------------------------------------
       /// @name Access to the scaled unit.
       /// @{
-      
+
       using quantity_t::unit;
       using quantity_t::unitName;
       using quantity_t::unitSymbol;
       using quantity_t::baseUnit;
-      
+
       /*
        * due to C++ (up to 17 at least) syntax limitations, we can't import
        * a dependent template (in this case, `Q::baseUnit<U>`, which depends
@@ -250,18 +250,18 @@ namespace util::quantities {
        * `using quantity_t::template sameUnitAs;`, which is not allowed in C++.
        * So we have to redefine the thing entirely.
        */
-      
+
       /// Returns whether objects of type `OU` have the same base unit as this.
       template <typename OU>
       static constexpr bool sameBaseUnitAs()
         { return quantity_t::template sameBaseUnitAs<OU>(); }
-        
+
       /// Returns whether objects of type `OU` have same unit and scale as this.
       template <typename OU>
       static constexpr bool sameUnitAs()
         { return quantity_t::template sameUnitAs<OU>(); }
-      
-      
+
+
       /// @}
       // -- END Access to the scaled unit --------------------------------------
 
@@ -297,12 +297,12 @@ namespace util::quantities {
        *       scale.
        */
       /// @{
-      
+
       /// Returns an interval sum of this and `other`
       /// (must have exactly the same unit _and_ scale).
       constexpr interval_t operator+(interval_t const other) const
         { return interval_t{ quantity() + other.quantity() }; }
-      
+
       /// Returns an interval difference of this and `other`
       /// (must have exactly the same unit _and_ scale).
       constexpr interval_t operator-(interval_t const other) const
@@ -376,7 +376,7 @@ namespace util::quantities {
        *
        */
       /// @{
-      
+
       template <typename OQ, typename OC>
       constexpr enable_if_compatible_t<Interval<OQ, OC>, bool>
       operator==(Interval<OQ, OC> const other) const
@@ -407,27 +407,27 @@ namespace util::quantities {
       operator<(Interval<OQ, OC> const other) const
         { return quantity_t::operator<(other.quantity()); }
 
-      
+
       /// @}
       // -- END Asymmetric arithmetic operations -------------------------------
 
       /// Convert this interval into the specified one.
       template <typename IV>
       IV convertInto() { return IV(*this); }
-      
+
       /**
        * @brief Returns a new interval initialized with the specified value.
        * @tparam U type to initialize the quantity with
        * @param value the value to initialize the interval with
        * @return a new `Interval` object initialized with `value`
-       * 
+       *
        * The `value` is cast into `value_t` via `static_cast()`.
        */
       template <typename U>
       static interval_t castFrom(U value)
         { return interval_t{ static_cast<value_t>(value) }; }
-      
-      
+
+
     }; // struct Interval
 
     template <typename... Args>
@@ -447,24 +447,24 @@ namespace util::quantities {
      *
      */
     /// @{
-    
+
     template <typename Q, typename Cat, typename... Args>
     constexpr bool operator==
       (Interval<Q, Cat> const a, Quantity<Args...> const b) noexcept
       { return a.quantity() == b; }
 
     template <typename Q, typename Cat, typename... Args>
-    constexpr bool operator== 
+    constexpr bool operator==
       (Quantity<Args...> const a, Interval<Q, Cat> const b) noexcept
       { return b == a; }
 
     template <typename Q, typename Cat, typename... Args>
-    constexpr bool operator!= 
+    constexpr bool operator!=
       (Interval<Q, Cat> const a, Quantity<Args...> const b) noexcept
       { return a.quantity() != b; }
 
     template <typename Q, typename Cat, typename... Args>
-    constexpr bool operator!= 
+    constexpr bool operator!=
       (Quantity<Args...> const a, Interval<Q, Cat> const b) noexcept
       { return b != a; }
 
@@ -474,7 +474,7 @@ namespace util::quantities {
       { return a.quantity() <= b; }
 
     template <typename Q, typename Cat, typename... Args>
-    constexpr bool operator<= 
+    constexpr bool operator<=
       (Quantity<Args...> const a, Interval<Q, Cat> const b) noexcept
       { return b >= a; }
 
@@ -494,12 +494,12 @@ namespace util::quantities {
       { return a.quantity() >= b; }
 
     template <typename Q, typename Cat, typename... Args>
-    constexpr bool operator>= 
+    constexpr bool operator>=
       (Quantity<Args...> const a, Interval<Q, Cat> const b) noexcept
       { return b <= a; }
 
     template <typename Q, typename Cat, typename... Args>
-    constexpr bool operator> 
+    constexpr bool operator>
       (Interval<Q, Cat> const a, Quantity<Args...> const b) noexcept
       { return a.quantity() > b; }
 
@@ -630,7 +630,7 @@ namespace util::quantities {
 #else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
       = delete; // comparison with unqualified value not allowed
 #endif
-    
+
     template <typename Q, typename Cat, typename T>
     constexpr std::enable_if_t
       <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
@@ -640,11 +640,11 @@ namespace util::quantities {
 #else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
       = delete; // comparison with unqualified value not allowed
 #endif
-    
-    
+
+
     /// @}
     // -- END Comparison operations --------------------------------------------
-    
+
 
     // -- BEGIN Arithmetic operations ------------------------------------------
     /**
@@ -700,7 +700,7 @@ namespace util::quantities {
 
 
     // -------------------------------------------------------------------------
-    
+
     /** ************************************************************************
      * @brief A quantity point.
      * @tparam Q quantity the interval is based on
@@ -711,11 +711,11 @@ namespace util::quantities {
      * with the exception of construction.
      * In this sense, the relation between `Point` and `Quantity` is similar
      * to the one between `Quantity` and its base type (`Quantity::value_t`).
-     * 
+     *
      * In addition, `Point` has some interaction with the corresponding
      * `Interval`: an interval can be seen as the distance, or difference,
      * between two quantity points.
-     * 
+     *
      * The point belongs to a category, which is just a tag that prevents
      * different points from being mixed up. Note that intervals do not have a
      * category.
@@ -725,53 +725,53 @@ namespace util::quantities {
       typename IV = Interval<Q, Cat>
       >
     struct Point: private Q, public details::WithCategory<Cat> {
-      
+
       using category_base_t = details::WithCategory<Cat>;
-      
+
       /// Traits of the category.
       using traits_t = typename category_base_t::traits_t;
-      
+
       template <typename OC, typename Type = void>
       using enable_if_compatible_t
        = std::enable_if_t
          <category_base_t::template category_compatible_with<OC>(), Type>
        ;
-      
-      
+
+
         public:
-      
+
       using point_t = Point<Q, Cat, IV>; ///< This type.
-      
-      
+
+
       // --- BEGIN -- Types from the base quantity -----------------------------
       /// @name Types from the base quantity
       /// @{
-          
+
       using quantity_t = Q; ///< Quantity the interval is based on.
-      
+
       /// The category this point belongs to.
       using category_t = typename category_base_t::category_t;
-      
+
       /// The interval type corresponding to the unit of this point.
       using interval_t = IV;
-      
+
       /// A quantity in the same unit, but possibly a different scale.
       template <typename R>
       using scaled_quantity_t = rescale<quantity_t, R>;
-      
+
       /// Type of the stored value.
       using value_t = typename quantity_t::value_t;
-      
+
       /// Description of the scaled unit.
       using unit_t = typename quantity_t::unit_t;
 
       /// Description of the unscaled unit.
       using baseunit_t = typename quantity_t::baseunit_t;
-      
+
       /// A point based on a different quantity but with the same category.
       template <typename OQ, typename OI>
       using other_point_t = Point<OQ, category_t, OI>;
-      
+
       /// @}
       // --- END -- Types from the base quantity -------------------------------
 
@@ -782,7 +782,7 @@ namespace util::quantities {
 
       /// Constructor: takes a value in the intended representation.
       explicit constexpr Point(value_t v): Point(quantity_t{ v }) {}
-      
+
       /**
        * @brief Constructor: converts from a quantity.
        * @tparam OQ type of the quantity
@@ -796,7 +796,7 @@ namespace util::quantities {
       template <typename... Args>
       constexpr Point(Quantity<Args...> const q)
         : quantity_t(quantity_t{ q }) {}
-      
+
       /**
        * @brief Constructor: converts from another point.
        * @tparam PT type of the other point
@@ -809,21 +809,21 @@ namespace util::quantities {
       template
         <typename PT, typename std::enable_if_t<is_point_v<PT>>* = nullptr>
       constexpr Point(PT const p): Point(quantity_t{ p.quantity() }) {}
-      
+
       /// Returns the value of the interval as a quantity.
       constexpr quantity_t const& quantity() const { return *this; }
 
       /// Returns the value of the interval as plain value.
       using quantity_t::value;
-      
+
       /// Conversion to the base quantity.
 #ifndef LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
       explicit
 #endif // LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
       constexpr operator value_t() const
         { return value(); }
-      
-      
+
+
 
       // -- BEGIN Asymmetric arithmetic operations -----------------------------
       /**
@@ -841,7 +841,7 @@ namespace util::quantities {
        *       _prevent_ that from happening, but requests are welcome to add
        *       features to _allow_ that not to happen, with some care of the
        *       user.
-       * 
+       *
        * @note Differently from `Interval`, the addition and subtraction of
        *       interval to _points_ is not symmetric, i.e. adding an interval
        *       to a point is supported (resulting in another point) but adding
@@ -852,7 +852,7 @@ namespace util::quantities {
        *       different unit scale.
        */
       /// @{
-      
+
       /// Returns the sum of this point plus an interval (from quantity)
       /// (note that addition is not symmetric).
       template <typename R>
@@ -870,13 +870,13 @@ namespace util::quantities {
       template <typename R>
       constexpr point_t operator- (scaled_quantity_t<R> const delta) const
         { return point_t(quantity().minus(delta)); }
-      
+
       /// Returns the value of this point after subtraction of an interval.
       template <typename OQ, typename OC>
       constexpr enable_if_compatible_t<Interval<OQ, OC>, point_t>
       operator- (Interval<OQ, OC> const delta) const
         { return operator- (delta.quantity()); }
-      
+
       /// Add a quantity (possibly converted) to this one.
       template <typename R>
       point_t& operator+= (scaled_quantity_t<R> const other)
@@ -928,7 +928,7 @@ namespace util::quantities {
        *
        */
       /// @{
-      
+
       template <typename OQ, typename OI>
       constexpr enable_if_compatible_t<other_point_t<OQ, OI>, bool> operator==(other_point_t<OQ, OI> const other) const
         { return quantity_t::operator==(other.quantity()); }
@@ -958,7 +958,7 @@ namespace util::quantities {
       operator<(other_point_t<OQ, OI> const other) const
         { return quantity_t::operator<(other.quantity()); }
 
-      
+
       /// @}
       // -- END Asymmetric arithmetic operations -------------------------------
 
@@ -966,32 +966,32 @@ namespace util::quantities {
       // -- BEGIN Access to the scaled unit ------------------------------------
       /// @name Access to the scaled unit.
       /// @{
-      
+
       using quantity_t::unit;
       using quantity_t::baseUnit;
       using quantity_t::unitName;
       using quantity_t::unitSymbol;
-      
+
       /// @}
       // -- END Access to the scaled unit --------------------------------------
 
       /// Convert this interval into the specified one.
       template <typename PT>
       std::enable_if_t<is_point_v<PT>, PT> convertInto() { return PT(*this); }
-      
+
       /**
        * @brief Returns a new point initialized with the specified value.
        * @tparam U type to initialize the quantity with
        * @param value the value to initialize the point with
        * @return a new `Point` object initialized with `value`
-       * 
+       *
        * The `value` is cast into `value_t` via `static_cast()`.
        */
       template <typename U>
       static point_t castFrom(U value)
         { return point_t{ static_cast<value_t>(value) }; }
-      
-      
+
+
     }; // struct Point
 
     template <typename... Args>
@@ -1011,25 +1011,25 @@ namespace util::quantities {
      *
      */
     /// @{
-    
-    
+
+
     template <typename Q, typename Cat, typename IV, typename... Args>
     constexpr bool operator==
       (Point<Q, Cat, IV> const a, Quantity<Args...> const b) noexcept
       { return a.quantity() == b; }
 
     template <typename Q, typename Cat, typename IV, typename... Args>
-    constexpr bool operator== 
+    constexpr bool operator==
       (Quantity<Args...> const a, Point<Q, Cat, IV> const b) noexcept
       { return b == a; }
 
     template <typename Q, typename Cat, typename IV, typename... Args>
-    constexpr bool operator!= 
+    constexpr bool operator!=
       (Point<Q, Cat, IV> const a, Quantity<Args...> const b) noexcept
       { return a.quantity() != b; }
 
     template <typename Q, typename Cat, typename IV, typename... Args>
-    constexpr bool operator!= 
+    constexpr bool operator!=
       (Quantity<Args...> const a, Point<Q, Cat, IV> const b) noexcept
       { return b != a; }
 
@@ -1039,7 +1039,7 @@ namespace util::quantities {
       { return a.quantity() <= b; }
 
     template <typename Q, typename Cat, typename IV, typename... Args>
-    constexpr bool operator<= 
+    constexpr bool operator<=
       (Quantity<Args...> const a, Point<Q, Cat, IV> const b) noexcept
       { return b >= a; }
 
@@ -1059,12 +1059,12 @@ namespace util::quantities {
       { return a.quantity() >= b; }
 
     template <typename Q, typename Cat, typename IV, typename... Args>
-    constexpr bool operator>= 
+    constexpr bool operator>=
       (Quantity<Args...> const a, Point<Q, Cat, IV> const b) noexcept
       { return b <= a; }
 
     template <typename Q, typename Cat, typename IV, typename... Args>
-    constexpr bool operator> 
+    constexpr bool operator>
       (Point<Q, Cat, IV> const a, Quantity<Args...> const b) noexcept
       { return a.quantity() > b; }
 
@@ -1206,7 +1206,7 @@ namespace util::quantities {
 #else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
       = delete; // comparison with unqualified value not allowed
 #endif
-    
+
     template <typename Q, typename Cat, typename IV, typename T>
     constexpr
     std::enable_if_t
@@ -1217,11 +1217,11 @@ namespace util::quantities {
 #else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
       = delete; // comparison with unqualified value not allowed
 #endif
-    
-    
+
+
     /// @}
     // -- END Comparison operations --------------------------------------------
-    
+
 
     // -- BEGIN Arithmetic operations ------------------------------------------
     /**
@@ -1235,17 +1235,17 @@ namespace util::quantities {
      *
      */
     /// @{
-    
+
     template <typename Q, typename Cat, typename IV, typename OQ, typename OC>
     constexpr Point<Q, Cat, IV> operator+
       (Interval<OQ, OC> const delta, Point<Q, Cat, IV> const p)
       = delete; // use `point + interval`, not `interval + point`
-    
+
     template <typename Q, typename Cat, typename IV, typename OQ, typename OC>
     constexpr Point<Q, Cat, IV> operator-
       (Interval<OQ, OC> const delta, Point<Q, Cat, IV> const p)
       = delete; // use `point + interval`, not `interval + point`
-    
+
     // two different points but with the same interval type
     template
       <typename Q, typename Cat, typename IV, typename OQ, typename OCat>
@@ -1254,7 +1254,7 @@ namespace util::quantities {
       ::template enable_if_compatible_t<Point<OQ, OCat, IV>, IV>
     operator- (Point<Q, Cat, IV> const a, Point<OQ, OCat, IV> const b)
       { return IV(a.quantity() - b.quantity()); }
-    
+
     /// @}
     // -- END Arithmetic operations --------------------------------------------
 
@@ -1270,20 +1270,20 @@ namespace util::quantities {
     template <typename Q, typename Cat, typename IV>
     std::string to_string(Point<Q, Cat, IV> const& p)
       { return util::to_string(p.quantity()); }
-    
+
     // -------------------------------------------------------------------------
 
   } // namespace concepts
-  
-  
+
+
   // ---------------------------------------------------------------------------
   struct NoCategory: concepts::CategoryBase {
-    
+
     static std::string name() { return "generic"; }
-    
+
   }; // struct NoCategory
-  
-  
+
+
   // ---------------------------------------------------------------------------
   // @{
   /**
@@ -1296,21 +1296,21 @@ namespace util::quantities {
    * @throw ValueError the numerical value in `s` is not parseable
    * @throw ExtraCharactersError spurious characters after the numeric value
    * @see `util::makeQuantity()`
-   * 
+   *
    * This function behaves like `util::makeQuantity()`.
    */
   template <typename IV>
   IV makeInterval(std::string_view s, bool unitOptional = false);
-  
+
   template <typename IV>
   IV makeInterval(std::string const& s, bool unitOptional = false);
-  
+
   template <typename IV>
   IV makeInterval(char const* s, bool unitOptional = false);
-  
+
   //@}
-  
-  
+
+
   // @{
   /**
    * @brief Returns a point of the specified type parsed from a string.
@@ -1322,23 +1322,23 @@ namespace util::quantities {
    * @throw ValueError the numerical value in `s` is not parseable
    * @throw ExtraCharactersError spurious characters after the numeric value
    * @see `util::makeQuantity()`
-   * 
+   *
    * This function behaves like `util::makeQuantity()`.
    */
   template <typename PT>
   PT makePoint(std::string_view s, bool unitOptional = false);
-  
+
   template <typename PT>
   PT makePoint(std::string const& s, bool unitOptional = false);
-  
+
   template <typename PT>
   PT makePoint(char const* s, bool unitOptional = false);
-  
+
   //@}
-  
-  
+
+
   // ---------------------------------------------------------------------------
-  
+
 } // namespace util::quantities
 
 
@@ -1350,135 +1350,135 @@ namespace util::quantities::concepts::details {
   //----------------------------------------------------------------------------
   template <typename, typename = std::void_t<>>
   struct has_category: std::false_type {};
-  
+
   template <typename Obj>
   struct has_category<Obj, std::void_t<typename Obj::category_t>>
     : std::true_type
   {};
-  
+
   template <typename Obj>
   constexpr bool has_category_v = has_category<Obj>();
-  
+
   //----------------------------------------------------------------------------
   template <typename, typename = std::void_t<>>
   struct category_has_name: std::false_type {};
-  
+
   template <typename Cat>
   struct category_has_name<Cat, std::void_t<decltype(Cat::name())>>
     : std::true_type {};
-  
+
   template <typename Cat>
   struct category_traits {
-    
+
     using category_t = Cat; ///< The categories the traits are about.
-    
+
     /// Whether the category supports `name()` call.
     static constexpr bool has_name = category_has_name<category_t>();
-    
+
     /// Returns whether the category `OC` is "compatible" with this one.
     template <typename OC>
     static constexpr bool compatible_with()
       { return util::is_any_of_v<OC, NoCategory, category_t>; }
-    
+
   }; // struct category_traits<>
-  
-  
+
+
   //----------------------------------------------------------------------------
   template <typename Cat, typename /* = void */>
   struct category_of_type { using type = Cat; };
-  
+
   template <typename Cat>
   struct category_of_type<Cat, std::void_t<typename Cat::category_t>>
     { using type = typename Cat::category_t; };
-  
-  
+
+
   //----------------------------------------------------------------------------
   template <typename Cat>
   struct WithCategory {
-    
+
     using category_t = Cat; ///< The category of this object.
-    
+
     /// Traits of this category.
     using traits_t = category_traits<category_t>;
-    
+
     /// Returns an instance of the category of this object.
     static constexpr category_t category();
-    
+
     // @{
     /// Returns whether the type `OC` belongs to `category_t`.
     template <typename OC>
     static constexpr bool same_category_as();
-    
+
     template <typename OC>
     static constexpr bool same_category_as(OC const&);
     // @}
-    
+
     // @{
     /// Returns whether `OC` has a category compatible with this one.
     template <typename OC>
     static constexpr bool category_compatible_with();
-    
+
     template <typename OC>
     static constexpr bool category_compatible_with(OC const&);
     // @}
-    
-    
+
+
     /// Returns whether this category has a name.
     static constexpr bool hasCategoryName();
-    
+
     /// Returns the name of the category of this object.
     static std::string categoryName();
-    
+
   }; // struct WithCategory<>
-  
-  
+
+
   //----------------------------------------------------------------------------
   //--- WithCategory
   //----------------------------------------------------------------------------
   template <typename Cat>
   constexpr auto WithCategory<Cat>::category() -> category_t { return {}; }
-  
-  
+
+
   //----------------------------------------------------------------------------
   template <typename Cat>
   template <typename OC>
   constexpr bool WithCategory<Cat>::same_category_as() {
     return details::has_category_v<OC>
-      && std::is_same_v<typename OC::category_t, category_t>; 
+      && std::is_same_v<typename OC::category_t, category_t>;
   } // WithCategory<>::same_category_as()
-  
+
   template <typename Cat>
   template <typename OC>
   constexpr bool WithCategory<Cat>::same_category_as(OC const&)
     { return same_category_as<OC>(); }
-  
-  
+
+
   //----------------------------------------------------------------------------
   template <typename Cat>
   template <typename OC>
   constexpr bool WithCategory<Cat>::category_compatible_with()
     { return traits_t::template compatible_with<category_of<OC>>(); }
-  
-  
+
+
   template <typename Cat>
   template <typename OC>
   constexpr bool WithCategory<Cat>::category_compatible_with(OC const&)
     { return category_compatible_with<OC>(); }
-  
+
   //----------------------------------------------------------------------------
   template <typename Cat>
   constexpr bool WithCategory<Cat>::hasCategoryName()
     { return details::category_traits<Cat>::has_name; }
-  
-  
+
+
   //----------------------------------------------------------------------------
   template <typename Cat>
   std::string WithCategory<Cat>::categoryName()
     { return Cat::name(); }
-  
-  
+
+
   //----------------------------------------------------------------------------
-  
+
 } // namespace util::quantities::concepts::details
 
 
@@ -1486,25 +1486,25 @@ namespace util::quantities::concepts::details {
 //--- template implementation
 //------------------------------------------------------------------------------
 namespace util::quantities::concepts {
-  
+
   //----------------------------------------------------------------------------
   template <typename>
   struct is_interval: public std::false_type {};
-  
+
   template <typename... Args>
   struct is_interval<Interval<Args...>>: public std::true_type {};
-  
-  
+
+
   //----------------------------------------------------------------------------
   template <typename>
   struct is_point: public std::false_type {};
-  
+
   template <typename... Args>
   struct is_point<Point<Args...>>: public std::true_type {};
-  
-  
+
+
   //----------------------------------------------------------------------------
-  
+
 } // namespace util::quantities::concepts
 
 
@@ -1574,7 +1574,7 @@ PT util::quantities::makePoint
 //---  Standard library extensions
 //------------------------------------------------------------------------------
 namespace std {
-  
+
   // ---------------------------------------------------------------------------
   /// Hash function of a interval or point is delegated to its quantity.
   template <typename Q, typename Cat>
@@ -1584,7 +1584,7 @@ namespace std {
       noexcept(noexcept(std::hash(key.quantity())))
       { return std::hash(key.quantity()); }
   }; // hash<Interval>
-  
+
   template <typename Q, typename Cat, typename IV>
   struct hash<util::quantities::concepts::Point<Q, Cat, IV>> {
     constexpr auto operator()
@@ -1592,8 +1592,8 @@ namespace std {
       noexcept(noexcept(std::hash(key.quantity())))
       { return std::hash(key.quantity()); }
   }; // hash<Interval>
-  
-  
+
+
   // ---------------------------------------------------------------------------
   /// Limits of a interval or point are the same as the underlying quantity and
   /// base type.
@@ -1602,55 +1602,55 @@ namespace std {
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Interval<Q, Cat>>
   {};
-  
+
   template <typename Q, typename Cat>
   class numeric_limits<util::quantities::concepts::Interval<Q, Cat> const>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Interval<Q, Cat> const>
   {};
-  
+
   template <typename Q, typename Cat>
   class numeric_limits<util::quantities::concepts::Interval<Q, Cat> volatile>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Interval<Q, Cat> volatile>
   {};
-  
+
   template <typename Q, typename Cat>
   class numeric_limits
     <util::quantities::concepts::Interval<Q, Cat> const volatile>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Interval<Q, Cat> const volatile>
   {};
-  
-  
+
+
   template <typename Q, typename Cat, typename IV>
   class numeric_limits<util::quantities::concepts::Point<Q, Cat, IV>>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Point<Q, Cat, IV>>
   {};
-  
+
   template <typename Q, typename Cat, typename IV>
   class numeric_limits<util::quantities::concepts::Point<Q, Cat, IV> const>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Point<Q, Cat, IV> const>
   {};
-  
+
   template <typename Q, typename Cat, typename IV>
   class numeric_limits<util::quantities::concepts::Point<Q, Cat, IV> volatile>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Point<Q, Cat, IV> volatile>
   {};
-  
+
   template <typename Q, typename Cat, typename IV>
   class numeric_limits
     <util::quantities::concepts::Point<Q, Cat, IV> const volatile>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Point<Q, Cat, IV> const volatile>
   {};
-  
-  
+
+
   // ---------------------------------------------------------------------------
-  
+
 } // namespace std
 
 

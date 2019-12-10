@@ -53,7 +53,7 @@
 /**
  * @def LARDATAALG_UTILITIES_QUANTITIES_ENABLE_IMPLICIT_CONVERSION
  * @brief Enable implicit conversions of `Quantity` into `value_t`.
- * 
+ *
  * This is likely going to break a number of features, and enabling it should
  * be followed by intense scrutiny of the tests.
  * If disabled, only the explicit conversion is supported.
@@ -63,7 +63,7 @@
 /**
  * @def LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
  * @brief Enable comparisons of `Quantity` with `value_t`.
- * 
+ *
  * This is likely going to break some code, and it is dangerous in that a
  * statement like `t > 5` does not really make sure `5` is the right unit.
  * With this feature disabled (which is recommended), the same comparison would
@@ -277,11 +277,11 @@ namespace util::quantities {
       /// Trait: `true_type` if `U` is a `ScaledUnit`-based object.
       template <typename U>
       struct has_unit;
-      
+
       /// Trait: `true` if `U` is a `ScaledUnit`-based object.
       template <typename U>
       constexpr bool has_unit_v = has_unit<U>();
-      
+
       /// Trait: `true_type` if `Q` is a `Quantity` specialization.
       template <typename Q>
       struct is_quantity;
@@ -293,54 +293,54 @@ namespace util::quantities {
       /// Trait: `true_type` if `Q` is a `Quantity`-based object.
       template <typename Q>
       struct has_quantity;
-      
+
       /// Trait: `true` if `Q` is a `Quantity`-based object.
       template <typename Q>
       constexpr bool has_quantity_v = has_quantity<Q>();
-      
+
 
       //------------------------------------------------------------------------
       /// Trait: type of value of `T`: may be `T` or, for objects with units,
       /// `T::value_t`.
       template <typename T>
       struct quantity_value_type;
-      
+
       /// Type of value of `T`: may be `T` or, for objects with units,
       /// `T::value_t`.
       template <typename T>
       using quantity_value_t = typename quantity_value_type<T>::type;
-      
-      
+
+
       /**
        * Trait: `true_type` if the type `T` is a value compatible with the value
        * of `Q`.
        */
       template <typename T, typename Q>
       struct is_value_compatible_with;
-      
+
       /// Trait: `true` if the type `T` is compatible with the value of `Q`.
       template <typename T, typename Q>
       constexpr bool is_value_compatible_with_v
         = is_value_compatible_with<T, Q>();
-      
-      
+
+
       /**
        * Trait: `true_type` if the value type of `T` is compatible with the one
        * of `U`.
-       * 
+       *
        * Note that this tells that `T` is compatible with `U`, but it may still
        * leave `U` not compatible with `T` (for example, if the compatibility
        * criterium were something asymmetric like a non-narrowing conversion).
        */
       template <typename T, typename U>
       struct has_value_compatible_with;
-      
+
       /// Trait: `true` if the value type of `T` is compatible with `U`'s.
       template <typename T, typename U>
       constexpr bool has_value_compatible_with_v
         = has_value_compatible_with<T, U>();
-      
-      
+
+
       //------------------------------------------------------------------------
       //---  constexpr string concatenation
       //------------------------------------------------------------------------
@@ -350,10 +350,10 @@ namespace util::quantities {
       //------------------------------------------------------------------------
       template <typename Q>
       class numeric_limits;
-      
-      
+
+
       //------------------------------------------------------------------------
-      
+
     } // namespace details
 
 
@@ -637,7 +637,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_IMPLICIT_CONVERSION
       constexpr operator value_t() const
         { return value(); }
-      
+
       // -- BEGIN Asymmetric arithmetic operations -----------------------------
       /**
        * @name Asymmetric operand arithmetic operations
@@ -654,7 +654,7 @@ namespace util::quantities {
        *       _prevent_ that from happening, but requests are welcome to add
        *       features to _allow_ that not to happen, with some care of the
        *       user.
-       * 
+       *
        * @note Operators `+` and `-` support only quantity operands of the same
        *       type, and no plain number operand. The rational behind this is
        *       that when writing `a + b` with `a` and `b` two homogeneous
@@ -666,7 +666,7 @@ namespace util::quantities {
        *       If the intention is clear, methods `plus()` and `minus()` are
        *       provided with the understanding that e.g. `a.plus(b)` explicitly
        *       requires the result to be of type `a`.
-       * 
+       *
        */
       /// @{
 
@@ -796,28 +796,28 @@ namespace util::quantities {
       template <typename OU>
       static constexpr bool sameUnitAs()
         { return unit_t::template sameUnitAs<OU>(); }
-      
+
       /// Whether `U` is a value type compatible with `value_t`.
       template <typename U>
       static constexpr bool is_compatible_value_v
-        = details::is_value_compatible_with_v<U, value_t>; 
-      
+        = details::is_value_compatible_with_v<U, value_t>;
+
       /// Whether `U` has (or is) a value type compatible with `value_t`.
       template <typename U>
       static constexpr bool has_compatible_value_v
-        = details::has_value_compatible_with_v<U, value_t>; 
-      
+        = details::has_value_compatible_with_v<U, value_t>;
+
       /// Returns whether `U` is a value type compatible with `value_t`.
       template <typename U>
       static constexpr bool isCompatibleValue()
         { return quantity_t::is_compatible_value_v<U>; }
-      
+
       /// Returns whether `U` has (or is) a value type compatible with
       /// `value_t`.
       template <typename U>
       static constexpr bool hasCompatibleValue()
         { return quantity_t::has_compatible_value_v<U>; }
-      
+
 
       /// @}
       // -- END Access to the scaled unit --------------------------------------
@@ -825,22 +825,22 @@ namespace util::quantities {
       /// Convert this quantity into the specified one.
       template <typename OQ>
       OQ convertInto() { return OQ(*this); }
-      
-      
+
+
       /**
        * @brief Returns a new quantity initialized with the specified value
        * @tparam U type to initialize the quantity with
        * @param value the value to initialize the quantity with
        * @return a new `Quantity` object initialized with `value`
-       * 
+       *
        * The `value` is cast into `value_t` via `static_cast()`.
-       * 
+       *
        * Example: be `Tick` a quantity based on an integral value, like
        * `util::quantities::tick`, and `detClocks` an instance of
        * `detinfo::DetectorClocks`:
        * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
        * double const tickDuration = detClocks.OpticalClock().TickPeriod();
-       * 
+       *
        * auto const triggerTick
        *   = Tick::castFrom(detClocks.TriggerTime() / tickDuration);
        * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -850,7 +850,7 @@ namespace util::quantities {
       template <typename U>
       static constexpr quantity_t castFrom(U value)
         { return quantity_t{ static_cast<value_t>(value) }; }
-      
+
 
         private:
       value_t fValue {}; ///< Stored value.
@@ -878,7 +878,7 @@ namespace util::quantities {
     //@{
     /**
      * Addition and subtraction of a quantity and a plain number are forbidden.
-     * 
+     *
      * The rationale is that it is not acceptable to support `position + 2_m`
      * but not `2_m + position`, and that it is not acceptable to have
      * `2_m + 50_cm` yield a type different than `50_cm + 2_m` (i.e. should
@@ -948,7 +948,7 @@ namespace util::quantities {
      *
      */
     /// @{
-    
+
     /*
      * To refrain the wild matching of every type with `V`, and still retain
      * the ability to compare to e.g. an integer rather than a double, instead
@@ -962,7 +962,7 @@ namespace util::quantities {
      * `std::is_arithmetic_v<V>`.
      */
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator== (Quantity<U, T> const q, V const value) noexcept
@@ -973,7 +973,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator== (V const value, Quantity<U, T> const q) noexcept
@@ -984,7 +984,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator!= (Quantity<U, T> const q, V const value) noexcept
@@ -995,7 +995,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator!= (V const value, Quantity<U, T> const q) noexcept
@@ -1006,7 +1006,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator<= (Quantity<U, T> const q, V const value) noexcept
@@ -1017,7 +1017,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator<= (V const value, Quantity<U, T> const q) noexcept
@@ -1028,7 +1028,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator< (Quantity<U, T> const q, V const value) noexcept
@@ -1039,7 +1039,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator< (V const value, Quantity<U, T> const q) noexcept
@@ -1050,7 +1050,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator>= (Quantity<U, T> const q, V const value) noexcept
@@ -1061,7 +1061,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator>= (V const value, Quantity<U, T> const q) noexcept
@@ -1072,7 +1072,7 @@ namespace util::quantities {
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator> (Quantity<U, T> const q, V const value) noexcept
@@ -1081,9 +1081,9 @@ namespace util::quantities {
 #else
       = delete; // forbidden
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-    
+
     template <typename U, typename T, typename V>
-    constexpr 
+    constexpr
     std::enable_if_t
       <Quantity<U, T>::template is_compatible_value_v<V>, bool>
     operator> (V const value, Quantity<U, T> const q) noexcept
@@ -1092,8 +1092,8 @@ namespace util::quantities {
 #else
       = delete; // forbidden
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-    
-    
+
+
     /// @}
     // -- END Comparisons ------------------------------------------------------
 
@@ -1116,12 +1116,12 @@ namespace util::quantities {
 
 
     // -------------------------------------------------------------------------
-    
+
     //
     // extensions STL-style
     // (can't be put in `std` since they are not specializations)
     //
-    
+
     /// Converts a unit into a string.
     /// @see `util::to_string()`
     template <typename... Args>
@@ -1130,7 +1130,7 @@ namespace util::quantities {
         return
           std::string(unit.prefix().symbol()) + unit.baseUnit().symbol.data();
       }
-    
+
     /// Converts a quantity into a string.
     /// @see `util::to_string()`
     template <typename... Args>
@@ -1245,7 +1245,7 @@ namespace util::quantities {
    * @throw ValueError the numerical value in `s` is not parseable
    * @throw ExtraCharactersError spurious characters after the numeric value
    *                             (including an unrecognised unit prefix)
-   * 
+   *
    * A quantity of type `Quantity` is returned, whose value is interpreted from
    * the content of `s`. The standard format includes a real number, a space
    * and a unit symbol. If `unitOptional` is `false`, that unit is required,
@@ -1253,52 +1253,52 @@ namespace util::quantities {
    * The base unit in `s`, when present, must exactly match the base unit of
    * `Quantity`; the scale may differ, in which case the proper conversion is
    * applied.
-   * 
+   *
    * Example:
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
    * using namespace util::quantities::time_literals;
    * using util::quantities::microsecond;
-   * 
+   *
    * auto const t = util::quantities::makeQuantity<microsecond>("7 ms");
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    * will assign to `t` the value `7000`.
    */
   template <typename Quantity>
   Quantity makeQuantity(std::string_view s, bool unitOptional = false);
-  
+
   template <typename Quantity>
   Quantity makeQuantity(std::string const& s, bool unitOptional = false);
-  
+
   template <typename Quantity>
   Quantity makeQuantity(char const* s, bool unitOptional = false);
-  
+
   //@}
-  
+
   // --- BEGIN -- Specific exceptions ------------------------------------------
-  
+
   /// String representing a quantity has no unit.
   struct MissingUnit: std::runtime_error
     { using std::runtime_error::runtime_error; };
-  
+
   /// String representing a quantity has unsupported unit prefix.
   struct InvalidUnitPrefix: std::runtime_error
     { using std::runtime_error::runtime_error; };
-  
+
   /// String representing a quantity has incompatible unit.
   struct MismatchingUnit: std::runtime_error
     { using std::runtime_error::runtime_error; };
-  
+
   /// String representing a quantity has an invalid number.
   struct ValueError: std::runtime_error
     { using std::runtime_error::runtime_error; };
-  
+
   /// String representing a quantity has spurious characters after the number.
   struct ExtraCharactersError: std::runtime_error
     { using std::runtime_error::runtime_error; };
-  
-  
+
+
   // --- END -- Specific exceptions --------------------------------------------
-  
+
   // ---------------------------------------------------------------------------
 
 } // namespace util::quantities
@@ -1327,13 +1327,13 @@ namespace util::quantities::concepts::details {
   //----------------------------------------------------------------------------
   template <typename U, typename Enable = void>
   struct has_unit_impl: public std::false_type {};
-  
+
   template <typename U>
   struct has_unit_impl
     <U, std::enable_if_t<util::always_true_v<typename U::unit_t>>>
     : public std::true_type
     {};
-  
+
   template <typename U>
   struct has_unit: public has_unit_impl<U> {};
 
@@ -1349,13 +1349,13 @@ namespace util::quantities::concepts::details {
   //----------------------------------------------------------------------------
   template <typename Q, typename Enable = void>
   struct has_quantity_impl: public std::false_type {};
-  
+
   template <typename Q>
   struct has_quantity_impl
     <Q, std::enable_if_t<util::always_true_v<typename Q::quantity_t>>>
     : public std::true_type
     {};
-  
+
   template <typename Q>
   struct has_quantity: public has_quantity_impl<Q> {};
 
@@ -1365,7 +1365,7 @@ namespace util::quantities::concepts::details {
   struct quantity_value_type_impl {
     using type = T;
   }; // quantity_value_type
-  
+
   template <typename T>
   struct quantity_value_type_impl<
     T,
@@ -1375,34 +1375,34 @@ namespace util::quantities::concepts::details {
   {
     using type = typename T::value_t;
   }; // quantity_value_type_impl<unit>
-  
-  
+
+
   template <typename T>
   struct quantity_value_type: quantity_value_type_impl<T> {};
-  
-  
+
+
   //----------------------------------------------------------------------------
   template <typename T, typename Q>
   struct is_value_compatible_with
     : std::bool_constant<std::is_convertible_v<T, quantity_value_t<Q>>>
   {};
-  
+
   //----------------------------------------------------------------------------
   template <typename T, typename U>
   struct has_value_compatible_with
     : is_value_compatible_with<quantity_value_t<T>, U>
   {};
-  
+
   //----------------------------------------------------------------------------
   /// Limits of a quantity are the same as the underlying type.
   template <typename Q>
   class numeric_limits: public std::numeric_limits<typename Q::value_t> {
-    
+
     using quantity_t = Q;
     using value_traits_t = std::numeric_limits<typename quantity_t::value_t>;
-    
+
       public:
-    
+
     static constexpr quantity_t min() noexcept
       { return quantity_t{ value_traits_t::min() }; }
     static constexpr quantity_t max() noexcept
@@ -1421,9 +1421,9 @@ namespace util::quantities::concepts::details {
       { return quantity_t{ value_traits_t::signaling_NaN() }; }
     static constexpr quantity_t denorm_min() noexcept
       { return quantity_t{ value_traits_t::denorm_min() }; }
-    
+
   }; // numeric_limits<Quantity>
-  
+
   //----------------------------------------------------------------------------
 
 } // namespace util::quantities::concepts::details
@@ -1503,7 +1503,7 @@ constexpr auto util::quantities::concepts::Quantity<U, T>::operator-
 template <typename U, typename T>
 template <typename OU, typename OT>
 constexpr auto util::quantities::concepts::Quantity<U, T>::plus
-  (Quantity<OU, OT> const other) const 
+  (Quantity<OU, OT> const other) const
   -> quantity_t
 {
   static_assert
@@ -1525,7 +1525,7 @@ constexpr auto util::quantities::concepts::Quantity<U, T>::plus
 template <typename U, typename T>
 template <typename OU, typename OT>
 constexpr auto util::quantities::concepts::Quantity<U, T>::minus
-  (Quantity<OU, OT> const other) const 
+  (Quantity<OU, OT> const other) const
   -> quantity_t
 {
   static_assert
@@ -1731,7 +1731,7 @@ constexpr bool util::quantities::concepts::Quantity<U, T>::operator>
 
 //------------------------------------------------------------------------------
 namespace util::quantities::details {
-  
+
   /**
    * @brief Parses the unit of a string representing a `Quantity`.
    * @tparam Quantity the quantity being represented
@@ -1760,10 +1760,10 @@ util::quantities::details::readUnit
   using value_t = typename Quantity_t::value_t;
   using unit_t = typename Quantity_t::unit_t;
   using baseunit_t = typename unit_t::baseunit_t;
-  
+
   // --- BEGIN -- static initialization ----------------------------------------
   using namespace std::string_literals;
-  
+
   using PrefixMap_t = std::map<std::string, value_t>;
   using PrefixValue_t = typename PrefixMap_t::value_type;
   static PrefixMap_t const factors {
@@ -1797,12 +1797,12 @@ util::quantities::details::readUnit
   static std::string const prefixPattern
     = composePrefixPattern(factors.begin(), factors.end());
   // --- END -- static initialization ------------------------------------------
-  
+
   std::regex const unitPattern {
     "[[:blank:]]*(" + prefixPattern + "?"
     + util::to_string(baseunit_t::symbol) + ")[[:blank:]]*$"
     };
-  
+
   std::smatch unitMatch;
   if (!std::regex_search(str, unitMatch, unitPattern)) {
     if (!unitOptional) {
@@ -1812,11 +1812,11 @@ util::quantities::details::readUnit
     }
     return { str, value_t{ 1 } };
   }
-  
+
   //
   // we do have a unit:
   //
-  
+
   // " 7 cm " => [0] full match (" cm ") [1] unit ("cm") [2] unit prefix ("c")
   auto const iFactor = factors.find(unitMatch.str(2U));
   if (iFactor == factors.end()) {
@@ -1826,12 +1826,12 @@ util::quantities::details::readUnit
       + "' (parsing '" + str + "')"
       );
   }
-  
+
   return {
-    str.substr(0U, str.length() - unitMatch.length()), 
+    str.substr(0U, str.length() - unitMatch.length()),
     static_cast<value_t>(unit_t::scale(iFactor->second))
     };
-  
+
 } // util::quantities::details::readUnit()
 
 
@@ -1845,9 +1845,9 @@ Quantity util::quantities::makeQuantity
   // some redesign is needed...
   //
   using value_t = typename Quantity::value_t;
-  
+
   auto const [ num_s, factor ] = details::readUnit<Quantity>(s, unitOptional);
-  
+
   char* parseEnd = nullptr;
   auto const value
     = static_cast<value_t>(std::strtod(num_s.c_str(), &parseEnd));
@@ -1864,7 +1864,7 @@ Quantity util::quantities::makeQuantity
     }
     ++parseEnd;
   } // while
-  
+
   //
   // create and return the quantity
   //
@@ -1896,7 +1896,7 @@ Quantity util::quantities::makeQuantity
 //---  Standard library extensions
 //------------------------------------------------------------------------------
 namespace std {
-  
+
   // ---------------------------------------------------------------------------
   /// Hash function of a quantity is delegated to its value
   template <typename... Args>
@@ -1910,8 +1910,8 @@ namespace std {
       noexcept(noexcept(std::hash<value_t>()(key.value())))
       { return std::hash<value_t>()(key.value()); }
   };
-  
-  
+
+
   // ---------------------------------------------------------------------------
   /// Limits of a quantity are the same as the underlying type.
   template <typename Unit, typename T>
@@ -1919,31 +1919,31 @@ namespace std {
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Quantity<Unit, T>>
   {};
-  
+
   template <typename Unit, typename T>
   class numeric_limits
     <util::quantities::concepts::Quantity<Unit, T> const>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Quantity<Unit, T> const>
   {};
-  
+
   template <typename Unit, typename T>
   class numeric_limits
     <util::quantities::concepts::Quantity<Unit, T> volatile>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Quantity<Unit, T> volatile>
   {};
-  
+
   template <typename Unit, typename T>
   class numeric_limits
     <util::quantities::concepts::Quantity<Unit, T> const volatile>
     : public util::quantities::concepts::details::numeric_limits
       <util::quantities::concepts::Quantity<Unit, T> const volatile>
   {};
-  
-  
+
+
   // ---------------------------------------------------------------------------
-  
+
 } // namespace std
 
 

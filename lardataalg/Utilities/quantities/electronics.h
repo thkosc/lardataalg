@@ -175,31 +175,31 @@ namespace util::quantities {
 
 
   // --- BEGIN Tick intervals --------------------------------------------------
-  
+
   namespace intervals {
-    
+
     /// A `units::Ticks`-based interval.
     template <typename T = util::quantities::tick_as<>::value_t>
     using ticks_as = concepts::Interval<util::quantities::tick_as<T>>;
 
     /// A tick interval based on `std::ptrdiff_t`.
     using ticks = ticks_as<>;
-    
+
     /// A tick interval based on single precision real number.
     using ticks_f = ticks_as<float>;
-    
+
     /// A tick interval based on double precision real number.
     using ticks_d = ticks_as<double>;
-    
+
   } // namespace intervals
-  
+
   // --- END Time intervals ----------------------------------------------------
-  
-  
+
+
   // --- BEGIN Time points -----------------------------------------------------
-  
+
   namespace points {
-    
+
     /// A `units::Ticks`-based point.
     template <
       typename T = util::quantities::tick_as<>::value_t,
@@ -209,18 +209,18 @@ namespace util::quantities {
 
     /// A tick value based on `std::ptrdiff_t`.
     using tick = tick_as<>;
-    
+
     /// A tick value based on single precision real number.
     using tick_f = tick_as<float>;
-    
+
     /// A tick value based on double precision real number.
     using tick_d = tick_as<double>;
-    
+
   } // namespace points
-  
+
   // --- END Tick points -------------------------------------------------------
-  
-  
+
+
   /// @}
 
 } // namespace util::quantities

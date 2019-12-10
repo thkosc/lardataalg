@@ -213,9 +213,9 @@ namespace util::quantities {
 
 
   // --- BEGIN Time intervals --------------------------------------------------
-  
+
   namespace intervals {
-    
+
     /// The most generic `units::Second`-based interval.
     template <typename R, typename T = double>
     using scaled_seconds
@@ -234,7 +234,7 @@ namespace util::quantities {
     //
     // milliseconds
     //
-    
+
     /// Type of time interval stored in milliseconds.
     template <typename T = double>
     using milliseconds_as = scaled_seconds<std::milli, T>;
@@ -245,7 +245,7 @@ namespace util::quantities {
     //
     // microseconds
     //
-    
+
     /// Type of time interval stored in microseconds.
     template <typename T = double>
     using microseconds_as = scaled_seconds<std::micro, T>;
@@ -256,7 +256,7 @@ namespace util::quantities {
     //
     // nanoseconds
     //
-    
+
     /// Type of time interval stored in nanoseconds.
     template <typename T = double>
     using nanoseconds_as = scaled_seconds<std::nano, T>;
@@ -267,7 +267,7 @@ namespace util::quantities {
     //
     // picoseconds
     //
-    
+
     /// Type of time interval stored in picoseconds.
     template <typename T = double>
     using picoseconds_as = scaled_seconds<std::pico, T>;
@@ -275,16 +275,16 @@ namespace util::quantities {
     /// Type of time interval stored in picoseconds, in double precision.
     using picoseconds = picoseconds_as<>;
 
-  
+
   } // namespace intervals
-  
+
   // --- END Time intervals ----------------------------------------------------
-  
-  
+
+
   // --- BEGIN Time points -----------------------------------------------------
-  
+
   namespace points {
-    
+
     /// The most generic `units::Second`-based point.
     template <typename R, typename T = double, typename Cat = NoCategory>
     using scaled_second
@@ -303,7 +303,7 @@ namespace util::quantities {
     //
     // millisecond
     //
-    
+
     /// Type of time point stored in milliseconds.
     template <typename T = double, typename Cat = NoCategory>
     using millisecond_as = scaled_second<std::milli, T, Cat>;
@@ -314,7 +314,7 @@ namespace util::quantities {
     //
     // microsecond
     //
-    
+
     /// Type of time point stored in microseconds.
     template <typename T = double, typename Cat = NoCategory>
     using microsecond_as = scaled_second<std::micro, T, Cat>;
@@ -325,7 +325,7 @@ namespace util::quantities {
     //
     // nanosecond
     //
-    
+
     /// Type of time point stored in nanoseconds.
     template <typename T = double, typename Cat = NoCategory>
     using nanosecond_as = scaled_second<std::nano, T, Cat>;
@@ -336,7 +336,7 @@ namespace util::quantities {
     //
     // picosecond
     //
-    
+
     /// Type of time point stored in picoseconds.
     template <typename T = double, typename Cat = NoCategory>
     using picosecond_as = scaled_second<std::pico, T, Cat>;
@@ -344,18 +344,18 @@ namespace util::quantities {
     /// Type of time point stored in picoseconds, in double precision.
     using picosecond = picosecond_as<>;
 
-  
+
   } // namespace points
-  
+
   // --- END Time points -------------------------------------------------------
-  
-  
+
+
   /// @}
   // -- END Time ---------------------------------------------------------------
-  
-  
-  
-  
+
+
+
+
 } // namespace util::quantities
 
 //------------------------------------------------------------------------------
