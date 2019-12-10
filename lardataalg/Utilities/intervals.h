@@ -1285,6 +1285,59 @@ namespace util::quantities {
   
   
   // ---------------------------------------------------------------------------
+  // @{
+  /**
+   * @brief Returns an interval of the specified type parsed from a string.
+   * @tparam IV the type of quantity interval to be returned
+   * @param s the string to be parsed
+   * @param unitOptional (default: `false`) whether unit is not required in `s`
+   * @return a quantity interval of the specified type parsed from a string
+   * @throw MissingUnit `s` does not contain the required unit
+   * @throw ValueError the numerical value in `s` is not parseable
+   * @throw ExtraCharactersError spurious characters after the numeric value
+   * @see `util::makeQuantity()`
+   * 
+   * This function behaves like `util::makeQuantity()`.
+   */
+  template <typename IV>
+  IV makeInterval(std::string_view s, bool unitOptional = false);
+  
+  template <typename IV>
+  IV makeInterval(std::string const& s, bool unitOptional = false);
+  
+  template <typename IV>
+  IV makeInterval(char const* s, bool unitOptional = false);
+  
+  //@}
+  
+  
+  // @{
+  /**
+   * @brief Returns a point of the specified type parsed from a string.
+   * @tparam PT the type of quantity point to be returned
+   * @param s the string to be parsed
+   * @param unitOptional (default: `false`) whether unit is not required in `s`
+   * @return a quantity point of the specified type parsed from a string
+   * @throw MissingUnit `s` does not contain the required unit
+   * @throw ValueError the numerical value in `s` is not parseable
+   * @throw ExtraCharactersError spurious characters after the numeric value
+   * @see `util::makeQuantity()`
+   * 
+   * This function behaves like `util::makeQuantity()`.
+   */
+  template <typename PT>
+  PT makePoint(std::string_view s, bool unitOptional = false);
+  
+  template <typename PT>
+  PT makePoint(std::string const& s, bool unitOptional = false);
+  
+  template <typename PT>
+  PT makePoint(char const* s, bool unitOptional = false);
+  
+  //@}
+  
+  
+  // ---------------------------------------------------------------------------
   
 } // namespace util::quantities
 
@@ -1453,6 +1506,68 @@ namespace util::quantities::concepts {
   //----------------------------------------------------------------------------
   
 } // namespace util::quantities::concepts
+
+
+//------------------------------------------------------------------------------
+//---  Template implementation
+//------------------------------------------------------------------------------
+template <typename IV>
+IV util::quantities::makeInterval
+  (std::string_view s, bool unitOptional /* = false */)
+{
+  using quantity_t = typename IV::quantity_t;
+  return { util::quantities::makeQuantity<quantity_t>(s, unitOptional) };
+} // util::quantities::makeInterval(string_view)
+
+
+//------------------------------------------------------------------------------
+template <typename IV>
+IV util::quantities::makeInterval
+  (std::string const& s, bool unitOptional /* = false */)
+{
+  using quantity_t = typename IV::quantity_t;
+  return { util::quantities::makeQuantity<quantity_t>(s, unitOptional) };
+} // util::quantities::makeInterval(string)
+
+
+//------------------------------------------------------------------------------
+template <typename IV>
+IV util::quantities::makeInterval
+  (char const* s, bool unitOptional /* = false */)
+{
+  using quantity_t = typename IV::quantity_t;
+  return { util::quantities::makeQuantity<quantity_t>(s, unitOptional) };
+} // util::quantities::makeInterval(C-string)
+
+
+//------------------------------------------------------------------------------
+template <typename PT>
+PT util::quantities::makePoint
+  (std::string_view s, bool unitOptional /* = false */)
+{
+  using quantity_t = typename PT::quantity_t;
+  return { util::quantities::makeQuantity<quantity_t>(s, unitOptional) };
+} // util::quantities::makePoint(string_view)
+
+
+//------------------------------------------------------------------------------
+template <typename PT>
+PT util::quantities::makePoint
+  (std::string const& s, bool unitOptional /* = false */)
+{
+  using quantity_t = typename PT::quantity_t;
+  return { util::quantities::makeQuantity<quantity_t>(s, unitOptional) };
+} // util::quantities::makePoint(string)
+
+
+//------------------------------------------------------------------------------
+template <typename PT>
+PT util::quantities::makePoint
+  (char const* s, bool unitOptional /* = false */)
+{
+  using quantity_t = typename PT::quantity_t;
+  return { util::quantities::makeQuantity<quantity_t>(s, unitOptional) };
+} // util::quantities::makePoint(C-string)
 
 
 //------------------------------------------------------------------------------

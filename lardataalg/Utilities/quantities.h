@@ -32,19 +32,22 @@
 // LArSoft libraries
 #include "lardataalg/Utilities/constexpr_math.h" // util::abs()
 #include "larcorealg/CoreUtils/MetaUtils.h" // util::always_true_v<>
-#include "larcorealg/CoreUtils/StdUtils.h" // util::to_string()
+#include "larcorealg/CoreUtils/StdUtils.h" // util::to_string(), ...
 
 // Boost libraries
 #include "boost/integer/common_factor_rt.hpp" // boost::integer::gcd()
 
 // C/C++ standard libraries
 #include <ostream>
+#include <map>
 #include <string>
 #include <string_view>
+#include <regex>
 #include <ratio>
 #include <limits>
 #include <functional> // std::hash<>
 #include <type_traits> // std::is_same<>, std::enable_if_t<>, ...
+#include <cctype> // std::isblank()
 
 
 /**
@@ -850,7 +853,7 @@ namespace util::quantities {
       
 
         private:
-      value_t fValue; ///< Stored value.
+      value_t fValue {}; ///< Stored value.
 
     }; // struct Quantity
 
@@ -911,12 +914,15 @@ namespace util::quantities {
       { return q * factor; }
     //@}
 
+    //@{
     /// Multiplication between quantities is forbidden.
     template <typename AU, typename AT, typename BU, typename BT>
     constexpr auto operator* (Quantity<AU, AT>, Quantity<BU, BT>)
       -> decltype(std::declval<AT>() * std::declval<BT>())
       = delete;
+    //@}
 
+    //@{
     // Division by a scalar.
     template <typename U, typename T, typename OT>
     constexpr
@@ -924,6 +930,7 @@ namespace util::quantities {
       <Quantity<U, T>::template is_compatible_value_v<OT>, Quantity<U, T>>
     operator/ (Quantity<U, T> q, OT quot)
       { return Quantity<U, T>{ q.value() / static_cast<T>(quot) }; }
+    //@}
 
     /// @}
     // -- END Arithmetic operations --------------------------------------------
@@ -1226,6 +1233,72 @@ namespace util::quantities {
   namespace units {} // we expect other libraries to fill it
 
 
+  // -------------------------------------------------------------------------
+  // @{
+  /**
+   * @brief Returns a quantity of the specified type parsed from a string.
+   * @tparam Quantity the quantity to be returned
+   * @param s the string to be parsed
+   * @param unitOptional (default: `false`) whether unit is not required in `s`
+   * @return a quantity of the specified type parsed from a string
+   * @throw MissingUnit `s` does not contain the required unit
+   * @throw ValueError the numerical value in `s` is not parseable
+   * @throw ExtraCharactersError spurious characters after the numeric value
+   *                             (including an unrecognised unit prefix)
+   * 
+   * A quantity of type `Quantity` is returned, whose value is interpreted from
+   * the content of `s`. The standard format includes a real number, a space
+   * and a unit symbol. If `unitOptional` is `false`, that unit is required,
+   * otherwise it is optional and defaults to the unit and scale in `Quantity`.
+   * The base unit in `s`, when present, must exactly match the base unit of
+   * `Quantity`; the scale may differ, in which case the proper conversion is
+   * applied.
+   * 
+   * Example:
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
+   * using namespace util::quantities::time_literals;
+   * using util::quantities::microsecond;
+   * 
+   * auto const t = util::quantities::makeQuantity<microsecond>("7 ms");
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   * will assign to `t` the value `7000`.
+   */
+  template <typename Quantity>
+  Quantity makeQuantity(std::string_view s, bool unitOptional = false);
+  
+  template <typename Quantity>
+  Quantity makeQuantity(std::string const& s, bool unitOptional = false);
+  
+  template <typename Quantity>
+  Quantity makeQuantity(char const* s, bool unitOptional = false);
+  
+  //@}
+  
+  // --- BEGIN -- Specific exceptions ------------------------------------------
+  
+  /// String representing a quantity has no unit.
+  struct MissingUnit: std::runtime_error
+    { using std::runtime_error::runtime_error; };
+  
+  /// String representing a quantity has unsupported unit prefix.
+  struct InvalidUnitPrefix: std::runtime_error
+    { using std::runtime_error::runtime_error; };
+  
+  /// String representing a quantity has incompatible unit.
+  struct MismatchingUnit: std::runtime_error
+    { using std::runtime_error::runtime_error; };
+  
+  /// String representing a quantity has an invalid number.
+  struct ValueError: std::runtime_error
+    { using std::runtime_error::runtime_error; };
+  
+  /// String representing a quantity has spurious characters after the number.
+  struct ExtraCharactersError: std::runtime_error
+    { using std::runtime_error::runtime_error; };
+  
+  
+  // --- END -- Specific exceptions --------------------------------------------
+  
   // ---------------------------------------------------------------------------
 
 } // namespace util::quantities
@@ -1388,7 +1461,7 @@ constexpr auto util::quantities::concepts::Prefix<R>::names
   if constexpr(std::is_same<ratio, std::pico>())
     return Long? "pico"sv:  "p"sv;
   if constexpr(std::is_same<ratio, std::femto>())
-    return Long? "femto"sv:  "f"sv;
+    return Long? "femto"sv: "f"sv;
   // TODO complete the long list of prefixes
 
   // backup; can't use `to_string()` because of `constexpr` requirement
@@ -1655,6 +1728,168 @@ constexpr bool util::quantities::concepts::Quantity<U, T>::operator>
   }
 } // util::quantities::concepts::Quantity<>::operator>()
 
+
+//------------------------------------------------------------------------------
+namespace util::quantities::details {
+  
+  /**
+   * @brief Parses the unit of a string representing a `Quantity`.
+   * @tparam Quantity the quantity being represented
+   * @param str the string to be parsed
+   * @param unitOptional (default: `false`) whether unit is not required
+   * @return a pair: the unparsed part of `str` and the factor for parsed unit
+   * @throw MissingUnit `s` does not contain the required unit
+   * @throw ValueError the numerical value in `s` is not parseable
+   * @throw ExtraCharactersError spurious characters after the numeric value
+   *                             (including an unrecognised unit prefix)
+   */
+  template <typename Quantity>
+  std::pair<std::string, typename Quantity::value_t> readUnit
+    (std::string const& str, bool unitOptional = false);
+
+} // util::quantities::details
+
+
+//------------------------------------------------------------------------------
+template <typename Quantity>
+std::pair<std::string, typename Quantity::value_t>
+util::quantities::details::readUnit
+  (std::string const& str, bool unitOptional /* = false */)
+{
+  using Quantity_t = Quantity;
+  using value_t = typename Quantity_t::value_t;
+  using unit_t = typename Quantity_t::unit_t;
+  using baseunit_t = typename unit_t::baseunit_t;
+  
+  // --- BEGIN -- static initialization ----------------------------------------
+  using namespace std::string_literals;
+  
+  using PrefixMap_t = std::map<std::string, value_t>;
+  using PrefixValue_t = typename PrefixMap_t::value_type;
+  static PrefixMap_t const factors {
+    PrefixValue_t{ "a"s,  1e-18 },
+    PrefixValue_t{ "f"s,  1e-15 },
+    PrefixValue_t{ "p"s,  1e-12 },
+    PrefixValue_t{ "n"s,  1e-09 },
+    PrefixValue_t{ "u"s,  1e-06 },
+    PrefixValue_t{ "m"s,  1e-03 },
+    PrefixValue_t{ "c"s,  1e-02 },
+    PrefixValue_t{ "d"s,  1e-01 },
+    PrefixValue_t{ ""s,   1e+00 },
+    PrefixValue_t{ "da"s, 1e+01 },
+    PrefixValue_t{ "h"s,  1e+02 },
+    PrefixValue_t{ "k"s,  1e+03 },
+    PrefixValue_t{ "M"s,  1e+06 },
+    PrefixValue_t{ "G"s,  1e+09 },
+    PrefixValue_t{ "T"s,  1e+12 },
+    PrefixValue_t{ "P"s,  1e+15 },
+    PrefixValue_t{ "E"s,  1e+18 }
+  }; // factors
+  static auto const composePrefixPattern = [](auto b, auto e) -> std::string
+    {
+      std::string pattern = "(";
+      if (b != e) {
+        pattern += b->first;
+        while (++b != e) { pattern += '|'; pattern += b->first; }
+      }
+      return pattern += ")";
+    };
+  static std::string const prefixPattern
+    = composePrefixPattern(factors.begin(), factors.end());
+  // --- END -- static initialization ------------------------------------------
+  
+  std::regex const unitPattern {
+    "[[:blank:]]*(" + prefixPattern + "?"
+    + util::to_string(baseunit_t::symbol) + ")[[:blank:]]*$"
+    };
+  
+  std::smatch unitMatch;
+  if (!std::regex_search(str, unitMatch, unitPattern)) {
+    if (!unitOptional) {
+      throw MissingUnit("Unit is mandatory and must derive from '"
+        + util::to_string(baseunit_t::symbol) + "' (parsing: '" + str + "')"
+        );
+    }
+    return { str, value_t{ 1 } };
+  }
+  
+  //
+  // we do have a unit:
+  //
+  
+  // " 7 cm " => [0] full match (" cm ") [1] unit ("cm") [2] unit prefix ("c")
+  auto const iFactor = factors.find(unitMatch.str(2U));
+  if (iFactor == factors.end()) {
+    throw InvalidUnitPrefix(
+      "Unit '" + unitMatch.str(1U)
+      + "' has unsupported prefix '" + unitMatch.str(2U)
+      + "' (parsing '" + str + "')"
+      );
+  }
+  
+  return {
+    str.substr(0U, str.length() - unitMatch.length()), 
+    static_cast<value_t>(unit_t::scale(iFactor->second))
+    };
+  
+} // util::quantities::details::readUnit()
+
+
+//------------------------------------------------------------------------------
+template <typename Quantity>
+Quantity util::quantities::makeQuantity
+  (std::string const& s, bool unitOptional /* = false */)
+{
+  //
+  // all this function is horrible;
+  // some redesign is needed...
+  //
+  using value_t = typename Quantity::value_t;
+  
+  auto const [ num_s, factor ] = details::readUnit<Quantity>(s, unitOptional);
+  
+  char* parseEnd = nullptr;
+  auto const value
+    = static_cast<value_t>(std::strtod(num_s.c_str(), &parseEnd));
+  const char* send = num_s.c_str() + num_s.length();
+  if (parseEnd == num_s.c_str()) {
+    throw ValueError("Could not convert '" + num_s + "' into a number!");
+  }
+  while (parseEnd != send) {
+    if (!std::isblank(static_cast<unsigned char>(*parseEnd))) {
+      throw ExtraCharactersError("Spurious characters after value "
+        + std::to_string(value) + " in '" + num_s + "' ('"
+        + std::string(parseEnd, send - parseEnd) + "')\n"
+        );
+    }
+    ++parseEnd;
+  } // while
+  
+  //
+  // create and return the quantity
+  //
+  return Quantity{ static_cast<value_t>(value * factor) };
+} // util::quantities::makeQuantity(string_view)
+
+
+//------------------------------------------------------------------------------
+template <typename Quantity>
+Quantity util::quantities::makeQuantity
+  (std::string_view s, bool unitOptional /* = false */)
+{
+  return util::quantities::makeQuantity<Quantity>
+    (std::string{ s.begin(), s.end() }, unitOptional);
+} // util::quantities::makeQuantity(string_view)
+
+
+//------------------------------------------------------------------------------
+template <typename Quantity>
+Quantity util::quantities::makeQuantity
+  (char const* s, bool unitOptional /* = false */)
+{
+  return
+    util::quantities::makeQuantity<Quantity>(std::string_view{s}, unitOptional);
+} // util::quantities::makeQuantity(string)
 
 
 //------------------------------------------------------------------------------
