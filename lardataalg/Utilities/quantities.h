@@ -1730,21 +1730,38 @@ constexpr bool util::quantities::concepts::Quantity<U, T>::operator>
 
 
 //------------------------------------------------------------------------------
+namespace util::quantities::details {
+  
+  /**
+   * @brief Parses the unit of a string representing a `Quantity`.
+   * @tparam Quantity the quantity being represented
+   * @param str the string to be parsed
+   * @param unitOptional (default: `false`) whether unit is not required
+   * @return a pair: the unparsed part of `str` and the factor for parsed unit
+   * @throw MissingUnit `s` does not contain the required unit
+   * @throw ValueError the numerical value in `s` is not parseable
+   * @throw ExtraCharactersError spurious characters after the numeric value
+   *                             (including an unrecognised unit prefix)
+   */
+  template <typename Quantity>
+  std::pair<std::string, typename Quantity::value_t> readUnit
+    (std::string const& str, bool unitOptional = false);
+
+} // util::quantities::details
+
+
+//------------------------------------------------------------------------------
 template <typename Quantity>
-Quantity util::quantities::makeQuantity
-  (std::string_view s, bool unitOptional /* = false */)
+std::pair<std::string, typename Quantity::value_t>
+util::quantities::details::readUnit
+  (std::string const& str, bool unitOptional /* = false */)
 {
-  //
-  // all this function is horrible;
-  // some redesign is needed...
-  //
   using Quantity_t = Quantity;
   using value_t = typename Quantity_t::value_t;
   using unit_t = typename Quantity_t::unit_t;
   using baseunit_t = typename unit_t::baseunit_t;
   
-  auto const asValue = [](auto v){ return static_cast<value_t>(v); };
-  
+  // --- BEGIN -- static initialization ----------------------------------------
   using namespace std::string_literals;
   
   using PrefixMap_t = std::map<std::string, value_t>;
@@ -1779,37 +1796,61 @@ Quantity util::quantities::makeQuantity
     };
   static std::string const prefixPattern
     = composePrefixPattern(factors.begin(), factors.end());
+  // --- END -- static initialization ------------------------------------------
   
-  
-  std::string str { s.begin(), s.end() };
   std::regex const unitPattern {
     "[[:blank:]]*(" + prefixPattern + "?"
     + util::to_string(baseunit_t::symbol) + ")[[:blank:]]*$"
     };
   
-  value_t factor { 1 };
-  if (std::smatch unitMatch; std::regex_search(str, unitMatch, unitPattern)) {
-    // " 7 cm " => [0] full match (" cm ") [1] unit ("cm") [2] unit prefix ("c")
-    auto const iFactor = factors.find(unitMatch.str(2U));
-    if (iFactor == factors.end()) {
-      throw InvalidUnitPrefix(
-        "Unit '" + unitMatch.str(1U)
-        + "' has unsupported prefix '" + unitMatch.str(2U)
-        + "' (parsing '" + str + "')"
+  std::smatch unitMatch;
+  if (!std::regex_search(str, unitMatch, unitPattern)) {
+    if (!unitOptional) {
+      throw MissingUnit("Unit is mandatory and must derive from '"
+        + util::to_string(baseunit_t::symbol) + "' (parsing: '" + str + "')"
         );
     }
-    factor = asValue(unit_t::scale(iFactor->second));
-    str.erase(str.length() - unitMatch.length());
+    return { str, value_t{ 1 } };
   }
-  else if (!unitOptional) {
-    throw MissingUnit("Unit is mandatory and must derive from '"
-      + util::to_string(baseunit_t::symbol) + "' (parsing: '" + str + "')"
+  
+  //
+  // we do have a unit:
+  //
+  
+  // " 7 cm " => [0] full match (" cm ") [1] unit ("cm") [2] unit prefix ("c")
+  auto const iFactor = factors.find(unitMatch.str(2U));
+  if (iFactor == factors.end()) {
+    throw InvalidUnitPrefix(
+      "Unit '" + unitMatch.str(1U)
+      + "' has unsupported prefix '" + unitMatch.str(2U)
+      + "' (parsing '" + str + "')"
       );
   }
-  std::string const num_s = std::move(str);
+  
+  return {
+    str.substr(0U, str.length() - unitMatch.length()), 
+    static_cast<value_t>(unit_t::scale(iFactor->second))
+    };
+  
+} // util::quantities::details::readUnit()
+
+
+//------------------------------------------------------------------------------
+template <typename Quantity>
+Quantity util::quantities::makeQuantity
+  (std::string const& s, bool unitOptional /* = false */)
+{
+  //
+  // all this function is horrible;
+  // some redesign is needed...
+  //
+  using value_t = typename Quantity::value_t;
+  
+  auto const [ num_s, factor ] = details::readUnit<Quantity>(s, unitOptional);
   
   char* parseEnd = nullptr;
-  value_t value = asValue(std::strtod(num_s.c_str(), &parseEnd));
+  auto const value
+    = static_cast<value_t>(std::strtod(num_s.c_str(), &parseEnd));
   const char* send = num_s.c_str() + num_s.length();
   if (parseEnd == num_s.c_str()) {
     throw ValueError("Could not convert '" + num_s + "' into a number!");
@@ -1827,18 +1868,18 @@ Quantity util::quantities::makeQuantity
   //
   // create and return the quantity
   //
-  return Quantity{ asValue(value * factor) };
+  return Quantity{ static_cast<value_t>(value * factor) };
 } // util::quantities::makeQuantity(string_view)
 
 
 //------------------------------------------------------------------------------
 template <typename Quantity>
 Quantity util::quantities::makeQuantity
-  (std::string const& s, bool unitOptional /* = false */)
+  (std::string_view s, bool unitOptional /* = false */)
 {
   return util::quantities::makeQuantity<Quantity>
-    (std::string_view{ s.data(), s.length() }, unitOptional);
-} // util::quantities::makeQuantity(string)
+    (std::string{ s.begin(), s.end() }, unitOptional);
+} // util::quantities::makeQuantity(string_view)
 
 
 //------------------------------------------------------------------------------
