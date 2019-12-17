@@ -16,6 +16,7 @@
 #include "lardataalg/Utilities/MultipleChoiceSelection.h"
 
 // C/C++ standard libraries
+#include <iostream>
 #include <string>
 
 
@@ -26,18 +27,16 @@ void MultipleChoiceSelection_test() {
   
   using OptionSelector_t = util::MultipleChoiceSelection<Color>;
   
-  OptionSelector_t options { 
-//     {
-      { Color::black, "black" },
-      { Color::gray, "gray", "grey" }
-//     }
+  OptionSelector_t options {
+    { Color::black, "black" },
+    { Color::gray, "gray", "grey" }
     };
   
   BOOST_CHECK_EQUAL(options.size(), 2U);
   
   BOOST_CHECK_THROW(
-    options.addAlias(Color::white, "blanche"), // not yet added
-    OptionSelector_t::OptionAlreadyExistsError
+    options.addAlias(Color::white, "blanche"), // Color::white not yet added
+    OptionSelector_t::UnknownOptionError
     );
   
   auto const& opWhite0 = options.addOption(Color::white, "white");
@@ -45,9 +44,11 @@ void MultipleChoiceSelection_test() {
   BOOST_CHECK_EQUAL(&opWhite0again, &opWhite0);
   BOOST_CHECK_EQUAL(options.size(), 3U);
   
+  std::cout << "Options:\n" << options.optionListDump(" * ") << std::endl;
+
   BOOST_CHECK( options.hasOption(Color::white));
   BOOST_CHECK( options.hasOption(Color::gray));
-  BOOST_CHECK( options.hasOption(Color::blue));
+  BOOST_CHECK(!options.hasOption(Color::blue));
   BOOST_CHECK( options.hasOption("white"));
   BOOST_CHECK( options.hasOption("blanche"));
   BOOST_CHECK( options.hasOption("wHite"));
@@ -118,7 +119,7 @@ void MultipleChoiceSelection_test() {
 // -----------------------------------------------------------------------------
 BOOST_AUTO_TEST_CASE(MultipleChoiceSelection_testcase) {
 
-  MultipleChoiceSelection_testcase();
+  MultipleChoiceSelection_test();
 
 } // BOOST_AUTO_TEST_CASE(MultipleChoiceSelection_testcase)
 

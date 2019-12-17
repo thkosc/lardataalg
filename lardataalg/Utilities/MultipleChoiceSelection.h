@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <ostream>
+#include <optional>
 #include <type_traits> // std::conjunction_v, std::is_convertible...
 #include <cctype> // std::tolower()
 #include <cstddef> // std::size_t
@@ -41,6 +42,7 @@ namespace util::details {
     
       private:
     static bool cmp_lower(unsigned char a, unsigned char b);
+    static bool eq_lower(unsigned char a, unsigned char b);
 
   }; // struct CaseInsensitiveComparer
 
@@ -52,6 +54,9 @@ namespace util::details {
   }; // struct SorterFrom<>
 
   
+  // ---------------------------------------------------------------------------
+  template <typename Value, typename = void> struct ValueToString;
+
   // ---------------------------------------------------------------------------
   /**
    * @brief Class representing one of the available options to be selected.
@@ -106,9 +111,15 @@ namespace util::details {
     /// Returns a string representing the value of the option.
     /// 
     /// That will be the `name()` of the option if the value is not convertible
-    /// to a string. TODO
+    /// to a string.
     std::string value_as_string() const;
     
+    /// Returns a string represent the value of the option, or `defValue`.
+    std::string value_as_string(std::string const& defValue) const;
+    
+    /// Returns in a string the name and all the aliases.
+    std::string dump() const;
+
     /// Returns whether the two options are the same (same value and name).
     bool operator== (Option_t const& option) const
       { return (value() == option.value()) && equal(name(), option.name()); }
@@ -116,6 +127,15 @@ namespace util::details {
     /// Returns whether the two options are not the same.
     bool operator!= (Option_t const& option) const
       { return (value() != option.value()) || !equal(name(), option.name()); }
+    
+    
+    /// Converts a value of type `Choices_t` into a string, if possible.
+    static std::optional<std::string> value_as_string(Choices_t value);
+    
+    /// Converts a value of type `Choices_t` into a string, if possible.
+    static std::string value_as_string
+      (Choices_t value, std::string const& defValue);
+    
     
       private:
     
@@ -229,6 +249,9 @@ class util::MultipleChoiceSelection: public util::MultipleChoiceSelectionBase {
   
   /// Returns the number of available options.
   std::size_t size() const;
+
+  /// Returns whether there is no available option.
+  bool empty() const;
   
   
   /**
@@ -333,6 +356,24 @@ class util::MultipleChoiceSelection: public util::MultipleChoiceSelectionBase {
   /// @}
   // --- END -- Option access --------------------------------------------------
   
+
+  /// --- BEGIN ----------------------------------------------------------------
+  /// @name Presentation and dumping
+  /// @{
+
+  /// Returns a string with the (main) name of all options.
+  std::string optionListString(std::string const& sep = ", ") const;
+
+  /// Returns a string with all the options, one per line.
+  std::string optionListDump
+    (std::string const& indent, std::string const& firstIndent) const;
+
+  /// Returns a string with all the options, one per line.
+  std::string optionListDump(std::string const& indent = "") const
+    { return optionListDump(indent, indent); }
+
+  /// @}
+  /// --- END ------------------------------------------------------------------
   
   
     private:
@@ -371,19 +412,34 @@ class util::MultipleChoiceSelection: public util::MultipleChoiceSelectionBase {
   /// @throw OptionAlreadyExistsError if there is already an option with `label`
   void recordLabel(std::string&& label, std::size_t index);
   
+  /// Associates all `labels` to the option at `index`.
+  /// @throw OptionAlreadyExistsError if there is already an option with any of
+  ///                                 the aliases
+  template <typename... Aliases>
+  std::enable_if_t<details::AllConvertibleToStrings_v<Aliases...>>
+  recordLabels(std::size_t index, std::string alias, Aliases... moreAliases);
+  
+  /// Removes the specified label from the register.
+  void unregisterLabel(std::string const& label);
   
   /// Retrieves the option with the specified `value`.
   /// @throw UnknownOptionError if there is no available option with `value`
   Option_t& get(Choices_t value);
   
-  /// Returns the index of the option with `label`, or `npos` if none.
-  std::size_t findOption(std::string label) const;
-  
-  /// Returns the index of the option with `label`, or `npos` if none.
+  /// Returns an iterator to the option with `label`, or `npos` if none.
   typename OptionList_t::const_iterator findOption(Choices_t value) const;
   
-  /// Returns the index of the option with `label`, or `npos` if none.
+  /// Returns an iterator to the option with `label`, or `npos` if none.
   typename OptionList_t::iterator findOption(Choices_t value);
+  
+  /// Returns the index of the option with `label`, or `npos` if none.
+  std::size_t findOptionIndex(Choices_t value) const;
+  
+  /// Returns the index of the option with `label`, or `npos` if none.
+  std::size_t findOptionIndex(std::string const& label) const;
+  
+  /// Special value.
+  static constexpr auto npos = std::numeric_limits<std::size_t>::max();
   
 }; // class util::MultipleChoiceSelection
 
@@ -471,9 +527,24 @@ namespace util::details {
 // -----------------------------------------------------------------------------
 // ---  (details)
 // -----------------------------------------------------------------------------
+template <typename B1, typename E1, typename B2, typename E2, typename Comp>
+bool my_lexicographical_compare(B1 b1, E1 e1, B2 b2, E2 e2, Comp less) {
+  
+  while (b1 != e1) {
+    if (b2 == e2) return false; // shorter is less
+    
+    if (less(*b1, *b2)) return true;
+    if (less(*b2, *b1)) return false;
+    // equal so far...
+    ++b1;
+    ++b2;
+  } // while
+  return true; // 1 is shorter
+} // my_lexicographical_compare()
+
 bool util::details::CaseInsensitiveComparer::equal
   (std::string const& a, std::string const& b)
-  { return std::equal(a.begin(), a.end(), b.begin(), b.end(), cmp_lower); }
+  { return std::equal(a.begin(), a.end(), b.begin(), b.end(), eq_lower); }
 
 
 // -----------------------------------------------------------------------------
@@ -488,6 +559,12 @@ bool util::details::CaseInsensitiveComparer::less
 // -----------------------------------------------------------------------------
 bool util::details::CaseInsensitiveComparer::cmp_lower
   (unsigned char a, unsigned char b)
+  { return std::tolower(a) < std::tolower(b); }
+
+
+// -----------------------------------------------------------------------------
+bool util::details::CaseInsensitiveComparer::eq_lower
+  (unsigned char a, unsigned char b)
   { return std::tolower(a) == std::tolower(b); }
 
 
@@ -496,6 +573,58 @@ template <typename Comparer>
 bool util::details::SorterFrom<Comparer>::operator()
   (std::string const& a, std::string const& b) const
   { return Comparer::less(a, b); }
+
+
+// -----------------------------------------------------------------------------
+namespace util::details {
+  
+  template <typename Value, typename /* = void */>
+  struct ValueToString {
+    static constexpr bool can_convert = false;
+    
+    template <typename T>
+    static std::optional<std::string> convert(T const&) { return {}; }
+  }; // struct ValueToString
+  
+  // enumerators
+  template <typename Value>
+  struct ValueToString<Value, std::enable_if_t<std::is_enum_v<Value>>> {
+    static constexpr bool can_convert = true;
+    
+    template <typename T>
+    static std::optional<std::string> convert(T const& value)
+      {
+        return 
+          { std::to_string(static_cast<std::underlying_type_t<T>>(value)) }; 
+      }
+  }; // ValueToString(enum)
+  
+  // whatever converts to `std::to_string`
+  template <typename Value>
+  struct ValueToString<Value,
+    std::enable_if_t<
+      std::is_convertible_v<Value, std::string>
+      || std::is_constructible_v<std::string, Value>
+    >>
+  {
+    static constexpr bool can_convert = true;
+    template <typename T>
+    static std::optional<std::string> convert(T const& value)
+      { return { std::string{ value } }; }
+  }; // ValueToString(string)
+  
+  // whatever supports `std::to_string`
+  template <typename Value>
+  struct ValueToString
+    <Value, std::void_t<decltype(std::to_string(std::declval<Value>()))>>
+  {
+    static constexpr bool can_convert = true;
+    template <typename T>
+    static std::optional<std::string> convert(T const& value)
+      { return { std::to_string(value) }; }
+  }; // ValueToString(to_string)
+  
+} // namespace util::details
 
 
 // -----------------------------------------------------------------------------
@@ -539,14 +668,70 @@ bool util::details::MultipleChoiceSelectionOption_t<Choices>::match
 
 
 // -----------------------------------------------------------------------------
-#if 0
-/// Returns a string representing the value of the option.
-/// 
-/// That will be the `name()` of the option if the value is not convertible
-/// to a string. TODO
-std::string value_as_string() const;
+template <typename Choices>
+std::string
+util::details::MultipleChoiceSelectionOption_t<Choices>::value_as_string
+  (std::string const& defValue) const
+  { return value_as_string(value(), defValue); }
 
-#endif // 0
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
+std::string
+util::details::MultipleChoiceSelectionOption_t<Choices>::value_as_string() const
+  { return value_as_string(name()); }
+
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
+std::optional<std::string>
+util::details::MultipleChoiceSelectionOption_t<Choices>::value_as_string
+  (Choices_t value)
+{
+  return details::ValueToString<std::decay_t<Choices_t>>::convert(value);
+} // util::details::MultipleChoiceSelectionOption_t<>::value_as_string()
+
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
+std::string
+util::details::MultipleChoiceSelectionOption_t<Choices>::value_as_string
+  (Choices_t value, std::string const& defValue)
+{
+  return value_as_string(value).value_or(defValue);
+} // util::details::MultipleChoiceSelectionOption_t<>::value_as_string()
+
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
+std::string util::details::MultipleChoiceSelectionOption_t<Choices>::dump()
+  const
+{
+  auto iLabel = fLabels.begin();
+  auto const lend = fLabels.end();
+  std::string s { '"' };
+  s += *iLabel;
+  s += '"';
+  auto const valueStr = value_as_string();
+  if (valueStr != *iLabel) {
+    s += " [=";
+    s += valueStr;
+    s += "]";
+  }
+  if (++iLabel != lend) {
+    s += " (aliases: \"";
+    s += *iLabel;
+    s += '"';
+    while (++iLabel != lend) {
+      s += " \"";
+      s += *iLabel;
+      s += '"';
+    } // while
+    s += ')';
+  } // if aliases
+
+  return s;
+} // util::details::MultipleChoiceSelectionOption_t<>::dump()
 
 
 // -----------------------------------------------------------------------------
@@ -632,6 +817,12 @@ std::size_t util::MultipleChoiceSelection<Choices>::size() const
 
 // -----------------------------------------------------------------------------
 template <typename Choices>
+bool util::MultipleChoiceSelection<Choices>::empty() const
+  { return fOptions.empty(); }
+
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
 template <typename... Aliases>
 auto util::MultipleChoiceSelection<Choices>::addOption
   (Choices_t value, std::string label, Aliases... aliases) -> Option_t const&
@@ -648,7 +839,11 @@ auto util::MultipleChoiceSelection<Choices>::addAlias
   -> std::enable_if_t
     <details::AllConvertibleToStrings_v<Aliases...>, Option_t const&>
 {
-  return get(value).addAlias(std::move(aliases)...);
+  std::size_t const index = findOptionIndex(value);
+  if (index >= fOptions.size())
+    throw UnknownOptionError(Option_t::value_as_string(value, ""));
+  recordLabels(index, aliases...);
+  return fOptions[index].addAlias(std::move(aliases)...);
 } // util::MultipleChoiceSelection<>::addAlias()
 
 
@@ -692,7 +887,8 @@ auto util::MultipleChoiceSelection<Choices>::get(Choices_t value) const
   -> Option_t const&
 {
   auto const iOption = findOption(value);
-  if (iOption == fOptions.end()) throw UnknownOptionError("");
+  if (iOption == fOptions.end())
+    throw UnknownOptionError(Option_t::value_as_string(value).value_or(""));
   return *iOption;
 } // util::MultipleChoiceSelection<>::get(value)
 
@@ -722,6 +918,51 @@ auto util::MultipleChoiceSelection<Choices>::parse
 
 // -----------------------------------------------------------------------------
 template <typename Choices>
+std::string util::MultipleChoiceSelection<Choices>::optionListString
+  (std::string const& sep /* = ", " */) const
+{
+  using namespace std::string_literals;
+
+  auto iOption = fOptions.begin();
+  auto const oend = fOptions.end();
+
+  if (iOption == oend) return "<no options>"s;
+
+  std::string s { *iOption };
+  while (++iOption != oend) {
+    s += sep;
+    s += *iOption;
+  } // while
+  return s;
+} // util::MultipleChoiceSelection<>::optionListString()
+
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
+std::string util::MultipleChoiceSelection<Choices>::optionListDump
+  (std::string const& indent, std::string const& firstIndent) const
+{
+  using namespace std::string_literals;
+
+  auto iOption = fOptions.begin();
+  auto const oend = fOptions.end();
+
+  if (iOption == oend) return firstIndent + "<no options>\n"s;
+
+  std::string s { firstIndent };
+  s += iOption->dump();
+  s += '\n';
+  while (++iOption != oend) {
+    s += indent;
+    s += iOption->dump();
+    s += '\n';
+  } // while
+  return s;
+} // util::MultipleChoiceSelection<>::optionListDump()
+
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
 auto util::MultipleChoiceSelection<Choices>::addOption(Option_t&& option)
   -> Option_t const&
 {
@@ -741,7 +982,7 @@ auto util::MultipleChoiceSelection<Choices>::addOption(Option_t&& option)
       // remove the new entries from the index
       // (*iLabel was not inserted, and all labels before it were new)
       for (auto iNewLabel = labels.begin(); iNewLabel != iLabel; ++iNewLabel)
-        fLabelToOptionIndex.erase(*iNewLabel);
+        unregisterLabel(*iNewLabel);
       
       // remove the new option from the list
       fOptions.pop_back();
@@ -782,6 +1023,32 @@ void util::MultipleChoiceSelection<Choices>::recordLabel
 
 // -----------------------------------------------------------------------------
 template <typename Choices>
+template <typename... Aliases>
+auto util::MultipleChoiceSelection<Choices>::recordLabels
+  (std::size_t index, std::string alias, Aliases... moreAliases)
+  -> std::enable_if_t<details::AllConvertibleToStrings_v<Aliases...>>
+{
+  try {
+    recordLabel(std::move(alias), index);
+    if constexpr(sizeof...(moreAliases) > 0U)
+      recordLabels(index, std::move(moreAliases)...);
+  }
+  catch (OptionAlreadyExistsError const&) {
+    unregisterLabel(alias); // if recordLabel() call threw alias is still intact
+    throw;
+  }
+} // util::MultipleChoiceSelection<>::recordLabels()
+
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
+void util::MultipleChoiceSelection<Choices>::unregisterLabel
+  (std::string const& label)
+  { fLabelToOptionIndex.erase(label); }
+
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
 auto util::MultipleChoiceSelection<Choices>::findOption(Choices_t value) const
   -> typename OptionList_t::const_iterator
 {
@@ -803,13 +1070,32 @@ auto util::MultipleChoiceSelection<Choices>::findOption(Choices_t value)
 
 
 // -----------------------------------------------------------------------------
-  /// Retrieves the option with the specified `value`.
-  /// @throw UnknownOptionError if there is no available option with `value`
+template <typename Choices>
+std::size_t util::MultipleChoiceSelection<Choices>::findOptionIndex
+  (Choices_t value) const
+{
+  auto const d = static_cast<std::size_t>
+    (std::distance(fOptions.begin(), findOption(value)));
+  return (d >= size())? npos: d;
+} // util::MultipleChoiceSelection<>::findOptionIndex(value) const
+
+
+// -----------------------------------------------------------------------------
+template <typename Choices>
+std::size_t util::MultipleChoiceSelection<Choices>::findOptionIndex
+  (std::string const& label) const
+{
+  auto const iOption = fLabelToOptionIndex.find(label);
+  return (iOption == fLabelToOptionIndex.end())? npos: iOption->second;
+} // util::MultipleChoiceSelection<>::findOptionIndex(string) const
+
+
+// -----------------------------------------------------------------------------
 template <typename Choices>
 auto util::MultipleChoiceSelection<Choices>::get(Choices_t value) -> Option_t& {
   auto const iOption = findOption(value);
   if (iOption == fOptions.end()) {
-    throw UnknownOptionError("");
+    throw UnknownOptionError(Option_t::value_as_string(value).value_or(""));
   }
   return *iOption;
 } // util::MultipleChoiceSelection<>::get()
