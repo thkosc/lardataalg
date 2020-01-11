@@ -8,6 +8,7 @@
  * Set of basic quantities related to electromagnetism. Currently, quantities
  * are defined based on the following units:
  * * coulomb (fC, pC, nC, uC, mC, C)
+ * * volt (uV, mV, V, kV, MV, GV)
  *
  * This is a header-only library.
  *
@@ -50,7 +51,7 @@ namespace util::quantities {
   /**
    * @name Charge quantities
    *
-   * These time quantities are tied to `util::quantities::units::Coulomb`.
+   * These charge quantities are tied to `util::quantities::units::Coulomb`.
    * A few options are provided:
    *
    * * most general template, `scaled_coulomb`, allowing to choose both the
@@ -75,7 +76,7 @@ namespace util::quantities {
   template <typename T = double>
   using coulomb_as = scaled_coulomb<std::ratio<1>, T>;
 
-  /// Type of time stored in coulombs, in double precision.
+  /// Type of charge stored in coulombs, in double precision.
   using coulomb = coulomb_as<>;
 
   //
@@ -85,7 +86,7 @@ namespace util::quantities {
   template <typename T = double>
   using millicoulomb_as = concepts::rescale<coulomb_as<T>, std::milli>;
 
-  /// Type of time stored in millicoulomb, in double precision.
+  /// Type of charge stored in millicoulomb, in double precision.
   using millicoulomb = millicoulomb_as<>;
 
   //
@@ -95,7 +96,7 @@ namespace util::quantities {
   template <typename T = double>
   using microcoulomb_as = concepts::rescale<coulomb_as<T>, std::micro>;
 
-  /// Type of time stored in microcoulomb, in double precision.
+  /// Type of charge stored in microcoulomb, in double precision.
   using microcoulomb = microcoulomb_as<>;
 
   //
@@ -105,7 +106,7 @@ namespace util::quantities {
   template <typename T = double>
   using nanocoulomb_as = concepts::rescale<coulomb_as<T>, std::nano>;
 
-  /// Type of time stored in nanocoulomb, in double precision.
+  /// Type of charge stored in nanocoulomb, in double precision.
   using nanocoulomb = nanocoulomb_as<>;
 
   //
@@ -115,7 +116,7 @@ namespace util::quantities {
   template <typename T = double>
   using picocoulomb_as = concepts::rescale<coulomb_as<T>, std::pico>;
 
-  /// Type of time stored in picocoulomb, in double precision.
+  /// Type of charge stored in picocoulomb, in double precision.
   using picocoulomb = picocoulomb_as<>;
 
   //
@@ -125,7 +126,7 @@ namespace util::quantities {
   template <typename T = double>
   using femtocoulomb_as = concepts::rescale<coulomb_as<T>, std::femto>;
 
-  /// Type of time stored in femtocoulomb, in double precision.
+  /// Type of charge stored in femtocoulomb, in double precision.
   using femtocoulomb = femtocoulomb_as<>;
 
 
@@ -136,7 +137,7 @@ namespace util::quantities {
   /**
    * @name Electric potential quantities
    *
-   * These time quantities are tied to `util::quantities::units::Volt`.
+   * These potential quantities are tied to `util::quantities::units::Volt`.
    * A few options are provided:
    *
    * * most general template, `scaled_volt`, allowing to choose both the
@@ -161,7 +162,7 @@ namespace util::quantities {
   template <typename T = double>
   using volt_as = scaled_volt<std::ratio<1>, T>;
 
-  /// Type of time stored in volts, in double precision.
+  /// Type of potential stored in volts, in double precision.
   using volt = volt_as<>;
 
   //
@@ -171,7 +172,7 @@ namespace util::quantities {
   template <typename T = double>
   using millivolt_as = concepts::rescale<volt_as<T>, std::milli>;
 
-  /// Type of time stored in millivolt, in double precision.
+  /// Type of potential stored in millivolt, in double precision.
   using millivolt = millivolt_as<>;
 
   //
@@ -181,7 +182,7 @@ namespace util::quantities {
   template <typename T = double>
   using microvolt_as = concepts::rescale<volt_as<T>, std::micro>;
 
-  /// Type of time stored in microvolt, in double precision.
+  /// Type of potential stored in microvolt, in double precision.
   using microvolt = microvolt_as<>;
 
   //
@@ -191,7 +192,7 @@ namespace util::quantities {
   template <typename T = double>
   using kilovolt_as = concepts::rescale<volt_as<T>, std::kilo>;
 
-  /// Type of time stored in kilovolt, in double precision.
+  /// Type of potential stored in kilovolt, in double precision.
   using kilovolt = kilovolt_as<>;
 
   //
@@ -201,17 +202,17 @@ namespace util::quantities {
   template <typename T = double>
   using megavolt_as = concepts::rescale<volt_as<T>, std::mega>;
 
-  /// Type of time stored in megavolt, in double precision.
+  /// Type of potential stored in megavolt, in double precision.
   using megavolt = megavolt_as<>;
 
   //
-  // femtovolt
+  // gigavolt
   //
   /// Type of potential stored in gigavolt.
   template <typename T = double>
   using gigavolt_as = concepts::rescale<volt_as<T>, std::giga>;
 
-  /// Type of time stored in gigavolt, in double precision.
+  /// Type of potential stored in gigavolt, in double precision.
   using gigavolt = gigavolt_as<>;
 
   /// @}
@@ -219,12 +220,13 @@ namespace util::quantities {
 
 
   /**
-   * @brief Literal constants for time quantities.
+   * @brief Literal constants for quantities.
    *
-   * These functions allow a simplified syntax for specifying a time quantity.
+   * These functions allow a simplified syntax for specifying a charge or
+   * potential quantity.
    * In order to use these, their namespace must be used:
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
-   * using namespace util::quantities::time_literals;
+   * using namespace util::quantities::electromagnetism_literals;
    *
    * // definition of `util::quantities::picocoulomb` constant:
    * constexpr auto Q_pC = 230_pC;

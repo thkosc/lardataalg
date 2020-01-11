@@ -12,6 +12,7 @@ cet_test(intervals_fhicl_test USE_BOOST_UNIT
     ${CETLIB_EXCEPT}
   )
 cet_test(frequency_test USE_BOOST_UNIT)
+cet_test(energy_test USE_BOOST_UNIT)
 cet_test(datasize_test USE_BOOST_UNIT)
 cet_test(StatCollector_test USE_BOOST_UNIT)
 cet_test(MappedContainer_test USE_BOOST_UNIT)
