@@ -429,6 +429,23 @@ namespace detinfo {
     trigger_time toTriggerTime(FromTime time) const
       { return toTimeScale<trigger_time>(time); }
     
+    /**
+     * @brief Converts a `time` point into simulation time scale.
+     * @tparam FromTime the time scale the input `time` is measured in
+     * @param time the time instant to be converted, in `FromTime` scale
+     * @return the time instant converted into simulation time scale.
+     * 
+     * Example:
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
+     * electronics_time beamTime = 47.5_ns;
+     * simulation_time firstParticleTime = timings.toSimulationTime(beamTime);
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+    template <typename FromTime>
+    simulation_time toSimulationTime(FromTime time) const
+      { return toTimeScale<simulation_time>(time); }
+    
+    
     /// @}
     // --- END -- Conversions --------------------------------------------------
     

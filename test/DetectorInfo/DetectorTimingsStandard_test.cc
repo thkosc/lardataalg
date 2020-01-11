@@ -184,7 +184,7 @@ unsigned int testSimulationTimes(detinfo::DetectorTimings const& timings) {
   // back to simulation time:
   
   auto const simulTime
-    = timings.toTimeScale<simulation_time>(electronics_time{ expectedTime });
+    = timings.toSimulationTime(electronics_time{ expectedTime });
   static_assert(util::is_same_decay_v
     <decltype(simulTime.quantity()), util::quantities::nanosecond>);
   
