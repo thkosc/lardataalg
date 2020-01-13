@@ -11,6 +11,7 @@ cet_test(intervals_fhicl_test USE_BOOST_UNIT
     ${FHICLCPP}
     ${CETLIB_EXCEPT}
   )
+cet_test(space_test USE_BOOST_UNIT)
 cet_test(frequency_test USE_BOOST_UNIT)
 cet_test(energy_test USE_BOOST_UNIT)
 cet_test(datasize_test USE_BOOST_UNIT)
