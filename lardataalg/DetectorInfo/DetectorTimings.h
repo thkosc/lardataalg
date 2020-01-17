@@ -574,7 +574,7 @@ namespace detinfo {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * sets `TPCstartTime` to the instant the TPC electronics time starts,
      * in the electronics time scale. This example in particular is yielding
-     * the same value as calling `detinfo::DetectorClocks()::TPCTime()`.
+     * the same value as calling `detinfo::DetectorClocks::TPCTime()`.
      * 
      * 
      * Implemented scales
@@ -608,7 +608,7 @@ namespace detinfo {
      * sets `TPCstartTime` to the instant the TPC electronics time starts,
      * in the electronics time tick scale. This example in particular is
      * yielding the same value as calling
-     * `detinfo::DetectorClocks()::TPCTick2TDC(0)`.
+     * `detinfo::DetectorClocks::TPCTick2TDC(0)`.
      * 
      * @todo The example is not even supported yet!
      * 

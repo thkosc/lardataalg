@@ -208,7 +208,7 @@
  *
  *   namespace binary {
  *
- *     /// Prefix for binary @f$ 2^20 @f$ (1048576).
+ *     // Prefix for binary 2^20 (1048576).
  *     using mebi = std::ratio<(1U << 20), 1U>;
  *
  *   } // namespace binary
@@ -864,7 +864,7 @@ namespace util::quantities {
 
     // -- BEGIN Arithmetic operations ------------------------------------------
     /**
-     * @name Arithmetic operations on `Quantity`
+     * @name Arithmetic operations on Quantity
      *
      * These operations, as well as the ones implemented as member functions,
      * are provided for convenience.
@@ -938,7 +938,7 @@ namespace util::quantities {
 
     // -- BEGIN Comparisons ----------------------------------------------------
     /**
-     * @name Comparisons between a `Quantity` and its base value type.
+     * @name Comparisons between a Quantity and its base value type.
      *
      * These operations, as well as the ones implemented as member functions,
      * are provided for convenience.
