@@ -59,7 +59,7 @@ namespace util::quantities::concepts {
    * @note The signature of this function is dictated by FHiCL requirements.
    */
   template <typename... Args>
-  fhicl::detail::ps_atom_t encode(Quantity<Args...> const& q);
+  ::fhicl::detail::ps_atom_t encode(Quantity<Args...> const& q);
 
   /// @}
   // --- END -- FHiCL encoding -----------------------------------------------
@@ -77,7 +77,7 @@ void util::quantities::concepts::decode
   using quantity_t = Quantity<Args...>;
 
   std::string s;
-  fhicl::detail::decode(src, s);
+  ::fhicl::detail::decode(src, s);
 
   q = util::quantities::makeQuantity<quantity_t>(s);
 
@@ -86,10 +86,10 @@ void util::quantities::concepts::decode
 
 // -----------------------------------------------------------------------------
 template <typename... Args>
-fhicl::detail::ps_atom_t util::quantities::concepts::encode
+::fhicl::detail::ps_atom_t util::quantities::concepts::encode
   (Quantity<Args...> const& q)
 {
-  return fhicl::detail::encode(util::to_string(q));
+  return ::fhicl::detail::encode(util::to_string(q));
 } // util::quantities::concepts::encode()
 
 

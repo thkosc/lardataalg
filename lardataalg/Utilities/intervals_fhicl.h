@@ -74,7 +74,7 @@ namespace util::quantities::concepts {
    * @note The signature of this function is dictated by FHiCL requirements.
    */
   template <typename... Args>
-  fhicl::detail::ps_atom_t encode(Interval<Args...> const& iv);
+  ::fhicl::detail::ps_atom_t encode(Interval<Args...> const& iv);
 
   /**
    * @brief Encodes a quantity point into a FHiCL parameter set atom.
@@ -88,7 +88,7 @@ namespace util::quantities::concepts {
    * @note The signature of this function is dictated by FHiCL requirements.
    */
   template <typename... Args>
-  fhicl::detail::ps_atom_t encode(Point<Args...> const& pt);
+  ::fhicl::detail::ps_atom_t encode(Point<Args...> const& pt);
 
   /// @}
   // --- END -- FHiCL encoding -----------------------------------------------
@@ -130,19 +130,19 @@ void util::quantities::concepts::decode
 
 // -----------------------------------------------------------------------------
 template <typename... Args>
-fhicl::detail::ps_atom_t util::quantities::concepts::encode
+::fhicl::detail::ps_atom_t util::quantities::concepts::encode
   (Interval<Args...> const& iv)
 {
-  return fhicl::detail::encode(util::to_string(iv));
+  return ::fhicl::detail::encode(util::to_string(iv));
 } // util::quantities::concepts::encode(Interval)
 
 
 // -----------------------------------------------------------------------------
 template <typename... Args>
-fhicl::detail::ps_atom_t util::quantities::concepts::encode
+::fhicl::detail::ps_atom_t util::quantities::concepts::encode
   (Point<Args...> const& p)
 {
-  return fhicl::detail::encode(util::to_string(p));
+  return ::fhicl::detail::encode(util::to_string(p));
 } // util::quantities::concepts::encode(Point)
 
 
