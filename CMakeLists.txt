@@ -3,20 +3,14 @@
 #
 #  cd .../path/to/build/directory
 #  source .../path/to/larcorealg/ups/setup_for_development <-d|-p>
-#  cmake [-DCMAKE_INSTALL_PREFIX=/install/path]
-#        -DCMAKE_BUILD_TYPE=$CETPKG_TYPE
-#        $CETPKG_SOURCE
-#  make
-#  make test
-#  make install
-#  make package (builds distribution tarfile)
+#  buildtool [-I /install/path] -bt[i] -jN
 # ======================================================================
 
 
-# use cmake 3.3 or later
-cmake_minimum_required (VERSION 3.3)
+# use cmake 3.14 or later
+cmake_minimum_required (VERSION 3.12...3.14 FATAL_ERROR)
 
-project(lardataalg)
+project(lardataalg LANGUAGES CXX)
 
 # cetbuildtools contains our cmake modules
 SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
@@ -45,7 +39,7 @@ find_ups_product( cetbuildtools )
 find_ups_product( larcoreobj )
 find_ups_product( larcorealg )
 find_ups_product( nusimdata )
-find_ups_root( )
+find_ups_root()
 
 # macros for artdaq_dictionary and simple_plugin
 include(ArtDictionary)
@@ -55,7 +49,7 @@ include(BasicPlugin)
 # source
 add_subdirectory(lardataalg)
 
-# tests 
+# tests
 add_subdirectory(test)
 
 # ups - table and config files
