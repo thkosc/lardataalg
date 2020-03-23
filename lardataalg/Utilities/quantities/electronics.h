@@ -17,6 +17,7 @@
 #define LARDATAALG_UTILITIES_QUANTITIES_ELECTRONICS_H
 
 // LArSoft libraries
+#include "lardataalg/Utilities/intervals.h"
 #include "lardataalg/Utilities/quantities.h"
 
 // C/C++ standard libraries
