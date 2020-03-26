@@ -16,7 +16,7 @@ standard_properties:
 # As of February 2017, this value is no longer used.
  Argon39DecayRate: 0.0
 
- # Optical properties	
+ # Optical properties
  # Fast and slow scintillation emission spectra, from [J Chem Phys vol 91 (1989) 1469]
  FastScintEnergies:    [ 6.0,  6.7,  7.1,  7.4,  7.7, 7.9,  8.1,  8.4,  8.5,  8.6,  8.8,  9.0,  9.1,  9.4,  9.8,  10.4,  10.7]
  SlowScintEnergies:    [ 6.0,  6.7,  7.1,  7.4,  7.7, 7.9,  8.1,  8.4,  8.5,  8.6,  8.8,  9.0,  9.1,  9.4,  9.8,  10.4,  10.7]
@@ -26,7 +26,7 @@ standard_properties:
  ScintFastTimeConst:   6.     # fast scintillation time constant (ns)
  ScintSlowTimeConst:   1590.  # slow scintillation time constant (ns)
  ScintBirksConstant:   0.069  # birks constant for LAr (1/MeV cm)
- ScintYield:           24000. # total scintillation yield (ph/Mev)         
+ ScintYield:           24000. # total scintillation yield (ph/Mev)
  ScintPreScale:        0.03   # Scale factor to reduce number of photons simulated
                               # Later QE should be corrected for this scale
  ScintYieldRatio:      0.3    # fast / slow scint ratio (needs revisitting)
@@ -37,11 +37,11 @@ standard_properties:
 
 
 
- # Scintillation yields and fast/slow ratios per particle type 
+ # Scintillation yields and fast/slow ratios per particle type
  MuonScintYield:          24000
  MuonScintYieldRatio:     0.23
  PionScintYield:          24000
- PionScintYieldRatio:     0.23 
+ PionScintYieldRatio:     0.23
  ElectronScintYield:      20000
  ElectronScintYieldRatio: 0.27
  KaonScintYield:          24000
@@ -57,8 +57,8 @@ standard_properties:
  RIndexSpectrum: [ 1.24664, 1.2205, 1.22694, 1.22932, 1.23124, 1.23322, 1.23545, 1.23806, 1.24116, 1.24489, 1.24942, 1.25499, 1.26197, 1.2709, 1.28263, 1.29865, 1.32169, 1.35747, 1.42039, 1.56011, 2.16626 ]
 
  # absorption length as function of energy
- AbsLengthEnergies: [ 4,     5,     6,     7,     8,     9,     10,    11   ]       
- AbsLengthSpectrum: [ 2000., 2000., 2000., 2000., 2000., 2000., 2000., 2000.] 
+ AbsLengthEnergies: [ 4,     5,     6,     7,     8,     9,     10,    11   ]
+ AbsLengthSpectrum: [ 2000., 2000., 2000., 2000., 2000., 2000., 2000., 2000.]
 
  # Rayleigh scattering length (cm) @ 90K as a function of energy (eV) from arXiv:2002.09346
 
@@ -67,13 +67,13 @@ RayleighSpectrum: [ 1200800, 390747, 128633, 54969.1, 27191.8, 14853.7, 8716.9, 
 
  # Surface reflectivity data - vector of energy spectrum per
  #   surface type
- ReflectiveSurfaceEnergies:           [ 7, 9, 10 ]             
- ReflectiveSurfaceNames:            [ "STEEL_STAINLESS_Fe7Cr2Ni" ]  
- ReflectiveSurfaceReflectances:     [ [ 0.25, 0.25, 0.25 ] ]        
+ ReflectiveSurfaceEnergies:           [ 7, 9, 10 ]
+ ReflectiveSurfaceNames:            [ "STEEL_STAINLESS_Fe7Cr2Ni" ]
+ ReflectiveSurfaceReflectances:     [ [ 0.25, 0.25, 0.25 ] ]
  ReflectiveSurfaceDiffuseFractions: [ [ 0.5,  0.5,  0.5  ] ]
 
- # Information related with the simulation of the Wavelength Shifter (TPB) 
- LoadExtraMatProperties: false	    
+ # Information related with the simulation of the Wavelength Shifter (TPB)
+ LoadExtraMatProperties: false
 
  # TPB - WLS
  TpbTimeConstant: 2.5 #wls time constant in s J. Lumin 81(1999) 285
@@ -83,7 +83,7 @@ RayleighSpectrum: [ 1200800, 390747, 128633, 54969.1, 27191.8, 14853.7, 8716.9, 
  TpbEmmisionSpectrum: [0.0, 0.0, 0.0, 0.0588,0.235, 0.853, 1.0,1.0,0.9259,0.704,0.0296,0.011, 0.0,0.0, 0.]
  TpbAbsorptionEnergies: [0.05,1.77,2.0675, 7.42, 7.75, 8.16, 8.73, 9.78,10.69, 50.39]
  TpbAbsorptionSpectrum: [100000.0,100000.0, 100000.0,0.001,0.00000000001,0.00000000001, 0.00000000001, 0.00000000001, 0.00000000001, 0.00000000001]
-        
+
 }
 
 END_PROLOG
