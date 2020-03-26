@@ -20,6 +20,8 @@
 // framework libraries
 #include "messagefacility/MessageLogger/MessageLogger.h" // mf namespace
 
+#include <limits>
+
 //------------------------------------------------------------------------------
 //---  The test environment
 //---
@@ -28,10 +30,17 @@
  * TesterEnvironment, configured with a "standard" configuration object, is used
  * in a non-Boost-unit-test context.
  * It provides:
- * - `detinfo::DetectorClocks const* Provider<detinfo::DetectorClocks>()`
  *
  */
 using TestEnvironment = testing::TesterEnvironment<testing::BasicEnvironmentConfiguration>;
+
+namespace {
+  double
+  close_in_value(double const a, double const b)
+  {
+    return std::abs(a - b) < std::numeric_limits<double>::epsilon();
+  }
+}
 
 //------------------------------------------------------------------------------
 //---  The tests
@@ -45,7 +54,7 @@ testTriggerTime(detinfo::DetectorTimings const& timings)
   //
   // trigger time
   //
-  double const expectedTime = timings.detClocks().TriggerTime(); // us
+  double const expectedTime = timings.clockData().TriggerTime(); // us
 
   // `TriggerTime()` returns a time in electronics time scale [us]
   auto const time = timings.TriggerTime();
@@ -68,19 +77,18 @@ testTriggerTime(detinfo::DetectorTimings const& timings)
 unsigned int
 testBeamGateTime(detinfo::DetectorTimings const& timings)
 {
-
   unsigned int nErrors = 0U;
 
   //
   // trigger time
   //
-  double const expectedTime = timings.detClocks().BeamGateTime(); // us
+  double const expectedTime = timings.clockData().BeamGateTime(); // us
 
   // `BeamGateTime()` returns a time in electronics time scale [us]
   auto const time = timings.BeamGateTime();
   static_assert(util::is_same_decay_v<decltype(time.quantity()), util::quantities::microsecond>);
 
-  if (time.value() == expectedTime) {
+  if (close_in_value(time.value(), expectedTime)) {
     mf::LogVerbatim("DetectorTimingsStandard_test")
       << "DetectorTimings::BeamGateTime() => " << time;
   }
@@ -111,7 +119,7 @@ testSimulationTimes(detinfo::DetectorTimings const& timings)
   //
 
   // simulation time start in electronics time
-  double const expectedStartTime_us = timings.detClocks().G4ToElecTime(0.0); // ns
+  double const expectedStartTime_us = timings.clockData().G4ToElecTime(0.0); // ns
   microsecond const expectedStartTime{expectedStartTime_us};
 
   // `startTime()` returns a time in electronics time scale [us]
@@ -152,7 +160,7 @@ testSimulationTimes(detinfo::DetectorTimings const& timings)
 
   // to electronics time:
   double const inputTime_ns = 100.0;
-  double const expectedTime = timings.detClocks().G4ToElecTime(inputTime_ns);
+  double const expectedTime = timings.clockData().G4ToElecTime(inputTime_ns);
 
   simulation_time inputTime{inputTime_ns};
   static_assert(
@@ -190,7 +198,7 @@ testSimulationTimes(detinfo::DetectorTimings const& timings)
   }
 
   // to TPC electronics ticks:
-  double const expectedTPCtick = timings.detClocks().TPCG4Time2Tick(inputTime_ns);
+  double const expectedTPCtick = timings.clockData().TPCG4Time2Tick(inputTime_ns);
 
   auto const TPCtick = timings.toTick<TPCelectronics_tick_d>(inputTime);
   if (cmp.equal(TPCtick.value(), expectedTPCtick)) {
@@ -244,7 +252,7 @@ testTriggerTimes(detinfo::DetectorTimings const& timings)
   //
 
   // trigger time start in electronics time
-  double const expectedStartTime = timings.detClocks().TriggerTime(); // us
+  double const expectedStartTime = timings.clockData().TriggerTime(); // us
 
   // `startTime()` returns a time in electronics time scale [us]
   auto const startTime = timings.startTime<trigger_time>();
@@ -284,7 +292,7 @@ testTriggerTimes(detinfo::DetectorTimings const& timings)
 
   // to electronics time:
   double const inputTime_us = 100.0;
-  double const expectedTime = timings.detClocks().TriggerTime() + inputTime_us;
+  double const expectedTime = timings.clockData().TriggerTime() + inputTime_us;
 
   trigger_time inputTime{inputTime_us};
   static_assert(
@@ -339,7 +347,7 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
   //
 
   // frequency
-  double const expectedFrequency = timings.detClocks().OpticalClock().Frequency(); // MHz
+  double const expectedFrequency = timings.clockData().OpticalClock().Frequency(); // MHz
 
   auto const frequency = timings.OpticalClockFrequency();
   static_assert(util::is_same_decay_v<decltype(frequency), util::quantities::megahertz>);
@@ -356,7 +364,7 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
   }
 
   // period
-  double const expectedPeriod = timings.detClocks().OpticalClock().TickPeriod(); // MHz
+  double const expectedPeriod = timings.clockData().OpticalClock().TickPeriod(); // MHz
 
   auto const period = timings.OpticalClockPeriod();
   static_assert(util::is_same_decay_v<decltype(period)::quantity_t, util::quantities::microsecond>);
@@ -430,7 +438,7 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
   //
   // to electronics time (real tick):
   //
-  double const expectedTime_us = inputTick_count * timings.detClocks().OpticalClock().TickPeriod();
+  double const expectedTime_us = inputTick_count * timings.clockData().OpticalClock().TickPeriod();
 
   optical_tick_d inputTick_d{inputTick_count};
   static_assert(util::is_same_decay_v<decltype(inputTick_d.quantity()), util::quantities::tick_d>);
@@ -468,10 +476,10 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
 
   // to trigger time (truncated tick):
 
-  double const expectedTrigTime_us = expectedTime_us - timings.detClocks().TriggerTime();
+  double const expectedTrigTime_us = expectedTime_us - timings.clockData().TriggerTime();
   double const expectedTrigTime_truncated_us =
-    static_cast<int>(inputTick_count) * timings.detClocks().OpticalClock().TickPeriod() -
-    timings.detClocks().TriggerTime();
+    static_cast<int>(inputTick_count) * timings.clockData().OpticalClock().TickPeriod() -
+    timings.clockData().TriggerTime();
 
   auto const inputTick = optical_tick::castFrom(inputTick_count);
   static_assert(util::is_same_decay_v<decltype(inputTick.quantity()), util::quantities::tick>);
@@ -518,7 +526,7 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
     util::is_same_decay_v<decltype(inputInterval.quantity()), util::quantities::microsecond>);
 
   // real
-  double const expectedTicksD = inputInterval_us / timings.detClocks().OpticalClock().TickPeriod();
+  double const expectedTicksD = inputInterval_us / timings.clockData().OpticalClock().TickPeriod();
 
   auto const ticks_d = timings.toTicks<optical_time_ticks_d>(inputInterval);
   static_assert(util::is_same_decay_v<decltype(ticks_d.quantity()), util::quantities::tick_d>);
@@ -609,11 +617,6 @@ main(int argc, char const** argv)
   // DetectorClocksStandard supports the simple set up; so we invoke it
   TestEnv.SimpleProviderSetup<detinfo::DetectorClocksStandard>();
 
-  // we print some information from the service itself;
-  // this is specific to the implementation, so we need to talk
-  // to the concrete type; this is not the way we would normally operate:
-  TestEnv.Provider<detinfo::DetectorClocksStandard>()->debugReport();
-
   //
   // run the test algorithm
   // (I leave it here for reference -- there is no test algorithm here)
@@ -628,28 +631,20 @@ main(int argc, char const** argv)
   // 3. then we run it!
   // Note that here we are querying the abstract DetectorClocks interface;
   // this is the right way to go.
-  detinfo::DetectorClocks const* detClocks = TestEnv.Provider<detinfo::DetectorClocks>();
-
-  // here we cheat and use the knowledge of which implementation we are using
-  // (need to use pointers to use the feature of nullptr on conversion failure)
-  auto const* detClocksStd = dynamic_cast<detinfo::DetectorClocksStandard const*>(detClocks);
-  if (detClocksStd) { detClocksStd->debugReport(); }
-  else {
-    mf::LogWarning("clocks_test") << "Can't run DetectorClocksStandard-specific diagnostics.";
-  }
+  auto const* detClocks = TestEnv.Provider<detinfo::DetectorClocks>();
 
   using namespace detinfo::timescales; // electronics_time
-  detinfo::DetectorTimings timings(*detClocks);
+  detinfo::DetectorTimings timings(detClocks->DataForJob());
 
   mf::LogVerbatim("DetectorTimingsStandard_test")
     << "Electronics clock: " << timings.ClockPeriodFor<electronics_time>() << ", "
     << timings.ClockFrequencyFor<electronics_time>();
 
-  nErrors += testTriggerTime(*detClocks);
-  nErrors += testBeamGateTime(*detClocks);
-  nErrors += testSimulationTimes(*detClocks);
-  nErrors += testTriggerTimes(*detClocks);
-  nErrors += testOpticalClockTimings(*detClocks);
+  nErrors += testTriggerTime(timings);
+  nErrors += testBeamGateTime(timings);
+  nErrors += testSimulationTimes(timings);
+  nErrors += testTriggerTimes(timings);
+  nErrors += testOpticalClockTimings(timings);
 
   // 4. And finally we cross fingers.
   if (nErrors > 0) { mf::LogError("clocks_test") << nErrors << " errors detected!"; }

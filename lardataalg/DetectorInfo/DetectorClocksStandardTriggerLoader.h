@@ -23,7 +23,6 @@
 #define LARDATA_DETECTORINFO_DETECTORCLOCKSSTANDARDTRIGGERLOADER_H
 
 // LArSoft libraries
-#include "lardataalg/DetectorInfo/DetectorClocksStandard.h"
 #include "lardataobj/RawData/TriggerData.h" // raw::Trigger
 
 // framework libraries
@@ -31,159 +30,10 @@
 #include "cetlib_except/exception.h"
 
 // C++ standard libraries
+#include <optional>
 #include <vector>
 
 namespace detinfo {
-
-  /**
-   * @brief Loads `DetectorClocksStandard` trigger times from a `raw::Trigger`.
-   * @param detClocks the instance of `detinfo::DetectorClocksStandard` to set
-   * @param trigger the trigger object to extract timings from
-   *
-   * The times are stored unconditionally and directly, with no time scale
-   * conversion.
-   */
-  inline void
-  setDetectorClocksStandardTriggersFromRawTrigger(detinfo::DetectorClocksStandard& detClocks,
-                                                  raw::Trigger const& trigger)
-  {
-    detClocks.SetTriggerTime(trigger.TriggerTime(), trigger.BeamGateTime());
-  }
-
-  /**
-   * @brief Resets `DetectorClocksStandard` G4RefTime based on a simulated `raw::Trigger`.
-   * @param detClocks the instance of `detinfo::DetectorClocksStandard` to set
-   * @param trigger the trigger object to extract timings from
-   *
-   * The times are stored unconditionally and directly, with no time scale
-   * conversion.
-   */
-  inline void
-  setDetectorClocksG4RefTimeFromSimTrigger(detinfo::DetectorClocksStandard& detClocks,
-                                           raw::Trigger const& trigger)
-  {
-    detClocks.RebaseG4RefTime(trigger.TriggerTime());
-  }
-
-  /**
-   * @brief Loads `DetectorClocksStandard` trigger times from a `raw::Trigger`.
-   * @tparam Event type of event where trigger data might be stored
-   * @param detClocks the instance of `detinfo::DetectorClocksStandard` to set
-   * @param event the event the trigger objects are stored into
-   * @return whether the times were set
-   * @throws cet::exception if trigger data product has more than one trigger
-   *
-   * The input tag stored in `detClocks`
-   * (`detinfo::DetectorClocksStandard::TrigModuleName()`) is used to read
-   * a `raw::Trigger` collection.
-   *
-   * If the event has no such trigger data product, or if that data product is
-   * empty, `false` is returned and `detClocks` is unchanged.
-   *
-   * If the trigger data product is found and there are more than one triggers
-   * in there, an exception is thrown: we support only the case where the
-   * trigger to be used is unequivocal.
-   */
-  template <typename Event>
-  bool
-  setDetectorClocksStandardTriggersFromEvent(detinfo::DetectorClocksStandard& detClocks,
-                                             Event const& event)
-  {
-    //
-    // fetch the trigger data product
-    //
-    using TriggerHandle_t = typename Event::template HandleT<std::vector<raw::Trigger>>;
-
-    art::InputTag const triggerTag = detClocks.TrigModuleName();
-    TriggerHandle_t triggerHandle;
-    if (!event.template getByLabel(triggerTag, triggerHandle)) return false;
-
-    //
-    // check that we do have a trigger
-    // (we have already checked whether the handle is valid above)
-    //
-
-    auto const& triggers = *triggerHandle;
-    if (triggers.empty()) return false;
-
-    //
-    // select which trigger to set (i.e., the only one!)
-    //
-    if (triggers.size() != 1) {
-      throw cet::exception("setDetectorClocksStandardTrigger")
-        << "Found " << triggers.size() << " trigger objects in '" << triggerTag.encode()
-        << "' (only one trigger per event is supported)\n";
-    }
-
-    //
-    // set the timings from the first and only trigger into the service
-    //
-    setDetectorClocksStandardTriggersFromRawTrigger(detClocks, triggers.front());
-
-    // all done
-    return true;
-
-  } // setDetectorClocksStandardTriggersFromEvent()
-
-  /**
-   * @brief Corrects `DetectorClocksStandard` G4RefTime to be based on trigger time
-   * @tparam Event type of event where trigger data might be stored
-   * @param detClocks the instance of `detinfo::DetectorClocksStandard` to set
-   * @param event the event the trigger objects are stored into
-   * @return whether the G4Ref times were set
-   * @throws cet::exception if trigger data product has more than one trigger
-   *
-   * The input tag stored in `detClocks`
-   * (`detinfo::DetectorClocksStandard::G4RefCorrTrigModuleName()`) is used to read
-   * a `raw::Trigger` collection.
-   *
-   * If the event has no such trigger data product, or if that data product is
-   * empty, `false` is returned and `detClocks` is unchanged.
-   *
-   * If the trigger data product is found and there are more than one triggers
-   * in there, an exception is thrown: we support only the case where the
-   * trigger to be used is unequivocal.
-   */
-  template <typename Event>
-  bool
-  setDetectorClocksStandardG4RefTimeCorrectionFromEvent(detinfo::DetectorClocksStandard& detClocks,
-                                                        Event const& event)
-  {
-    //
-    // fetch the trigger data product
-    //
-    using TriggerHandle_t = typename Event::template HandleT<std::vector<raw::Trigger>>;
-
-    art::InputTag const triggerTag = detClocks.G4RefCorrTrigModuleName();
-    TriggerHandle_t triggerHandle;
-    if (!event.template getByLabel(triggerTag, triggerHandle)) return false;
-
-    //
-    // check that we do have a trigger
-    // (we have already checked whether the handle is valid above)
-    //
-
-    auto const& triggers = *triggerHandle;
-    if (triggers.empty()) return false;
-
-    //
-    // select which trigger to set (i.e., the only one!)
-    //
-    if (triggers.size() != 1) {
-      throw cet::exception("setDetectorClocksStandardTrigger")
-        << "Found " << triggers.size() << " trigger objects in '" << triggerTag.encode()
-        << "' (only one trigger per event is supported)\n";
-    }
-
-    //
-    // set the timings from the first and only trigger into the service
-    //
-    setDetectorClocksG4RefTimeFromSimTrigger(detClocks, triggers.front());
-
-    // all done
-    return true;
-
-  } // setDetectorClocksStandardTriggersFromEvent()
 
   /**
    * @brief Loads `DetectorClocksStandard` trigger times.
@@ -204,21 +54,31 @@ namespace detinfo {
    * in the event, in which case no choice is made, and an exception is thrown.
    */
   template <typename Event>
-  bool
-  setDetectorClocksStandardTrigger(detinfo::DetectorClocksStandard& detClocks, Event const& event)
+  std::optional<std::pair<double, double>>
+  trigger_times_for_event(art::InputTag const& triggerTag, Event const& event)
   {
-    //
     // try to read the trigger from the event
-    //
-    if (setDetectorClocksStandardTriggersFromEvent(detClocks, event)) return true;
+    // fetch the trigger data product
+    using TriggerHandle_t = typename Event::template HandleT<std::vector<raw::Trigger>>;
 
-    //
-    // if there was no trigger candidate, set it default
-    //
-    detClocks.SetDefaultTriggerTime();
-    return false;
+    TriggerHandle_t triggerHandle;
+    if (!event.template getByLabel(triggerTag, triggerHandle)) { return std::nullopt; }
 
-  } // setDetectorClocksStandardTrigger
+    // check that we do have a trigger
+    // (we have already checked whether the handle is valid above)
+    auto const& triggers = *triggerHandle;
+    if (triggers.empty()) { return std::nullopt; }
+
+    // select which trigger to set (i.e., the only one!)
+    if (triggers.size() != 1) {
+      throw cet::exception("setDetectorClocksStandardTrigger")
+        << "Found " << triggers.size() << " trigger objects in '" << triggerTag.encode()
+        << "' (only one trigger per event is supported)\n";
+    }
+
+    auto const& trigger = triggers.front();
+    return std::make_optional(std::make_pair(trigger.TriggerTime(), trigger.BeamGateTime()));
+  }
 
   /**
    * @brief Loads `DetectorClocksStandard` G4Ref correction times.
@@ -239,20 +99,29 @@ namespace detinfo {
    * in the event, in which case no choice is made, and an exception is thrown.
    */
   template <typename Event>
-  bool
-  setDetectorClocksStandardG4RefTimeCorrection(detinfo::DetectorClocksStandard& detClocks,
-                                               Event const& event)
+  std::optional<double>
+  g4ref_time_for_event(art::InputTag const& triggerTag, Event const& event)
   {
-    //
-    // try to read the trigger from the event
-    //
-    if (setDetectorClocksStandardG4RefTimeCorrectionFromEvent(detClocks, event)) return true;
+    // fetch the trigger data product
+    using TriggerHandle_t = typename Event::template HandleT<std::vector<raw::Trigger>>;
 
-    //
-    // if there was no trigger candidate, do nothing
-    return false;
+    TriggerHandle_t triggerHandle;
+    if (!event.template getByLabel(triggerTag, triggerHandle)) return std::nullopt;
 
-  } // setDetectorClocksStandardTrigger
+    // check that we do have a trigger
+    // (we have already checked whether the handle is valid above)
+    auto const& triggers = *triggerHandle;
+    if (triggers.empty()) return std::nullopt;
+
+    // select which trigger to set (i.e., the only one!)
+    if (triggers.size() != 1) {
+      throw cet::exception("setDetectorClocksStandardTrigger")
+        << "Found " << triggers.size() << " trigger objects in '" << triggerTag.encode()
+        << "' (only one trigger per event is supported)\n";
+    }
+
+    return std::make_optional(triggers.front().TriggerTime());
+  }
 
 } // namespace detinfo
 

@@ -27,7 +27,6 @@
  * GeometryTesterEnvironment, configured with a geometry-aware configuration
  * object, is used in a non-Boost-unit-test context.
  * It provides:
- * - `detinfo::DetectorProperties const* Provider<detinfo::DetectorProperties>()`
  * - all the other services configured as dependencies
  */
 using TesterConfiguration =
@@ -111,11 +110,12 @@ main(int argc, char const** argv)
   //  Tester.Setup(*(TestEnv.Provider<detinfo::DetectorProperties>()));
 
   // 3. then we run it!
-  auto const& geom = *(TestEnv.Provider<geo::GeometryCore>());
-  auto const& detp = *(TestEnv.Provider<detinfo::DetectorProperties>());
+  auto const& geom = *TestEnv.Provider<geo::GeometryCore>();
+  auto const clock_data = TestEnv.Provider<detinfo::DetectorClocks>()->DataForJob();
+  auto const& detp = *TestEnv.Provider<detinfo::DetectorProperties>();
 
   auto const driftVelocity = detp.DriftVelocity();
-  auto const TDCtick = detp.SamplingRate();
+  auto const TDCtick = sampling_rate(clock_data);
   unsigned int const nWaveformTicks = detp.NumberTimeSamples();
   unsigned int const nReadoutWindowTicks = detp.ReadOutWindowSize();
 
@@ -130,7 +130,6 @@ main(int argc, char const** argv)
                                << (nWaveformTicks * TDCtick / 1000) << " us)";
 
   // accumulate the plane IDs; needed just for table formatting
-  unsigned int const colWidth = 9U;
   unsigned int headerColWidth = 0U;
   for (auto planeID : geom.IteratePlaneIDs()) {
     auto const l = std::string(planeID).length();
@@ -175,33 +174,6 @@ main(int argc, char const** argv)
           << std::setw(columnSizes[3]) << (driftTime / (TDCtick / 1000.));
     } // for TPC
   }
-
-  // print tick number table header
-  // number of ticks
-  constexpr unsigned int nPrintedTicks = 11;
-  mf::LogVerbatim("detp_test") << "Conversion of tick number to x position [cm]"
-                                  " (detinfo::DetectorProperties::ConvertTicksToX()):";
-
-  std::array<double, nPrintedTicks> ticks;
-  for (unsigned int iTick = 0; iTick < nPrintedTicks; ++iTick)
-    ticks[iTick] = iTick * nWaveformTicks / (nPrintedTicks - 1);
-
-  {
-    mf::LogVerbatim log("detp_test");
-    log << std::setw(headerColWidth) << "tick #:";
-    for (double tick : ticks)
-      log << " | " << std::setw(colWidth) << tick;
-  }
-
-  for (auto planeID : geom.IteratePlaneIDs()) {
-    mf::LogVerbatim log("detp_test");
-    log << std::setw(headerColWidth) << std::string(planeID);
-
-    for (double tick : ticks) {
-      double const x = detp.ConvertTicksToX(tick, planeID);
-      log << " | " << std::setw(colWidth) << x;
-    } // for tick
-  }   // for planes
 
   // 4. And finally we cross fingers.
   if (nErrors > 0) { mf::LogError("detp_test") << nErrors << " errors detected!"; }

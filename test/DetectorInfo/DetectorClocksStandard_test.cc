@@ -18,7 +18,6 @@
  * TesterEnvironment, configured with a "standard" configuration object, is used
  * in a non-Boost-unit-test context.
  * It provides:
- * - `detinfo::DetectorClocks const* Provider<detinfo::DetectorClocks>()`
  *
  */
 using TestEnvironment = testing::TesterEnvironment<testing::BasicEnvironmentConfiguration>;
@@ -81,35 +80,19 @@ main(int argc, char const** argv)
   // DetectorClocksStandard supports the simple set up; so we invoke it
   TestEnv.SimpleProviderSetup<detinfo::DetectorClocksStandard>();
 
-  // we print some information from the service itself;
-  // this is specific to the implementation, so we need to talk
-  // to the concrete type; this is not the way we would normally operate:
-  TestEnv.Provider<detinfo::DetectorClocksStandard>()->debugReport();
-
-  //
-  // run the test algorithm
-  // (I leave it here for reference -- there is no test algorithm here)
-  //
-
-  // 1. we initialize it from the configuration in the environment,
-  //  MyTestAlgo Tester(TestEnv.TesterParameters());
-
-  // 2. we set it up with the geometry from the environment
-  //  Tester.Setup(*(TestEnv.Provider<detinfo::DetectorClocks>()));
-
-  // 3. then we run it!
   // Note that here we are querying the abstract DetectorClocks interface;
   // this is the right way to go.
-  detinfo::DetectorClocks const* detClocks = TestEnv.Provider<detinfo::DetectorClocks>();
-  mf::LogVerbatim("clocks_test") << "TPC clock period: " << detClocks->TPCClock().FramePeriod()
-                                 << " us";
+  auto const* detClocks = TestEnv.Provider<detinfo::DetectorClocks>();
+  mf::LogVerbatim("clocks_test")
+    << "TPC clock period: " << detClocks->DataForJob().TPCClock().FramePeriod() << " us";
 
   // here we cheat and use the knowledge of which implementation we are using
   // (need to use pointers to use the feature of nullptr on conversion failure)
-  auto const* detClocksStd = dynamic_cast<detinfo::DetectorClocksStandard const*>(detClocks);
-  if (detClocksStd) { detClocksStd->debugReport(); }
-  else {
-    mf::LogWarning("clocks_test") << "Can't run DetectorClocksStandard-specific diagnostics.";
+  auto const* detClocksStd
+    = dynamic_cast<detinfo::DetectorClocksStandard const*>(detClocks);
+  if (detClocksStd == nullptr) {
+    mf::LogWarning("clocks_test")
+      << "Can't run DetectorClocksStandard-specific diagnostics.";
   }
 
   // 4. And finally we cross fingers.

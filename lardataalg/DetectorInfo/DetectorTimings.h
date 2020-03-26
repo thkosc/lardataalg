@@ -3,14 +3,14 @@
  * @brief  Interface to `detinfo::DetectorClocks`.
  * @author Gianluca Petrillo (petrillo@slac.stanford.edu)
  * @date   May 30, 2019
- * 
+ *
  */
 
 #ifndef LARDATAALG_DETECTORINFO_DETECTORTIMINGS_H
 #define LARDATAALG_DETECTORINFO_DETECTORTIMINGS_H
 
 // LArSoft libraries
-#include "lardataalg/DetectorInfo/DetectorClocks.h"
+#include "lardataalg/DetectorInfo/DetectorClocksData.h"
 #include "lardataalg/DetectorInfo/DetectorTimingTypes.h" // ns. timescales
 #include "lardataalg/Utilities/quantities/electronics.h"
 #include "lardataalg/Utilities/quantities/frequency.h"
@@ -24,26 +24,26 @@ namespace detinfo {
   // ---------------------------------------------------------------------------
   /**
    * @brief A partial `detinfo::DetectorClocks` supporting units.
-   * 
+   *
    * This class is instantiated based on a `detinfo::DetectorClocks`, which
    * is relied upon to provide the underlying functionality.
-   * 
+   *
    * Example of usage:
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
    * detinfo::DetectorClocksWithUnits const& detClocks
    *   = detinfo::makeDetectorClocksWithUnits
    *   (lar::providerFrom<detinfo::DetectorClocks>())
    *   ;
-   * 
+   *
    * util::quantities::nanosecond simulStartTime
    *   = detClocks.G4ToElecTime(0.0);
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   * 
+   *
    */
   class DetectorClocksWithUnits {
 
-    /// The backend instance of `detinfo::DetectorClocks` this object uses.
-    detinfo::DetectorClocks const* fDetClocks = nullptr;
+    /// The backend instance of `detinfo::DetectorClocksData` this object uses.
+    detinfo::DetectorClocksData const* fClockData = nullptr;
 
   public:
     // import types
@@ -54,38 +54,40 @@ namespace detinfo {
 
     // @{
     /// Constructor: uses `detClocks` for internal conversions.
-    DetectorClocksWithUnits(detinfo::DetectorClocks const* detClocks) : fDetClocks(detClocks) {}
-    DetectorClocksWithUnits(detinfo::DetectorClocks const& detClocks)
+    explicit DetectorClocksWithUnits(detinfo::DetectorClocksData const* detClocks)
+      : fClockData(detClocks)
+    {}
+    explicit DetectorClocksWithUnits(detinfo::DetectorClocksData const& detClocks)
       : DetectorClocksWithUnits(&detClocks)
     {}
     // @}
 
-    /// Returns the detector clocks service provider in use.
-    detinfo::DetectorClocks const&
-    detClocks() const
+    /// Returns the detector clocks data object
+    detinfo::DetectorClocksData const&
+    clockData() const
     {
-      return *fDetClocks;
+      return *fClockData;
     }
 
     /// Equivalent to `detinfo::DetectorClocks::TriggerTime()`.
     microsecond
     TriggerTime() const
     {
-      return microsecond{detClocks().TriggerTime()};
+      return microsecond{clockData().TriggerTime()};
     }
 
     /// Equivalent to `detinfo::DetectorClocks::BeamGateTime()`.
     microsecond
     BeamGateTime() const
     {
-      return microsecond{detClocks().BeamGateTime()};
+      return microsecond{clockData().BeamGateTime()};
     }
 
     /// Equivalent to `detinfo::DetectorClocks::TPCTime()`.
     microsecond
     TPCTime() const
     {
-      return microsecond{detClocks().TPCTime()};
+      return microsecond{clockData().TPCTime()};
     }
 
     // @{
@@ -93,7 +95,7 @@ namespace detinfo {
     microsecond
     G4ToElecTime(nanosecond simTime) const
     {
-      return microsecond{detClocks().G4ToElecTime(simTime.value())};
+      return microsecond{clockData().G4ToElecTime(simTime.value())};
     }
     microsecond
     G4ToElecTime(double simTime) const
@@ -107,7 +109,7 @@ namespace detinfo {
     ticks_d
     TPCTick2TDC(ticks_d tpcticks) const
     {
-      return ticks_d{detClocks().TPCTick2TDC(tpcticks.value())};
+      return ticks_d{clockData().TPCTick2TDC(tpcticks.value())};
     }
     ticks_d
     TPCTick2TDC(double tpcticks) const
@@ -121,7 +123,7 @@ namespace detinfo {
     microsecond
     OpticalClockPeriod() const
     {
-      return microsecond{detClocks().OpticalClock().TickPeriod()};
+      return microsecond{clockData().OpticalClock().TickPeriod()};
     }
 
     /// Equivalent to
@@ -129,7 +131,7 @@ namespace detinfo {
     megahertz
     OpticalClockFrequency() const
     {
-      return megahertz{detClocks().OpticalClock().Frequency()};
+      return megahertz{clockData().OpticalClock().Frequency()};
     }
 
   }; // class DetectorClocksWithUnits
@@ -137,15 +139,15 @@ namespace detinfo {
   /// Transforms a `detinfo::DetectorClocks` into a
   /// `detinfo::DetectorClocksWithUnits`.
   inline detinfo::DetectorClocksWithUnits
-  makeDetectorClocksWithUnits(detinfo::DetectorClocks const& detClocks)
+  makeDetectorClocksWithUnits(detinfo::DetectorClocksData const& clockData)
   {
-    return {detClocks};
+    return detinfo::DetectorClocksWithUnits{clockData};
   }
 
   // ---------------------------------------------------------------------------
   /**
    * @brief A class exposing an updated version of `detinfo::DetectorClocks`.
-   * 
+   *
    * This object actually wraps around an existing `detinfo::DetectorClocks`
    * object. For example, in _art_/LArSoft, one can be created as:
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
@@ -161,25 +163,25 @@ namespace detinfo {
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    * In this case, the `detinfo::DetectorClocksWithUnits` object must exist for
    * all the lifetime of `timings`, since it is referenced by the latter.
-   * 
-   * 
+   *
+   *
    * Data types
    * ===========
-   * 
+   *
    * Several data types are designed to resolve the ambiguity of which time,
    * which time scale and which time unit are used.
    * The class distinguish between time points, which identify events in
    * absolute terms, and time intervals and durations, which identify the time
    * lapsed between two events or time points.
-   * 
+   *
    * The time duration is generally expressed by a single type, since it is
    * common to all main time scales expressed in real time:
    * * `time_interval` is natively represented in microseconds
-   * 
+   *
    * Note that while each data type has a native representation (usually
    * microseconds), these objects can convert into other units to remain
    * consistent. Still, they are not fool-proof...
-   * 
+   *
    * Different time point types are defined to reflect the different time
    * scales:
    * * `electronics_time` for times on the
@@ -216,8 +218,8 @@ namespace detinfo {
    *   @ref DetectorClocksSimulationTime "simulation time axis", starting at the
    *   @ref DetectorClocksGeant4TimeStart "GEANT4 time start",
    *   natively expressed in nanoseconds.
-   * 
-   * 
+   *
+   *
    * For each time scale, a "category" is defined (e.g.
    * `electronics_time::category_t`), and traits are available for each category
    * as `timescale_traits` objects (for example
@@ -228,12 +230,12 @@ namespace detinfo {
    * (`time_interval_t`), the tick type in integral units (`tick_t`) and real
    * units (`tick_d_t`), the name of the time scale itself (`name()`) and
    * little more.
-   * 
+   *
    * Note that not all time scales support all features. For example, simulation
    * time is not actually associated to any clock, so that for example an
    * attempt to convert a time into simulation time ticks will result in a
    * compilation failure.
-   * 
+   *
    */
   class DetectorTimings : private detinfo::DetectorClocksWithUnits {
 
@@ -283,11 +285,11 @@ namespace detinfo {
     // note that `makeDetectorTimings()` provides an additional construction way
     // @{
     /// Constructor: wraps around a specified `detinfo::DetectorClocks` object.
-    DetectorTimings(detinfo::DetectorClocks const& detClocks)
-      : detinfo::DetectorClocksWithUnits(detClocks)
+    explicit DetectorTimings(detinfo::DetectorClocksData const& clockData)
+      : detinfo::DetectorClocksWithUnits(clockData)
     {}
-    DetectorTimings(detinfo::DetectorClocks const* detClocks)
-      : detinfo::DetectorClocksWithUnits(detClocks)
+    explicit DetectorTimings(detinfo::DetectorClocksData const* clockData)
+      : detinfo::DetectorClocksWithUnits(clockData)
     {}
     // @}
 
@@ -302,11 +304,11 @@ namespace detinfo {
       return static_cast<detinfo::DetectorClocksWithUnits const&>(*this);
     }
 
-    /// Returns the detector clocks service provider in use.
-    detinfo::DetectorClocks const&
-    detClocks() const
+    /// Returns the detector clocks data.
+    detinfo::DetectorClocksData const&
+    clockData() const
     {
-      return detClocksUnits().detClocks();
+      return detClocksUnits().clockData();
     }
 
     /// @}
@@ -342,11 +344,11 @@ namespace detinfo {
      * @tparam FromTime the time scale the input `time` is measured in
      * @param time the time instant to be converted, in `FromTime` scale
      * @return the time instant converted into `TargetTime` time scale
-     * 
+     *
      * Example:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
      * simulation_time nuTime = 47.5_ns;
-     * electronics_time nuElecTime 
+     * electronics_time nuElecTime
      *   = timings.toTimeScale<electronics_time>(nuTime);
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * is equivalent to use `detinfo::DetectorClocks::G4ToElecTime(47.5)`.
@@ -360,7 +362,7 @@ namespace detinfo {
      * @tparam FromTime the time scale the input `time` is measured in
      * @param time the time instant to be converted, in `FromTime` scale
      * @return the time instant converted as tick into `TargetTick` time scale
-     * 
+     *
      * Example:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
      * simulation_time nuTime = 47.5_ns;
@@ -375,7 +377,7 @@ namespace detinfo {
      * @brief Returns the number of ticks corresponding to a `time` interval.
      * @tparam Ticks type of tick interval returned
      * @return the `time` interval expressed as number of ticks
-     * 
+     *
      * The `time` interval is represented by the number of ticks on the time
      * scale of `Ticks` which fits in that interval.
      * If `Ticks` is based on an integral type, the resulting number of ticks is
@@ -393,7 +395,7 @@ namespace detinfo {
      * @tparam FromTime the time scale the input `time` is measured in
      * @param time the time instant to be converted, in `FromTime` scale
      * @return the time instant converted into electronics time scale.
-     * 
+     *
      * Example:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
      * simulation_time nuTime = 47.5_ns;
@@ -414,7 +416,7 @@ namespace detinfo {
      * @param time the time instant to be converted, in `FromTime` scale
      * @return the time instant converted into electronics tick number.
      * @see `toTick()`, `toElectronicsTime()`, `toElectronicsTick()`
-     * 
+     *
      * Example:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
      * simulation_time nuTime = 47.5_ns;
@@ -434,7 +436,7 @@ namespace detinfo {
      * @param time the time instant to be converted, in `FromTime` scale
      * @return the time instant converted into electronics tick number.
      * @see `toTick()`, `toElectronicsTime()`, `toElectronicsTickD()`
-     * 
+     *
      * Example:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
      * simulation_time nuTime = 47.5_ns;
@@ -453,7 +455,7 @@ namespace detinfo {
      * @tparam FromTime the time scale the input `time` is measured in
      * @param time the time instant to be converted, in `FromTime` scale
      * @return the time instant converted into trigger time scale.
-     * 
+     *
      * Example:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
      * simulation_time nuTime = 47.5_ns;
@@ -472,7 +474,7 @@ namespace detinfo {
      * @tparam FromTime the time scale the input `time` is measured in
      * @param time the time instant to be converted, in `FromTime` scale
      * @return the time instant converted into simulation time scale.
-     * 
+     *
      * Example:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
      * electronics_time beamTime = 47.5_ns;
@@ -536,7 +538,7 @@ namespace detinfo {
      * @tparam Ticks type of tick interval returned
      *               (default: _optical_time_ticks_)
      * @return the `time` interval expressed as number of optical ticks
-     * 
+     *
      * The `time` interval is represented by the number of optical detector
      * electronics ticks fitting in it. If `Ticks` is based on an integral type,
      * the resulting number of ticks is usually truncated.
@@ -556,7 +558,7 @@ namespace detinfo {
      * @param time time point to be converted into an optical tick
      * @return the `time` point expressed as integral number of ticks
      * @see `toTick()`, `toOpticalTickD()`
-     * 
+     *
      * The specified time point is converted in ticks from the start of the
      * optical time scale (i.e., from `startTime<optical_time>()`).
      * The ticks are from the optical detector clock (`OpticalClockPeriod()`).
@@ -575,7 +577,7 @@ namespace detinfo {
      * @param time time point to be converted into an optical tick
      * @return the `time` point expressed as real number of ticks
      * @see `toTick()`, `toOpticalTickD()`
-     * 
+     *
      * The specified time point is converted in ticks from the start of the
      * optical time scale (i.e., from `startTime<optical_time>()`).
      * The ticks are from the optical detector clock (`OpticalClockPeriod()`).
@@ -598,7 +600,7 @@ namespace detinfo {
      *        of electronics time.
      * @param time electronics time point to be converted
      * @return time elapsed from the start of electronics time to `time`
-     * 
+     *
      * This is mostly a logic operation, since the value of the returned time
      * duration is the same as the value of the `time` point (i.e. the start
      * time is 0).
@@ -610,28 +612,28 @@ namespace detinfo {
      * @tparam TimePoint the type of time point on the requested scale
      * @tparam TimeScale the type of scale to get the result in
      *                   (default: `electronics_time`)
-     * 
+     *
      * This method returns the start time of a time scale, in another time
      * scale (or in the very same, in which case the result is trivially `0`).
      * Example:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
      * using namespace detinfo::timescales;
-     * 
+     *
      * electronics_time const TPCstartTime
      *   = detTimings.startTime<TPCelectronics_time>();
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * sets `TPCstartTime` to the instant the TPC electronics time starts,
      * in the electronics time scale. This example in particular is yielding
      * the same value as calling `detinfo::DetectorClocks::TPCTime()`.
-     * 
-     * 
+     *
+     *
      * Implemented scales
      * -------------------
-     * 
+     *
      * * all where `TimePoint` is the same as `TimeScale` (trivially, `0`)
      * * `TPCelectronics_time` to:
      *     * `electronics_time`
-     * 
+     *
      */
     template <typename TimePoint, typename TimeScale = electronics_time>
     constexpr TimeScale startTime() const;
@@ -641,14 +643,14 @@ namespace detinfo {
      * @tparam TickPoint the type of tick point on the requested scale
      * @tparam TimeTickScale the type of scale to get the result in, also a time
      *                       tick point (default: `electronics_tick`)
-     * 
+     *
      * This method returns the start tick of a time tick scale, in another time
      * tick scale (or in the very same, in which case the result is trivially
      * `0`).
      * Example:
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
      * using namespace detinfo::timescales;
-     * 
+     *
      * electronics_time_tick const TPCstartTick
      *   = detTimings.startTick<TPCelectronics_time_tick>();
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -656,18 +658,18 @@ namespace detinfo {
      * in the electronics time tick scale. This example in particular is
      * yielding the same value as calling
      * `detinfo::DetectorClocks::TPCTick2TDC(0)`.
-     * 
+     *
      * @todo The example is not even supported yet!
-     * 
-     * 
+     *
+     *
      * Implemented scales
      * -------------------
-     * 
+     *
      * * all where `TickPoint` is the same as `TimeScale` (trivially, `0`)
      * * `TPCelectronics_time` to:
      *     * `electronics_time`
-     * 
-     * 
+     *
+     *
      */
     template <typename TickPoint, typename TimeTickScale = electronics_tick>
     constexpr TimeTickScale startTick() const;
@@ -682,14 +684,14 @@ namespace detinfo {
 
   /// Returns `DetectorTimings` object from specified `detinfo::DetectorClocks`.
   inline detinfo::DetectorTimings
-  makeDetectorTimings(detinfo::DetectorClocks const& detClocks)
+  makeDetectorTimings(detinfo::DetectorClocksData const& detClocks)
   {
-    return {detClocks};
+    return detinfo::DetectorTimings{detClocks};
   }
 
   /// Returns `DetectorTimings` object from specified `detinfo::DetectorClocks`.
   inline detinfo::DetectorTimings
-  makeDetectorTimings(detinfo::DetectorClocks const* detClocks)
+  makeDetectorTimings(detinfo::DetectorClocksData const* detClocks)
   {
     return makeDetectorTimings(*detClocks);
   }
@@ -970,7 +972,7 @@ namespace detinfo {
       static detinfo::ElecClock const&
       get(DetectorTimings const* timings)
       {
-        return timings->detClocks().TPCClock();
+        return timings->clockData().TPCClock();
       }
     };
 
@@ -979,7 +981,7 @@ namespace detinfo {
       static detinfo::ElecClock const&
       get(DetectorTimings const* timings)
       {
-        return timings->detClocks().OpticalClock();
+        return timings->clockData().OpticalClock();
       }
     };
 
@@ -988,7 +990,7 @@ namespace detinfo {
       static detinfo::ElecClock const&
       get(DetectorTimings const* timings)
       {
-        return timings->detClocks().TriggerClock();
+        return timings->clockData().TriggerClock();
       }
     };
 

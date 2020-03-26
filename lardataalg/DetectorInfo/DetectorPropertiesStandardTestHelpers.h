@@ -90,7 +90,11 @@ namespace testing {
       // for this test the same configuration as for art-based tests.
       //
       std::set<std::string> ignore_keys({"InheritNumberTimeSamples"});
-      return std::make_unique<detinfo::DetectorPropertiesStandard>(pset, providers, ignore_keys);
+      return std::make_unique<detinfo::DetectorPropertiesStandard>(
+        pset,
+        providers.get<geo::GeometryCore>(),
+        providers.get<detinfo::LArProperties>(),
+        ignore_keys);
     } // setup()
 
   }; // ProviderSetupClass<DetectorPropertiesStandard>

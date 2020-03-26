@@ -89,20 +89,7 @@ namespace detinfo {
    *       occur, and you need to be in control of which one.
    */
   class ElecClock {
-
   public:
-    /**
-     * @brief Default constructor.
-     *
-     * A default-constructed clock is useless.
-     * It is caller's responsibility to set _all_ the information of the
-     * default-constructed clock by assignment from another clock.
-     *
-     * Better yet, don't use this constructor and instead construct the clock
-     * immediately right.
-     */
-    ElecClock() : ElecClock(0, kTIME_MAX, 1e9) {}
-
     /**
      * @brief Constructor: sets all values.
      * @param time starting time of the clock [&micro;s]
@@ -110,96 +97,44 @@ namespace detinfo {
      * @param frequency clock frequency [MHz]
      *
      */
-    ElecClock(double time, double frame_period, double frequency)
-      : fTime(time), fFramePeriod(frame_period), fFrequency(frequency)
+    ElecClock(double const time, double const frame_period, double const frequency)
+      : ElecClock{time, frame_period, frequency, std::nothrow}
     {
       if (fFrequency <= 0)
-        throw detinfo::DetectorClocksException("Negative frequency is prohibited!");
+        throw detinfo::DetectorClocksException("Only positive frequency allowed.");
     }
 
-  protected:
-    //-- Attribute variables --//
-
-    double fTime;        ///< Time in microseconds.
-    double fFramePeriod; ///< Frame period in microseconds.
-    double fFrequency;   ///< Clock speed in MHz.
-
-  public:
-    //-- Setters --//
-
-    /**
-     * @brief Directly sets the current time on the clock.
-     * @param time reference time (expected in microseconds)
-     */
-    void
-    SetTime(double time)
+    constexpr ElecClock
+    WithTime(double const time) const noexcept
     {
-      fTime = time;
+      return {time, fFramePeriod, fFrequency, std::nothrow};
     }
 
-    /**
-     * @brief Sets the current time on the clock from frame and sample number.
-     * @param sample the number of the sample within the specified frame
-     * @param frame the frame containing the time to be sets
-     *
-     * The current clock time is set to the instant of the start of the
-     * specified sample.
-     */
-    void
-    SetTime(int sample, int frame)
+    constexpr ElecClock
+    WithTick(int const tick, int const frame = 0) const noexcept
     {
-      fTime = Time(sample, frame);
+      return {Time(tick, frame), fFramePeriod, fFrequency, std::nothrow};
     }
 
-    /**
-     * @brief Sets the current time on the clock from frame and sample number.
-     * @param sample the number of the sample within the specified frame
-     * @param frame the frame containing the time to be sets
-     *
-     * The current clock time is set to the instant of the start of the
-     * specified sample.
-     */
-    void
-    SetTime(unsigned int sample, unsigned int frame)
+    constexpr ElecClock
+    AdvanceTimeBy(double const time) const noexcept
     {
-      SetTime(int(sample), int(frame));
+      return {fTime + time, fFramePeriod, fFrequency, std::nothrow};
     }
 
-    /**
-     * @brief Sets the current time on the clock from tick number.
-     * @param ticks the number of tick to set the clock to
-     *
-     * The current clock time is set to the instant of the start of the
-     * specified tick.
-     */
-    void
-    SetTime(int ticks)
+    constexpr ElecClock
+    AdvanceTicksBy(int const ticks) const noexcept
     {
-      fTime = Time(ticks, 0);
+      return {fTime + Time(ticks), fFramePeriod, fFrequency, std::nothrow};
     }
-
-    /**
-     * @brief Sets the current time on the clock from tick number.
-     * @param ticks the number of tick to set the clock to
-     *
-     * The current clock time is set to the instant of the start of the
-     * specified tick.
-     */
-    void
-    SetTime(unsigned int ticks)
-    {
-      SetTime(int(ticks));
-    }
-
-    //-- Getters --//
 
     /**
      * @brief Current time (as stored) in microseconds.
      *
      * Note that this is different than `Time(Time())`, which is discretized.
      */
-    double
-    Time() const
+    constexpr double
+    Time() const noexcept
     {
       return fTime;
     }
@@ -215,8 +150,8 @@ namespace detinfo {
      *
      * The returned time is not related to the current time of the clock.
      */
-    double
-    Time(int sample, int frame) const
+    constexpr double
+    Time(int const sample, int const frame) const noexcept
     {
       return (sample / fFrequency + frame * fFramePeriod);
     }
@@ -230,8 +165,8 @@ namespace detinfo {
      *
      * It is not related to the current time of the clock.
      */
-    double
-    Time(double time) const
+    constexpr double
+    Time(double const time) const noexcept
     {
       return Time(Sample(time), Frame(time));
     }
@@ -245,29 +180,29 @@ namespace detinfo {
      *
      * It is not related to the current time of the clock.
      */
-    double
-    Time(int ticks) const
+    constexpr double
+    Time(int const ticks) const noexcept
     {
       return ticks / fFrequency;
     }
 
     /// Frequency in MHz.
-    double
+    constexpr double
     Frequency() const
     {
       return fFrequency;
     }
 
     /// A single frame period in microseconds.
-    double
-    FramePeriod() const
+    constexpr double
+    FramePeriod() const noexcept
     {
       return fFramePeriod;
     }
 
     /// Current clock tick (that is, the number of tick `Time()` falls in).
-    int
-    Ticks() const
+    constexpr int
+    Ticks() const noexcept
     {
       return Ticks(fTime);
     }
@@ -282,10 +217,10 @@ namespace detinfo {
      * @note The returned value (number of tick) can wrap if the real number of
      *       the tick is beyond the range of the returned data type (`int`).
      */
-    int
-    Ticks(double time) const
+    constexpr int
+    Ticks(double const time) const noexcept
     {
-      return (int)(time * fFrequency);
+      return static_cast<int>(time * fFrequency);
     }
 
     /**
@@ -299,8 +234,8 @@ namespace detinfo {
      * @note The returned value (number of tick) can wrap if the real number of
      *       the tick is beyond the range of the returned data type (`int`).
      */
-    int
-    Ticks(int sample, int frame) const
+    constexpr int
+    Ticks(int const sample, int const frame) const noexcept
     {
       return sample + frame * FrameTicks();
     }
@@ -314,8 +249,8 @@ namespace detinfo {
      * To univocally define the sample, the number of the frame must also be
      * obtained, e.g. via `Frame()`.
      */
-    int
-    Sample() const
+    constexpr int
+    Sample() const noexcept
     {
       return Sample(fTime);
     }
@@ -333,10 +268,10 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    int
-    Sample(double time) const
+    constexpr int
+    Sample(double const time) const noexcept
     {
-      return (int)((time - Frame(time) * fFramePeriod) * fFrequency);
+      return static_cast<int>((time - Frame(time) * fFramePeriod) * fFrequency);
     }
 
     /**
@@ -352,10 +287,10 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    int
-    Sample(int tick) const
+    constexpr int
+    Sample(int const tick) const noexcept
     {
-      return (tick % (int)(FrameTicks()));
+      return (tick % static_cast<int>(FrameTicks()));
     }
 
     /**
@@ -365,8 +300,8 @@ namespace detinfo {
      * The returned value is the number of the frame which the current clock
      * time falls in.
      */
-    int
-    Frame() const
+    constexpr int
+    Frame() const noexcept
     {
       return Frame(fTime);
     }
@@ -382,10 +317,10 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    int
-    Frame(double time) const
+    constexpr int
+    Frame(double const time) const noexcept
     {
-      return (int)(time / fFramePeriod);
+      return static_cast<int>(time / fFramePeriod);
     }
 
     /**
@@ -399,183 +334,60 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    int
-    Frame(int tick) const
+    constexpr int
+    Frame(int const tick) const noexcept
     {
-      return (tick / (int)(FrameTicks()));
+      return (tick / static_cast<int>(FrameTicks()));
     }
 
     /// Number ticks in a frame.
-    unsigned int
-    FrameTicks() const
+    constexpr unsigned int
+    FrameTicks() const noexcept
     {
-      return (int)(fFramePeriod * fFrequency);
+      return static_cast<unsigned int>(fFramePeriod * fFrequency);
     }
 
     /// A single tick period in microseconds.
-    double
-    TickPeriod() const
+    constexpr double
+    TickPeriod() const noexcept
     {
       return 1. / fFrequency;
     }
 
-    //-- operators --//
+    //-- comparators --//
 
-    /// @{
-    /// @name Operators to modify clock time.
-
-    /// Increases the current clock time by a full tick time.
-    ElecClock&
-    operator++()
-    {
-      fTime += 1. / fFrequency;
-      return *this;
-    }
-
-    /// Increases the current clock time by a full tick time.
-    ElecClock
-    operator++(int)
-    {
-      ElecClock tmp(*this);
-      operator++();
-      return tmp;
-    }
-
-    /// Decreases the current clock time by a full tick time.
-    ElecClock&
-    operator--()
-    {
-      fTime -= 1. / fFrequency;
-      return *this;
-    }
-
-    /// Decreases the current clock time by a full tick time.
-    ElecClock
-    operator--(int)
-    {
-      ElecClock tmp(*this);
-      operator--();
-      return tmp;
-    }
-
-    /// Increases the current clock time by the specified time in microseconds.
-    ElecClock&
-    operator+=(const double& rhs)
-    {
-      fTime += rhs;
-      return *this;
-    }
-    /// Decreases the current clock time by the specified time in microseconds.
-    ElecClock&
-    operator-=(const double& rhs)
-    {
-      fTime -= rhs;
-      return *this;
-    }
-
-    /// Increases the current clock time by the specified time in microseconds.
-    ElecClock&
-    operator+=(const float& rhs)
-    {
-      fTime += (double)rhs;
-      return *this;
-    }
-    /// Decreases the current clock time by the specified time in microseconds.
-    ElecClock&
-    operator-=(const float& rhs)
-    {
-      fTime -= (double)rhs;
-      return *this;
-    }
-
-    /// Increases the current clock time by the specified number of ticks.
-    ElecClock&
-    operator+=(const int& rhs)
-    {
-      fTime += Time(rhs);
-      return *this;
-    }
-    /// Decreases the current clock time by the specified number of ticks.
-    ElecClock&
-    operator-=(const int& rhs)
-    {
-      fTime -= Time(rhs);
-      return *this;
-    }
-
-    /// Increases the current clock time by the specified number of ticks.
-    ElecClock&
-    operator+=(const unsigned int& rhs)
-    {
-      fTime += Time((int)rhs);
-      return *this;
-    }
-    /// Decreases the current clock time by the specified number of ticks.
-    ElecClock&
-    operator-=(const unsigned int& rhs)
-    {
-      fTime -= Time((int)rhs);
-      return *this;
-    }
-
-    /// Increases the current clock time by the current time of another clock.
-    ElecClock&
-    operator+=(const ElecClock& rhs)
-    {
-      fTime += rhs.Time();
-      return *this;
-    }
-
-    /// Decreases the current clock time by the current time of another clock.
-    ElecClock&
-    operator-=(const ElecClock& rhs)
-    {
-      fTime -= rhs.Time();
-      return *this;
-    }
-
-    /// Returns a clock like this one, with its current time increased by
-    /// the current time of `rhs`.
-    inline ElecClock
-    operator+(const ElecClock& rhs)
-    {
-      return ElecClock(fTime + rhs.Time(), fFramePeriod, fFrequency);
-    }
-
-    /// Returns a clock like this one, with its current time decreased by
-    /// the current time of `rhs`.
-    inline ElecClock
-    operator-(const ElecClock& rhs)
-    {
-      return ElecClock(fTime - rhs.Time(), fFramePeriod, fFrequency);
-    }
-
-    /// @}
-
-    /// Compares the current time of this clock with the one of `rhs`.
-    inline bool
-    operator<(const ElecClock& rhs) const
+    constexpr bool
+    operator<(const ElecClock& rhs) const noexcept
     {
       return fTime < rhs.Time();
     }
-    /// Compares the current time of this clock with the one of `rhs`.
-    inline bool
-    operator>(const ElecClock& rhs) const
+    constexpr bool
+    operator>(const ElecClock& rhs) const noexcept
     {
       return fTime > rhs.Time();
     }
-    /// Compares the current time of this clock with the one of `rhs`.
-    inline bool
-    operator<=(const ElecClock& rhs) const
+    constexpr bool
+    operator<=(const ElecClock& rhs) const noexcept
     {
       return fTime <= rhs.Time();
     }
-    /// Compares the current time of this clock with the one of `rhs`.
-    inline bool
-    operator>=(const ElecClock& rhs) const
+    constexpr bool
+    operator>=(const ElecClock& rhs) const noexcept
     {
       return fTime >= rhs.Time();
     }
+
+  private:
+    constexpr ElecClock(double const time,
+                        double const frame_period,
+                        double const frequency,
+                        std::nothrow_t) noexcept
+      : fTime(time), fFramePeriod(frame_period), fFrequency(frequency)
+    {}
+
+    double fTime{};                 ///< Time in microseconds.
+    double fFramePeriod{kTIME_MAX}; ///< Frame period in microseconds.
+    double fFrequency{1e9};         ///< Clock speed in MHz.
 
   }; // class ElecClock
 
