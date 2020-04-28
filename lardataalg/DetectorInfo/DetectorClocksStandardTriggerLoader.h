@@ -33,7 +33,6 @@
 // C++ standard libraries
 #include <vector>
 
-
 namespace detinfo {
 
   /**
@@ -44,10 +43,12 @@ namespace detinfo {
    * The times are stored unconditionally and directly, with no time scale
    * conversion.
    */
-  inline void setDetectorClocksStandardTriggersFromRawTrigger
-    (detinfo::DetectorClocksStandard& detClocks, raw::Trigger const& trigger)
-    { detClocks.SetTriggerTime(trigger.TriggerTime(), trigger.BeamGateTime()); }
-
+  inline void
+  setDetectorClocksStandardTriggersFromRawTrigger(detinfo::DetectorClocksStandard& detClocks,
+                                                  raw::Trigger const& trigger)
+  {
+    detClocks.SetTriggerTime(trigger.TriggerTime(), trigger.BeamGateTime());
+  }
 
   /**
    * @brief Resets `DetectorClocksStandard` G4RefTime based on a simulated `raw::Trigger`.
@@ -57,10 +58,12 @@ namespace detinfo {
    * The times are stored unconditionally and directly, with no time scale
    * conversion.
    */
-  inline void setDetectorClocksG4RefTimeFromSimTrigger
-    (detinfo::DetectorClocksStandard& detClocks, raw::Trigger const& trigger)
-    { detClocks.RebaseG4RefTime(trigger.TriggerTime()); }
-
+  inline void
+  setDetectorClocksG4RefTimeFromSimTrigger(detinfo::DetectorClocksStandard& detClocks,
+                                           raw::Trigger const& trigger)
+  {
+    detClocks.RebaseG4RefTime(trigger.TriggerTime());
+  }
 
   /**
    * @brief Loads `DetectorClocksStandard` trigger times from a `raw::Trigger`.
@@ -82,14 +85,14 @@ namespace detinfo {
    * trigger to be used is unequivocal.
    */
   template <typename Event>
-  bool setDetectorClocksStandardTriggersFromEvent
-    (detinfo::DetectorClocksStandard& detClocks, Event const& event)
+  bool
+  setDetectorClocksStandardTriggersFromEvent(detinfo::DetectorClocksStandard& detClocks,
+                                             Event const& event)
   {
     //
     // fetch the trigger data product
     //
-    using TriggerHandle_t
-      = typename Event::template HandleT<std::vector<raw::Trigger>>;
+    using TriggerHandle_t = typename Event::template HandleT<std::vector<raw::Trigger>>;
 
     art::InputTag const triggerTag = detClocks.TrigModuleName();
     TriggerHandle_t triggerHandle;
@@ -108,22 +111,19 @@ namespace detinfo {
     //
     if (triggers.size() != 1) {
       throw cet::exception("setDetectorClocksStandardTrigger")
-        << "Found " << triggers.size()
-        << " trigger objects in '" << triggerTag.encode()
+        << "Found " << triggers.size() << " trigger objects in '" << triggerTag.encode()
         << "' (only one trigger per event is supported)\n";
     }
 
     //
     // set the timings from the first and only trigger into the service
     //
-    setDetectorClocksStandardTriggersFromRawTrigger
-      (detClocks, triggers.front());
+    setDetectorClocksStandardTriggersFromRawTrigger(detClocks, triggers.front());
 
     // all done
     return true;
 
   } // setDetectorClocksStandardTriggersFromEvent()
-
 
   /**
    * @brief Corrects `DetectorClocksStandard` G4RefTime to be based on trigger time
@@ -145,14 +145,14 @@ namespace detinfo {
    * trigger to be used is unequivocal.
    */
   template <typename Event>
-  bool setDetectorClocksStandardG4RefTimeCorrectionFromEvent
-    (detinfo::DetectorClocksStandard& detClocks, Event const& event)
+  bool
+  setDetectorClocksStandardG4RefTimeCorrectionFromEvent(detinfo::DetectorClocksStandard& detClocks,
+                                                        Event const& event)
   {
     //
     // fetch the trigger data product
     //
-    using TriggerHandle_t
-      = typename Event::template HandleT<std::vector<raw::Trigger>>;
+    using TriggerHandle_t = typename Event::template HandleT<std::vector<raw::Trigger>>;
 
     art::InputTag const triggerTag = detClocks.G4RefCorrTrigModuleName();
     TriggerHandle_t triggerHandle;
@@ -171,16 +171,14 @@ namespace detinfo {
     //
     if (triggers.size() != 1) {
       throw cet::exception("setDetectorClocksStandardTrigger")
-        << "Found " << triggers.size()
-        << " trigger objects in '" << triggerTag.encode()
+        << "Found " << triggers.size() << " trigger objects in '" << triggerTag.encode()
         << "' (only one trigger per event is supported)\n";
     }
 
     //
     // set the timings from the first and only trigger into the service
     //
-    setDetectorClocksG4RefTimeFromSimTrigger
-      (detClocks, triggers.front());
+    setDetectorClocksG4RefTimeFromSimTrigger(detClocks, triggers.front());
 
     // all done
     return true;
@@ -206,14 +204,13 @@ namespace detinfo {
    * in the event, in which case no choice is made, and an exception is thrown.
    */
   template <typename Event>
-  bool setDetectorClocksStandardTrigger
-    (detinfo::DetectorClocksStandard& detClocks, Event const& event)
+  bool
+  setDetectorClocksStandardTrigger(detinfo::DetectorClocksStandard& detClocks, Event const& event)
   {
     //
     // try to read the trigger from the event
     //
-    if (setDetectorClocksStandardTriggersFromEvent(detClocks, event))
-      return true;
+    if (setDetectorClocksStandardTriggersFromEvent(detClocks, event)) return true;
 
     //
     // if there was no trigger candidate, set it default
@@ -222,7 +219,6 @@ namespace detinfo {
     return false;
 
   } // setDetectorClocksStandardTrigger
-
 
   /**
    * @brief Loads `DetectorClocksStandard` G4Ref correction times.
@@ -243,14 +239,14 @@ namespace detinfo {
    * in the event, in which case no choice is made, and an exception is thrown.
    */
   template <typename Event>
-  bool setDetectorClocksStandardG4RefTimeCorrection
-    (detinfo::DetectorClocksStandard& detClocks, Event const& event)
+  bool
+  setDetectorClocksStandardG4RefTimeCorrection(detinfo::DetectorClocksStandard& detClocks,
+                                               Event const& event)
   {
     //
     // try to read the trigger from the event
     //
-    if (setDetectorClocksStandardG4RefTimeCorrectionFromEvent(detClocks, event))
-      return true;
+    if (setDetectorClocksStandardG4RefTimeCorrectionFromEvent(detClocks, event)) return true;
 
     //
     // if there was no trigger candidate, do nothing
@@ -259,6 +255,5 @@ namespace detinfo {
   } // setDetectorClocksStandardTrigger
 
 } // namespace detinfo
-
 
 #endif // LARDATA_DETECTORINFO_DETECTORCLOCKSSTANDARDTRIGGERLOADER_H

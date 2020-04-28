@@ -12,14 +12,13 @@
 #include "lardataalg/DetectorInfo/ElecClock.h"
 
 // C++ libraries
-#include <vector>
 #include <string>
+#include <vector>
 
-
-namespace detinfo{
+namespace detinfo {
 
   enum InheritConfigType_t {
-    kG4RefTime=0,
+    kG4RefTime = 0,
     kTriggerOffsetTPC,
     kFramePeriod,
     kClockSpeedTPC,
@@ -305,10 +304,10 @@ namespace detinfo{
   class DetectorClocks {
 
   public:
-    DetectorClocks(const DetectorClocks &) = delete;
-    DetectorClocks(DetectorClocks &&) = delete;
-    DetectorClocks& operator = (const DetectorClocks &) = delete;
-    DetectorClocks& operator = (DetectorClocks &&) = delete;
+    DetectorClocks(const DetectorClocks&) = delete;
+    DetectorClocks(DetectorClocks&&) = delete;
+    DetectorClocks& operator=(const DetectorClocks&) = delete;
+    DetectorClocks& operator=(DetectorClocks&&) = delete;
     virtual ~DetectorClocks() = default;
 
     // --- BEGIN Configuration information -------------------------------------
@@ -326,8 +325,6 @@ namespace detinfo{
 
     /// @}
     // --- END Configuration information ---------------------------------------
-
-
 
     // --- BEGIN Time points and intervals -------------------------------------
     /// @{
@@ -358,11 +355,8 @@ namespace detinfo{
     /// @ref DetectorClocksBeamGateOpening "Beam gate opening time" (in @ref DetectorClocksElectronicsTime "electronics time frame") [&micro;s].
     virtual double BeamGateTime() const = 0;
 
-
     /// @}
     // --- END Time points and intervals ---------------------------------------
-
-
 
     // --- BEGIN Time conversions ----------------------------------------------
     /// @{
@@ -380,11 +374,8 @@ namespace detinfo{
     /// Converts a @ref DetectorClocksTPCelectronicsTime "TPC time" (in ticks) into a @ref DetectorClocksBeamGateTime "beam gate time" [&micro;s].
     virtual double TPCTick2BeamTime(double tick) const = 0;
 
-
     /// @}
     // --- END Time conversions ------------------------------------------------
-
-
 
     // --- BEGIN Electronics clocks --------------------------------------------
     /// @{
@@ -467,8 +458,7 @@ namespace detinfo{
      * sample number, and it can be set to any value afterwards.
      *
      */
-    virtual detinfo::ElecClock TPCClock(unsigned int sample,unsigned int frame) const = 0;
-
+    virtual detinfo::ElecClock TPCClock(unsigned int sample, unsigned int frame) const = 0;
 
     //
     // Getters of Optical ElecClock
@@ -522,7 +512,6 @@ namespace detinfo{
      * sample number, and it can be set to any value afterwards.
      */
     virtual detinfo::ElecClock OpticalClock(unsigned int sample, unsigned int frame) const = 0;
-
 
     //
     // Getters of Trigger ElecClock
@@ -585,7 +574,6 @@ namespace detinfo{
      */
     virtual detinfo::ElecClock TriggerClock(unsigned int sample, unsigned int frame) const = 0;
 
-
     //
     // Getters of External ElecClock
     //
@@ -641,7 +629,6 @@ namespace detinfo{
     /// @}
     // --- END Electronics clocks ----------------------------------------------
 
-
     // --- BEGIN Conversions from electronics time -----------------------------
     /// @{
     /**
@@ -673,7 +660,6 @@ namespace detinfo{
 
     /// @}
     // --- END Conversions from electronics time -------------------------------
-
 
     // --- BEGIN Conversions from electronics waveform ticks -------------------
     /// @{
@@ -720,7 +706,6 @@ namespace detinfo{
      * Note that the start of the TPC waveform is defined by `TPCTime()`.
      */
     virtual double TPCTick2Time(double tick) const = 0;
-
 
     /**
      * @brief Converts an @ref DetectorClocksOpticalElectronicsTime "optical time tick" into a @ref DetectorClocksTriggerTime "trigger time" [&micro;s]
@@ -808,7 +793,6 @@ namespace detinfo{
      */
     virtual double OpticalTick2Time(double tick, size_t sample, size_t frame) const = 0;
 
-
     /**
      * @brief Converts an @ref DetectorClocksExternalElectronicsTime "external time tick" into a @ref DetectorClocksTriggerTime "trigger time" [&micro;s]
      * @param tick the tick number within the external waveform
@@ -876,8 +860,6 @@ namespace detinfo{
     /// @}
     // --- END Conversions from electronics waveform ticks ---------------------
 
-
-
     // --- BEGIN Conversions to electronics waveform ticks ---------------------
     /// @{
     /**
@@ -916,7 +898,6 @@ namespace detinfo{
      */
     virtual double TPCG4Time2Tick(double g4time) const = 0;
 
-
     /**
      * @brief Converts a @ref DetectorClocksSimulationTime "simulation time" into @ref DetectorClocksOpticalElectronicsTime "optical electronics time ticks".
      * @param g4time @ref DetectorClocksSimulationTime "simulation time" value [ns]
@@ -953,13 +934,11 @@ namespace detinfo{
     /// @}
     // --- END Conversions to electronics waveform ticks ---------------------
 
-
-    protected:
-      DetectorClocks() = default;
+  protected:
+    DetectorClocks() = default;
 
   }; // class DetectorClocks
 
 } //namespace detinfo
-
 
 #endif // LARDATAALG_DETECTORINFO_DETECTORCLOCKS_H

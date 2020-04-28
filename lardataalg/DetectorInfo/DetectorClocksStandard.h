@@ -18,12 +18,14 @@
 #include <string>
 #include <vector>
 
-#include "lardataalg/DetectorInfo/ElecClock.h"
 #include "lardataalg/DetectorInfo/DetectorClocks.h"
+#include "lardataalg/DetectorInfo/ElecClock.h"
 
-namespace fhicl { class ParameterSet; }
+namespace fhicl {
+  class ParameterSet;
+}
 
-namespace detinfo{
+namespace detinfo {
 
   /**
    * @brief Implementation of `detinfo::DetectorClocks` interface with fixed
@@ -126,26 +128,31 @@ namespace detinfo{
     DetectorClocksStandard();
     DetectorClocksStandard(fhicl::ParameterSet const& pset);
     DetectorClocksStandard(DetectorClocksStandard const&) = delete;
-    virtual ~DetectorClocksStandard() {};
+    virtual ~DetectorClocksStandard(){};
 
     bool Configure(fhicl::ParameterSet const& pset);
-    bool Update(uint64_t ts=0);
+    bool Update(uint64_t ts = 0);
 
     /**
      * @see `detinfo::DetectorClocks::TriggerOffsetTPC()`
      *
      * This offset is set via configuration parameter `TriggerOffsetTPC`.
      */
-    virtual double TriggerOffsetTPC() const override
+    virtual double
+    TriggerOffsetTPC() const override
     {
-      if (fTriggerOffsetTPC<0)
-	return fTriggerOffsetTPC;
+      if (fTriggerOffsetTPC < 0)
+        return fTriggerOffsetTPC;
       else
-	return -fTriggerOffsetTPC/fTPCClock.Frequency(); //convert ticks to us
+        return -fTriggerOffsetTPC / fTPCClock.Frequency(); //convert ticks to us
     }
 
     /// Returns the @ref DetectorClocksTPCelectronicsStartTime "TPC electronics start time" in @ref DetectorClocksElectronicsTime "electronics time".
-    virtual double TPCTime() const override { return doTPCTime(); }
+    virtual double
+    TPCTime() const override
+    {
+      return doTPCTime();
+    }
 
     void debugReport() const;
 
@@ -156,7 +163,11 @@ namespace detinfo{
      * The trigger module name is set directly in the configuration as
      * `TrigModuleName`.
      */
-    std::string TrigModuleName() const { return fTrigModuleName; }
+    std::string
+    TrigModuleName() const
+    {
+      return fTrigModuleName;
+    }
 
     /**
      * @brief Returns the input tag of the trigger data product for G4Ref correctons.
@@ -165,24 +176,52 @@ namespace detinfo{
      * The trigger module name is set directly in the configuration as
      * `G4RefCorrTrigModuleName`.
      */
-    std::string G4RefCorrTrigModuleName() const { return fG4RefCorrTrigModuleName; }
+    std::string
+    G4RefCorrTrigModuleName() const
+    {
+      return fG4RefCorrTrigModuleName;
+    }
 
     /// Sets trigger and beam gate time from default configuration values.
     void SetDefaultTriggerTime();
 
     /// Given Geant4 time [ns], returns relative time [us] w.r.t. electronics time T0
-    virtual double G4ToElecTime(double g4_time) const override {return g4_time * 1.e-3 - fG4RefTime; }
+    virtual double
+    G4ToElecTime(double g4_time) const override
+    {
+      return g4_time * 1.e-3 - fG4RefTime;
+    }
 
     /// Trigger electronics clock time in [us]
-    virtual double TriggerTime() const override { return fTriggerTime; }
+    virtual double
+    TriggerTime() const override
+    {
+      return fTriggerTime;
+    }
 
     /// Beam gate electronics clock time in [us]
-    virtual double BeamGateTime() const override { return fBeamGateTime; }
+    virtual double
+    BeamGateTime() const override
+    {
+      return fBeamGateTime;
+    }
 
-    virtual std::vector<std::string> ConfigNames() const override { return fConfigName; }
-    virtual std::vector<double> ConfigValues() const override { return fConfigValue; }
+    virtual std::vector<std::string>
+    ConfigNames() const override
+    {
+      return fConfigName;
+    }
+    virtual std::vector<double>
+    ConfigValues() const override
+    {
+      return fConfigValue;
+    }
 
-    void SetConfigValue(size_t i, double val) { fConfigValue[i] = val; }
+    void
+    SetConfigValue(size_t i, double val)
+    {
+      fConfigValue[i] = val;
+    }
 
     /**
      * @brief Setter for trigger times.
@@ -193,9 +232,10 @@ namespace detinfo{
      * @ref DetectorClocksBeamGateOpening "beam gate opening" times are set, and
      * the electronic clocks are updated to store the new trigger time.
      */
-    virtual void SetTriggerTime(double trig_time, double beam_time)
+    virtual void
+    SetTriggerTime(double trig_time, double beam_time)
     {
-      fTriggerTime  = trig_time;
+      fTriggerTime = trig_time;
       fBeamGateTime = beam_time;
       fTPCClock.SetTime(trig_time);
       fOpticalClock.SetTime(trig_time);
@@ -209,7 +249,8 @@ namespace detinfo{
      * The G4RefTime is corrected to use the existing TriggerTime() as a base, rather than
      * the fcl parameter. This is done in particularly to accomodate matching in overlay (data+sim) samples.
      */
-    virtual void RebaseG4RefTime(double sim_trig_time)
+    virtual void
+    RebaseG4RefTime(double sim_trig_time)
     {
       fG4RefTime = fG4RefTimeDefault - TriggerTime() + sim_trig_time;
     }
@@ -218,142 +259,242 @@ namespace detinfo{
     // Getters of TPC ElecClock
     //
     /// Borrow a const TPC clock with time set to Trigger time [us]
-    virtual const ::detinfo::ElecClock& TPCClock() const override
-    { return fTPCClock; }
+    virtual const ::detinfo::ElecClock&
+    TPCClock() const override
+    {
+      return fTPCClock;
+    }
 
     /// Create a TPC clock for a given time [us] from clock counting start
-    virtual ::detinfo::ElecClock TPCClock(double time) const override
-	{ return ::detinfo::ElecClock(time,fTPCClock.FramePeriod(),fTPCClock.Frequency());}
+    virtual ::detinfo::ElecClock
+    TPCClock(double time) const override
+    {
+      return ::detinfo::ElecClock(time, fTPCClock.FramePeriod(), fTPCClock.Frequency());
+    }
 
     /// Create a TPC clock for a given sample/frame number in TPC clock frequency
-    detinfo::ElecClock TPCClock(unsigned int sample,
-		       unsigned int frame) const override
-      { detinfo::ElecClock clock = TPCClock(); clock.SetTime(sample,frame); return clock; }
+    detinfo::ElecClock
+    TPCClock(unsigned int sample, unsigned int frame) const override
+    {
+      detinfo::ElecClock clock = TPCClock();
+      clock.SetTime(sample, frame);
+      return clock;
+    }
 
     //
     // Getters of Optical ElecClock
     //
     /// Borrow a const Optical clock with time set to Trigger time [us]
-    virtual const detinfo::ElecClock& OpticalClock() const override
-    { return fOpticalClock; }
+    virtual const detinfo::ElecClock&
+    OpticalClock() const override
+    {
+      return fOpticalClock;
+    }
 
     /// Create a Optical clock for a given time [us] from clock counting start
-    virtual detinfo::ElecClock OpticalClock(double time) const override
-      { return detinfo::ElecClock(time,fOpticalClock.FramePeriod(),fOpticalClock.Frequency());}
+    virtual detinfo::ElecClock
+    OpticalClock(double time) const override
+    {
+      return detinfo::ElecClock(time, fOpticalClock.FramePeriod(), fOpticalClock.Frequency());
+    }
 
     /// Create a Optical clock for a given sample/frame number in Optical clock frequency
-    virtual detinfo::ElecClock OpticalClock(unsigned int sample,
-			   unsigned int frame) const override
-    { detinfo::ElecClock clock = OpticalClock(); clock.SetTime(sample,frame); return clock; }
+    virtual detinfo::ElecClock
+    OpticalClock(unsigned int sample, unsigned int frame) const override
+    {
+      detinfo::ElecClock clock = OpticalClock();
+      clock.SetTime(sample, frame);
+      return clock;
+    }
 
     //
     // Getters of Trigger ElecClock
     //
     /// Borrow a const Trigger clock with time set to Trigger time [us]
-    virtual const detinfo::ElecClock& TriggerClock() const override
-    { return fTriggerClock; }
+    virtual const detinfo::ElecClock&
+    TriggerClock() const override
+    {
+      return fTriggerClock;
+    }
 
     /// Create a Trigger clock for a given time [us] from clock counting start
-    virtual detinfo::ElecClock TriggerClock(double time) const  override
-    { return detinfo::ElecClock(time,fTriggerClock.FramePeriod(),fTriggerClock.Frequency());}
+    virtual detinfo::ElecClock
+    TriggerClock(double time) const override
+    {
+      return detinfo::ElecClock(time, fTriggerClock.FramePeriod(), fTriggerClock.Frequency());
+    }
 
     /// Create a Trigger clock for a given sample/frame number in Trigger clock frequency
-    virtual detinfo::ElecClock TriggerClock(unsigned int sample,
-			   unsigned int frame) const override
-    { detinfo::ElecClock clock = TriggerClock(); clock.SetTime(sample,frame); return clock; }
+    virtual detinfo::ElecClock
+    TriggerClock(unsigned int sample, unsigned int frame) const override
+    {
+      detinfo::ElecClock clock = TriggerClock();
+      clock.SetTime(sample, frame);
+      return clock;
+    }
 
     //
     // Getters of External ElecClock
     //
     /// Borrow a const Trigger clock with time set to External Time [us]
-    virtual const detinfo::ElecClock& ExternalClock() const override
-    { return fExternalClock; }
+    virtual const detinfo::ElecClock&
+    ExternalClock() const override
+    {
+      return fExternalClock;
+    }
 
     /// Create a External clock for a given time [us] from clock counting start
     /// @bug The frequency is taken from `TriggerClock()`, not `ExternalClock()`
-    virtual detinfo::ElecClock ExternalClock(double time) const override
-      { return detinfo::ElecClock(time,fExternalClock.FramePeriod(),fTriggerClock.Frequency());}
+    virtual detinfo::ElecClock
+    ExternalClock(double time) const override
+    {
+      return detinfo::ElecClock(time, fExternalClock.FramePeriod(), fTriggerClock.Frequency());
+    }
 
     /// Create a External clock for a given sample/frame number in External clock frequency
-    virtual detinfo::ElecClock ExternalClock(unsigned int sample,
-				  unsigned int frame) const override
-      { detinfo::ElecClock clock = ExternalClock(); clock.SetTime(sample,frame); return clock; }
+    virtual detinfo::ElecClock
+    ExternalClock(unsigned int sample, unsigned int frame) const override
+    {
+      detinfo::ElecClock clock = ExternalClock();
+      clock.SetTime(sample, frame);
+      return clock;
+    }
 
     //
     // Getters for time [us] w.r.t. trigger given information from waveform
     //
 
     /// Given TPC time-tick (waveform index), returns time [us] w.r.t. trigger time stamp
-    virtual double TPCTick2TrigTime(double tick) const override
-    { return fTPCClock.TickPeriod() * tick + TriggerOffsetTPC(); }
+    virtual double
+    TPCTick2TrigTime(double tick) const override
+    {
+      return fTPCClock.TickPeriod() * tick + TriggerOffsetTPC();
+    }
     /// Given TPC time-tick (waveform index), returns time [us] w.r.t. beam gate time
-    virtual double TPCTick2BeamTime(double tick) const override
-    { return TPCTick2TrigTime(tick) + TriggerTime() - BeamGateTime(); }
+    virtual double
+    TPCTick2BeamTime(double tick) const override
+    {
+      return TPCTick2TrigTime(tick) + TriggerTime() - BeamGateTime();
+    }
     /// Given Optical time-tick (waveform index), sample and frame number, returns time [us] w.r.t. trigger time stamp
-    virtual double OpticalTick2TrigTime(double tick, size_t sample, size_t frame) const override
-    { return fOpticalClock.TickPeriod() * tick + fOpticalClock.Time(sample,frame) - TriggerTime();  }
+    virtual double
+    OpticalTick2TrigTime(double tick, size_t sample, size_t frame) const override
+    {
+      return fOpticalClock.TickPeriod() * tick + fOpticalClock.Time(sample, frame) - TriggerTime();
+    }
     /// Given Optical time-tick (waveform index), sample and frame number, returns time [us] w.r.t. beam gate time stamp
-    virtual double OpticalTick2BeamTime(double tick, size_t sample, size_t frame) const override
-    { return fOpticalClock.TickPeriod() * tick + fOpticalClock.Time(sample,frame) - BeamGateTime(); }
+    virtual double
+    OpticalTick2BeamTime(double tick, size_t sample, size_t frame) const override
+    {
+      return fOpticalClock.TickPeriod() * tick + fOpticalClock.Time(sample, frame) - BeamGateTime();
+    }
     /// Given External time-tick (waveform index), sample and frame number, returns time [us] w.r.t. trigger time stamp
-    virtual double ExternalTick2TrigTime(double tick, size_t sample, size_t frame) const override
-    { return fExternalClock.TickPeriod() * tick + fExternalClock.Time(sample,frame) - TriggerTime(); }
+    virtual double
+    ExternalTick2TrigTime(double tick, size_t sample, size_t frame) const override
+    {
+      return fExternalClock.TickPeriod() * tick + fExternalClock.Time(sample, frame) -
+             TriggerTime();
+    }
     /// Given External time-tick (waveform index), sample and frame number, returns time [us] w.r.t. beam gate time stamp
-    virtual double ExternalTick2BeamTime(double tick, size_t sample, size_t frame) const override
-    { return fExternalClock.TickPeriod() * tick + fExternalClock.Time(sample,frame) - BeamGateTime(); }
+    virtual double
+    ExternalTick2BeamTime(double tick, size_t sample, size_t frame) const override
+    {
+      return fExternalClock.TickPeriod() * tick + fExternalClock.Time(sample, frame) -
+             BeamGateTime();
+    }
 
     /// Returns the specified electronics time in TDC electronics ticks.
-    virtual double Time2Tick(double time) const override
-      { return doTime2Tick(time); }
+    virtual double
+    Time2Tick(double time) const override
+    {
+      return doTime2Tick(time);
+    }
 
     //
     // Getters for time [tdc] (electronics clock counting ... in double precision)
     //
 
     /// Given TPC time-tick (waveform index), returns electronics clock count [tdc]
-    virtual double TPCTick2TDC(double tick) const override
-    { return ( doTPCTime() / fTPCClock.TickPeriod() + tick ); }
+    virtual double
+    TPCTick2TDC(double tick) const override
+    {
+      return (doTPCTime() / fTPCClock.TickPeriod() + tick);
+    }
     /// Given G4 time [ns], returns corresponding TPC electronics clock count [tdc]
-    virtual double TPCG4Time2TDC(double g4time) const override
-    { return G4ToElecTime(g4time) / fTPCClock.TickPeriod(); }
+    virtual double
+    TPCG4Time2TDC(double g4time) const override
+    {
+      return G4ToElecTime(g4time) / fTPCClock.TickPeriod();
+    }
     /// Given Optical time-tick (waveform index), sample and frame number, returns time electronics clock count [tdc]
-    virtual double OpticalTick2TDC(double tick, size_t sample, size_t frame) const override
-    { return fOpticalClock.Ticks(sample,frame) + tick; }
+    virtual double
+    OpticalTick2TDC(double tick, size_t sample, size_t frame) const override
+    {
+      return fOpticalClock.Ticks(sample, frame) + tick;
+    }
     /// Given G4 time [ns], returns corresponding Optical electronics clock count [tdc]
-    virtual double OpticalG4Time2TDC(double g4time) const override
-    { return G4ToElecTime(g4time) / fOpticalClock.TickPeriod(); }
+    virtual double
+    OpticalG4Time2TDC(double g4time) const override
+    {
+      return G4ToElecTime(g4time) / fOpticalClock.TickPeriod();
+    }
     /// Given External time-tick (waveform index), sample and frame number, returns time electronics clock count [tdc]
-    virtual double ExternalTick2TDC(double tick, size_t sample, size_t frame) const override
-    { return fExternalClock.Ticks(sample,frame) + tick; }
+    virtual double
+    ExternalTick2TDC(double tick, size_t sample, size_t frame) const override
+    {
+      return fExternalClock.Ticks(sample, frame) + tick;
+    }
     /// Given G4 time [ns], returns corresponding External electronics clock count [tdc]
-    virtual double ExternalG4Time2TDC(double g4time) const override
-    { return G4ToElecTime(g4time) / fExternalClock.TickPeriod(); }
+    virtual double
+    ExternalG4Time2TDC(double g4time) const override
+    {
+      return G4ToElecTime(g4time) / fExternalClock.TickPeriod();
+    }
 
     //
     // Getters for time [us] (electronics clock counting ... in double precision)
     //
     /// Given TPC time-tick (waveform index), returns electronics clock [us]
-    virtual double TPCTick2Time(double tick) const override
-    { return doTPCTime() + tick * fTPCClock.TickPeriod(); }
+    virtual double
+    TPCTick2Time(double tick) const override
+    {
+      return doTPCTime() + tick * fTPCClock.TickPeriod();
+    }
     /// Given Optical time-tick (waveform index), sample and frame number, returns electronics clock [us]
-    virtual double OpticalTick2Time(double tick, size_t sample, size_t frame) const override
-    { return fOpticalClock.Time(sample,frame) + tick * fOpticalClock.TickPeriod(); }
+    virtual double
+    OpticalTick2Time(double tick, size_t sample, size_t frame) const override
+    {
+      return fOpticalClock.Time(sample, frame) + tick * fOpticalClock.TickPeriod();
+    }
     /// Given External time-tick (waveform index), sample and frame number, returns electronics clock [us]
-    virtual double ExternalTick2Time(double tick, size_t sample, size_t frame) const override
-    { return fExternalClock.Time(sample,frame) + tick * fExternalClock.TickPeriod(); }
+    virtual double
+    ExternalTick2Time(double tick, size_t sample, size_t frame) const override
+    {
+      return fExternalClock.Time(sample, frame) + tick * fExternalClock.TickPeriod();
+    }
 
     //
     // Getters for time [ticks] (waveform index number)
     //
 
     /// Given electronics clock count [tdc] returns TPC time-tick
-    virtual double TPCTDC2Tick(double tdc) const override
-    { return ( tdc - doTPCTime() / fTPCClock.TickPeriod() ); }
+    virtual double
+    TPCTDC2Tick(double tdc) const override
+    {
+      return (tdc - doTPCTime() / fTPCClock.TickPeriod());
+    }
     /// Given G4 time returns electronics clock count [tdc]
-    virtual double TPCG4Time2Tick(double g4time) const override
-    { return (G4ToElecTime(g4time) - doTPCTime()) / fTPCClock.TickPeriod(); }
+    virtual double
+    TPCG4Time2Tick(double g4time) const override
+    {
+      return (G4ToElecTime(g4time) - doTPCTime()) / fTPCClock.TickPeriod();
+    }
 
-    bool InheritClockConfig() { return fInheritClockConfig; }
+    bool
+    InheritClockConfig()
+    {
+      return fInheritClockConfig;
+    }
 
     /// Internal function to apply loaded parameters to member attributes
     void ApplyParams();
@@ -362,10 +503,9 @@ namespace detinfo{
     bool IsRightConfig(const fhicl::ParameterSet& ps) const;
 
   protected:
-
     std::vector<std::string> fConfigName;
 
-    std::vector<double>      fConfigValue;
+    std::vector<double> fConfigValue;
 
     bool fInheritClockConfig;
 
@@ -404,15 +544,21 @@ namespace detinfo{
     double fBeamGateTime;
 
     /// Implementation of `TPCTime()`.
-    double doTPCTime() const { return TriggerTime() + TriggerOffsetTPC(); }
+    double
+    doTPCTime() const
+    {
+      return TriggerTime() + TriggerOffsetTPC();
+    }
 
     /// Implementation of `Time2Tick()`.
-    double doTime2Tick(double time) const
-      { return (time - doTPCTime()) / fTPCClock.TickPeriod();  }
+    double
+    doTime2Tick(double time) const
+    {
+      return (time - doTPCTime()) / fTPCClock.TickPeriod();
+    }
 
   }; // class DetectorClocksStandard
 
 } //namespace detinfo
-
 
 #endif // LARDATAALG_DETECTORINFO_DETECTORCLOCKSSTANDARD_H

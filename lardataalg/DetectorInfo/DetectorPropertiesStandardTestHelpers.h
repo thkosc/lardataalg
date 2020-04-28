@@ -18,17 +18,16 @@
 #define LARDATA_DETECTORINFO_DETECTORPROPERTIESSTANDARDTESTHELPERS_H 1
 
 // LArSoft libraries
-#include "lardataalg/DetectorInfo/DetectorPropertiesStandard.h"
 #include "larcorealg/TestUtils/ProviderTestHelpers.h"
+#include "lardataalg/DetectorInfo/DetectorPropertiesStandard.h"
 
 // framework and utility libraries
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // C/C++ standard libraries
-#include <string>
 #include <memory> // std::unique_ptr<>
-
+#include <string>
 
 namespace testing {
 
@@ -55,49 +54,46 @@ namespace testing {
   template <>
   struct ProviderSetupClass<detinfo::DetectorPropertiesStandard> {
 
-    static std::unique_ptr<detinfo::DetectorPropertiesStandard> setup
-      (
-        fhicl::ParameterSet const& pset,
-        detinfo::DetectorPropertiesStandard::providers_type const& providers
-      )
-      {
-        // some feedback about whether we are using the right configuration
-        std::string ServiceProviderPath;
-        if (pset.get_if_present("service_provider", ServiceProviderPath)) {
-          std::string ServiceProviderName = ServiceProviderPath;
-          size_t iSlash = ServiceProviderPath.rfind('/');
-          if (iSlash != std::string::npos)
-            ServiceProviderName.erase(0, iSlash + 1);
+    static std::unique_ptr<detinfo::DetectorPropertiesStandard>
+    setup(fhicl::ParameterSet const& pset,
+          detinfo::DetectorPropertiesStandard::providers_type const& providers)
+    {
+      // some feedback about whether we are using the right configuration
+      std::string ServiceProviderPath;
+      if (pset.get_if_present("service_provider", ServiceProviderPath)) {
+        std::string ServiceProviderName = ServiceProviderPath;
+        size_t iSlash = ServiceProviderPath.rfind('/');
+        if (iSlash != std::string::npos) ServiceProviderName.erase(0, iSlash + 1);
 
-          if (ServiceProviderName == "DetectorPropertiesServiceStandard") {
-            MF_LOG_TRACE("ProviderSetup") << "Verified service implementation for "
-              "DetectorPropertiesService"
-              ": '" << ServiceProviderPath << "'";
-          }
-          else {
-            // this means you should not be using the simple set up...
-            mf::LogWarning("setupProvider")
-              << "This set up is for a DetectorPropertiesStandard provider.\n"
-              "Your configuration specifies a '" << ServiceProviderPath
-              << "' service implementation"
-              " that is not known to use that provider.";
-          }
+        if (ServiceProviderName == "DetectorPropertiesServiceStandard") {
+          MF_LOG_TRACE("ProviderSetup") << "Verified service implementation for "
+                                           "DetectorPropertiesService"
+                                           ": '"
+                                        << ServiceProviderPath << "'";
         }
+        else {
+          // this means you should not be using the simple set up...
+          mf::LogWarning("setupProvider")
+            << "This set up is for a DetectorPropertiesStandard provider.\n"
+               "Your configuration specifies a '"
+            << ServiceProviderPath
+            << "' service implementation"
+               " that is not known to use that provider.";
+        }
+      }
 
-        //
-        // create the new DetectorPropertiesStandard service provider
-        //
-        // we choose to ignore a configuration parameter that is known to be used
-        // by the art services but unknown to the provider; in this way we can use
-        // for this test the same configuration as for art-based tests.
-        //
-        std::set<std::string> ignore_keys({ "InheritNumberTimeSamples" });
-        return std::make_unique<detinfo::DetectorPropertiesStandard>
-          (pset, providers, ignore_keys);
-      } // setup()
+      //
+      // create the new DetectorPropertiesStandard service provider
+      //
+      // we choose to ignore a configuration parameter that is known to be used
+      // by the art services but unknown to the provider; in this way we can use
+      // for this test the same configuration as for art-based tests.
+      //
+      std::set<std::string> ignore_keys({"InheritNumberTimeSamples"});
+      return std::make_unique<detinfo::DetectorPropertiesStandard>(pset, providers, ignore_keys);
+    } // setup()
 
   }; // ProviderSetupClass<DetectorPropertiesStandard>
-
 
   /**
    * @brief Environment setup helper for DetectorPropertiesStandard
@@ -128,24 +124,19 @@ namespace testing {
    * configured and available.
    */
   template <typename TestEnv>
-  struct SimpleEnvironmentSetupClass
-    <detinfo::DetectorPropertiesStandard, TestEnv>
-  {
-    static detinfo::DetectorPropertiesStandard* setup(TestEnv& env)
-      {
-        auto* detp = env.template SetupProviderFor
-          <detinfo::DetectorProperties, detinfo::DetectorPropertiesStandard>
-          (
-            env.ServiceParameters("DetectorPropertiesService"),
-            env.template ProviderPackFor<detinfo::DetectorPropertiesStandard>()
-          );
-        return detp;
-      } // setup()
+  struct SimpleEnvironmentSetupClass<detinfo::DetectorPropertiesStandard, TestEnv> {
+    static detinfo::DetectorPropertiesStandard*
+    setup(TestEnv& env)
+    {
+      auto* detp = env.template SetupProviderFor<detinfo::DetectorProperties,
+                                                 detinfo::DetectorPropertiesStandard>(
+        env.ServiceParameters("DetectorPropertiesService"),
+        env.template ProviderPackFor<detinfo::DetectorPropertiesStandard>());
+      return detp;
+    } // setup()
 
   }; // SimpleEnvironmentSetupClass<detinfo::DetectorPropertiesStandard>
 
-
 } // namespace testing
-
 
 #endif // LARDATA_DETECTORINFO_DETECTORPROPERTIESSTANDARDTESTHELPERS_H

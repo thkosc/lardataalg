@@ -6,18 +6,18 @@
  */
 
 // LArSoft libraries
-#include "lardataalg/DetectorInfo/LArPropertiesStandardTestHelpers.h"
+#include "larcorealg/CoreUtils/RealComparisons.h"
+#include "larcorealg/Geometry/ChannelMapStandardAlg.h"
+#include "larcorealg/Geometry/GeometryCore.h"
 #include "lardataalg/DetectorInfo/DetectorClocksStandardTestHelpers.h"
 #include "lardataalg/DetectorInfo/DetectorPropertiesStandard.h"
 #include "lardataalg/DetectorInfo/DetectorPropertiesStandardTestHelpers.h"
-#include "larcorealg/Geometry/ChannelMapStandardAlg.h"
-#include "larcorealg/Geometry/GeometryCore.h"
-#include "larcorealg/CoreUtils/RealComparisons.h"
+#include "lardataalg/DetectorInfo/LArPropertiesStandardTestHelpers.h"
 #include "test/Geometry/geometry_unit_test_base.h"
 
 // C/C++ standard libraries
-#include <iomanip>
 #include <array>
+#include <iomanip>
 
 //------------------------------------------------------------------------------
 //---  The test environment
@@ -30,15 +30,13 @@
  * - `detinfo::DetectorProperties const* Provider<detinfo::DetectorProperties>()`
  * - all the other services configured as dependencies
  */
-using TesterConfiguration
-  = testing::BasicGeometryEnvironmentConfiguration<geo::ChannelMapStandardAlg>;
+using TesterConfiguration =
+  testing::BasicGeometryEnvironmentConfiguration<geo::ChannelMapStandardAlg>;
 using TestEnvironment = testing::GeometryTesterEnvironment<TesterConfiguration>;
-
 
 //------------------------------------------------------------------------------
 //---  The tests
 //---
-
 
 /** ****************************************************************************
  * @brief Runs the test
@@ -57,7 +55,9 @@ using TestEnvironment = testing::GeometryTesterEnvironment<TesterConfiguration>;
  *
  */
 //------------------------------------------------------------------------------
-int main(int argc, char const** argv) {
+int
+main(int argc, char const** argv)
+{
 
   TesterConfiguration config("detp_test");
 
@@ -67,10 +67,10 @@ int main(int argc, char const** argv) {
   int iParam = 0;
 
   // first argument: configuration file (mandatory)
-  if (++iParam < argc) config.SetConfigurationPath(argv[iParam]);
+  if (++iParam < argc)
+    config.SetConfigurationPath(argv[iParam]);
   else {
-    std::cerr << "FHiCL configuration file path required as first argument!"
-      << std::endl;
+    std::cerr << "FHiCL configuration file path required as first argument!" << std::endl;
     return 1;
   }
 
@@ -81,11 +81,10 @@ int main(int argc, char const** argv) {
   // third argument: path of the parameter set for DetectorProperties confi
   // (optional; default: "services.DetectorProperties" from inherited object)
   if (++iParam < argc) {
-    config.SetServiceParameterSetPath
-      ("DetectorPropertiesService", argv[iParam]);
+    config.SetServiceParameterSetPath("DetectorPropertiesService", argv[iParam]);
   }
 
-  unsigned int nErrors = 0 /* Tester.Run() */ ;
+  unsigned int nErrors = 0 /* Tester.Run() */;
 
   //
   // testing environment setup
@@ -106,10 +105,10 @@ int main(int argc, char const** argv) {
   //
 
   // 1. we initialize it from the configuration in the environment,
-//  MyTestAlgo Tester(TestEnv.TesterParameters());
+  //  MyTestAlgo Tester(TestEnv.TesterParameters());
 
   // 2. we set it up with the geometry from the environment
-//  Tester.Setup(*(TestEnv.Provider<detinfo::DetectorProperties>()));
+  //  Tester.Setup(*(TestEnv.Provider<detinfo::DetectorProperties>()));
 
   // 3. then we run it!
   auto const& geom = *(TestEnv.Provider<geo::GeometryCore>());
@@ -120,22 +119,20 @@ int main(int argc, char const** argv) {
   unsigned int const nWaveformTicks = detp.NumberTimeSamples();
   unsigned int const nReadoutWindowTicks = detp.ReadOutWindowSize();
 
-
-  mf::LogVerbatim("detp_test")
-    <<   "Electric field in the active volume: " << detp.Efield() << " kV/cm"
-    << "\nSampling rate:       " << TDCtick << " ns"
-    << "\nArgon temperature:   " << detp.Temperature() << " K"
-    << "\nDrift velocity:      " << driftVelocity << " cm/us"
-    << "\nReadout window:      " << nReadoutWindowTicks << " ticks ("
-      << (nReadoutWindowTicks * TDCtick / 1000) << " us)"
-    << "\nTPC waveform length: " << nWaveformTicks << " ticks ("
-      << (nWaveformTicks * TDCtick / 1000) << " us)"
-    ;
+  mf::LogVerbatim("detp_test") << "Electric field in the active volume: " << detp.Efield()
+                               << " kV/cm"
+                               << "\nSampling rate:       " << TDCtick << " ns"
+                               << "\nArgon temperature:   " << detp.Temperature() << " K"
+                               << "\nDrift velocity:      " << driftVelocity << " cm/us"
+                               << "\nReadout window:      " << nReadoutWindowTicks << " ticks ("
+                               << (nReadoutWindowTicks * TDCtick / 1000) << " us)"
+                               << "\nTPC waveform length: " << nWaveformTicks << " ticks ("
+                               << (nWaveformTicks * TDCtick / 1000) << " us)";
 
   // accumulate the plane IDs; needed just for table formatting
   unsigned int const colWidth = 9U;
   unsigned int headerColWidth = 0U;
-  for (auto planeID: geom.IteratePlaneIDs()) {
+  for (auto planeID : geom.IteratePlaneIDs()) {
     auto const l = std::string(planeID).length();
     if (headerColWidth < l) headerColWidth = l;
   }
@@ -145,51 +142,45 @@ int main(int argc, char const** argv) {
   bool allSameDrift = true;
   lar::util::RealComparisons<double> check(1.0); // 1 cm tolerance
   auto driftDistances = geom.makeTPCData<double>();
-  for (auto const& TPC: geom.IterateTPCs()) {
+  for (auto const& TPC : geom.IterateTPCs()) {
     auto const driftDistance = TPC.DriftDistance();
     driftDistances[TPC.ID()] = driftDistance;
-    allSameDrift
-      = allSameDrift & check.equal(driftDistance, driftDistances.first());
+    allSameDrift = allSameDrift & check.equal(driftDistance, driftDistances.first());
   } // for
 
   if (allSameDrift) {
     // print drift distance
     auto const driftDistance = driftDistances.first();
     auto const driftTime = driftDistance / driftVelocity;
-    mf::LogVerbatim("detp_test")
-      <<   "Drift distance:    " << driftDistance << " cm"
-      << "\nDrift time:        " << driftTime << " us, "
-                                 << (driftTime / (TDCtick / 1000.)) << " ticks"
-      ;
+    mf::LogVerbatim("detp_test") << "Drift distance:    " << driftDistance << " cm"
+                                 << "\nDrift time:        " << driftTime << " us, "
+                                 << (driftTime / (TDCtick / 1000.)) << " ticks";
   }
   else {
     // print drift distance table header
     mf::LogVerbatim log("detp_test");
-    std::array<unsigned int, 4U> const columnSizes
-      = {{ headerColWidth, 9U, 13U, 7U }};
+    std::array<unsigned int, 4U> const columnSizes = {{headerColWidth, 9U, 13U, 7U}};
     log << std::setw(columnSizes[0]) << "Drift:"
-      << " | " << std::setw(columnSizes[1]) << "time [us]"
-      << " | " << std::setw(columnSizes[2]) << "distance [cm]"
-      << " | " << std::setw(columnSizes[3]) << "ticks";
+        << " | " << std::setw(columnSizes[1]) << "time [us]"
+        << " | " << std::setw(columnSizes[2]) << "distance [cm]"
+        << " | " << std::setw(columnSizes[3]) << "ticks";
 
     // print drift distances by TPC
-    for (auto const& TPCID: geom.IterateTPCIDs()) {
+    for (auto const& TPCID : geom.IterateTPCIDs()) {
       auto const driftDistance = driftDistances[TPCID];
       auto const driftTime = driftDistance / driftVelocity;
-      log << "\n" << std::setw(columnSizes[0]) << TPCID
-        << " | " << std::setw(columnSizes[1]) << driftTime
-        << " | " << std::setw(columnSizes[2]) << driftDistance
-        << " | " << std::setw(columnSizes[3]) << (driftTime / (TDCtick / 1000.))
-        ;
+      log << "\n"
+          << std::setw(columnSizes[0]) << TPCID << " | " << std::setw(columnSizes[1]) << driftTime
+          << " | " << std::setw(columnSizes[2]) << driftDistance << " | "
+          << std::setw(columnSizes[3]) << (driftTime / (TDCtick / 1000.));
     } // for TPC
   }
 
   // print tick number table header
   // number of ticks
   constexpr unsigned int nPrintedTicks = 11;
-  mf::LogVerbatim("detp_test")
-    << "Conversion of tick number to x position [cm]"
-    " (detinfo::DetectorProperties::ConvertTicksToX()):";
+  mf::LogVerbatim("detp_test") << "Conversion of tick number to x position [cm]"
+                                  " (detinfo::DetectorProperties::ConvertTicksToX()):";
 
   std::array<double, nPrintedTicks> ticks;
   for (unsigned int iTick = 0; iTick < nPrintedTicks; ++iTick)
@@ -198,23 +189,22 @@ int main(int argc, char const** argv) {
   {
     mf::LogVerbatim log("detp_test");
     log << std::setw(headerColWidth) << "tick #:";
-    for (double tick: ticks) log << " | " << std::setw(colWidth) << tick;
+    for (double tick : ticks)
+      log << " | " << std::setw(colWidth) << tick;
   }
 
-  for (auto planeID: geom.IteratePlaneIDs()) {
+  for (auto planeID : geom.IteratePlaneIDs()) {
     mf::LogVerbatim log("detp_test");
     log << std::setw(headerColWidth) << std::string(planeID);
 
-    for (double tick: ticks) {
+    for (double tick : ticks) {
       double const x = detp.ConvertTicksToX(tick, planeID);
       log << " | " << std::setw(colWidth) << x;
     } // for tick
-  } // for planes
+  }   // for planes
 
   // 4. And finally we cross fingers.
-  if (nErrors > 0) {
-    mf::LogError("detp_test") << nErrors << " errors detected!";
-  }
+  if (nErrors > 0) { mf::LogError("detp_test") << nErrors << " errors detected!"; }
 
   return nErrors;
 } // main()

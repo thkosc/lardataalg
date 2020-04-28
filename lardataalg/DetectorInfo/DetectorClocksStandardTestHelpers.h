@@ -18,17 +18,16 @@
 #define LARDATA_DETECTORINFO_DETECTORCLOCKSSTANDARDTESTHELPERS_H 1
 
 // LArSoft libraries
-#include "lardataalg/DetectorInfo/DetectorClocksStandard.h"
 #include "larcorealg/TestUtils/ProviderTestHelpers.h"
+#include "lardataalg/DetectorInfo/DetectorClocksStandard.h"
 
 // framework and utility libraries
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // C/C++ standard libraries
-#include <string>
 #include <memory> // std::unique_ptr<>
-
+#include <string>
 
 namespace testing {
 
@@ -42,45 +41,43 @@ namespace testing {
   template <>
   struct ProviderSetupClass<detinfo::DetectorClocksStandard> {
 
-    static std::unique_ptr<detinfo::DetectorClocksStandard> setup
-      (fhicl::ParameterSet const& pset)
-      {
-        // some feedback about whether we are using the right configuration
-        std::string ServiceProviderPath;
-        if (pset.get_if_present("service_provider", ServiceProviderPath)) {
-          std::string ServiceProviderName = ServiceProviderPath;
-          size_t iSlash = ServiceProviderPath.rfind('/');
-          if (iSlash != std::string::npos)
-            ServiceProviderName.erase(0, iSlash + 1);
+    static std::unique_ptr<detinfo::DetectorClocksStandard>
+    setup(fhicl::ParameterSet const& pset)
+    {
+      // some feedback about whether we are using the right configuration
+      std::string ServiceProviderPath;
+      if (pset.get_if_present("service_provider", ServiceProviderPath)) {
+        std::string ServiceProviderName = ServiceProviderPath;
+        size_t iSlash = ServiceProviderPath.rfind('/');
+        if (iSlash != std::string::npos) ServiceProviderName.erase(0, iSlash + 1);
 
-          if (ServiceProviderName == "DetectorClocksServiceStandard") {
-            MF_LOG_TRACE("setupProvider")
-              << "Verified service implementation for DetectorClocksService: '"
-              << ServiceProviderPath << "'";
-          }
-          else {
-            mf::LogWarning("setupProvider")
-              << "This set up is for a DetectorClocksStandard provider.\n"
-              "Your configuration specifies a '" << ServiceProviderPath
-              << "' service implementation"
-              " that is not known to use that provider.";
-          }
+        if (ServiceProviderName == "DetectorClocksServiceStandard") {
+          MF_LOG_TRACE("setupProvider")
+            << "Verified service implementation for DetectorClocksService: '" << ServiceProviderPath
+            << "'";
         }
+        else {
+          mf::LogWarning("setupProvider")
+            << "This set up is for a DetectorClocksStandard provider.\n"
+               "Your configuration specifies a '"
+            << ServiceProviderPath
+            << "' service implementation"
+               " that is not known to use that provider.";
+        }
+      }
 
-        //
-        // create the new DetectorClocksStandard service provider
-        //
-        auto detClocks
-          = std::make_unique<detinfo::DetectorClocksStandard>(pset);
+      //
+      // create the new DetectorClocksStandard service provider
+      //
+      auto detClocks = std::make_unique<detinfo::DetectorClocksStandard>(pset);
 
-        //
-        // all done
-        //
-        return detClocks;
-      } // setup()
+      //
+      // all done
+      //
+      return detClocks;
+    } // setup()
 
   }; // ProviderSetupClass<DetectorClocksStandard>
-
 
   /**
    * @brief Environment setup helper for DetectorClocksStandard.
@@ -109,16 +106,15 @@ namespace testing {
    */
   template <typename TestEnv>
   struct SimpleEnvironmentSetupClass<detinfo::DetectorClocksStandard, TestEnv> {
-    static detinfo::DetectorClocksStandard* setup(TestEnv& env)
-      {
-        return SimpleEnvironmentStandardSetupByName
-          <detinfo::DetectorClocksStandard, detinfo::DetectorClocks, TestEnv>
-          (env, "DetectorClocksService");
-      }
+    static detinfo::DetectorClocksStandard*
+    setup(TestEnv& env)
+    {
+      return SimpleEnvironmentStandardSetupByName<detinfo::DetectorClocksStandard,
+                                                  detinfo::DetectorClocks,
+                                                  TestEnv>(env, "DetectorClocksService");
+    }
   };
 
-
 } // namespace testing
-
 
 #endif // LARDATA_DETECTORINFO_DETECTORCLOCKSSTANDARDTESTHELPERS_H

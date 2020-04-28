@@ -88,10 +88,9 @@ namespace detinfo {
    *       neither `int` not `double`, because a conversion to one of them will
    *       occur, and you need to be in control of which one.
    */
-  class ElecClock{
+  class ElecClock {
 
   public:
-
     /**
      * @brief Default constructor.
      *
@@ -102,7 +101,7 @@ namespace detinfo {
      * Better yet, don't use this constructor and instead construct the clock
      * immediately right.
      */
-    ElecClock(): ElecClock(0, kTIME_MAX, 1e9) {}
+    ElecClock() : ElecClock(0, kTIME_MAX, 1e9) {}
 
     /**
      * @brief Constructor: sets all values.
@@ -112,15 +111,13 @@ namespace detinfo {
      *
      */
     ElecClock(double time, double frame_period, double frequency)
-      : fTime(time),
-	fFramePeriod(frame_period),
-	fFrequency(frequency)
+      : fTime(time), fFramePeriod(frame_period), fFrequency(frequency)
     {
-      if( fFrequency <= 0 ) throw detinfo::DetectorClocksException("Negative frequency is prohibited!");
+      if (fFrequency <= 0)
+        throw detinfo::DetectorClocksException("Negative frequency is prohibited!");
     }
 
   protected:
-
     //-- Attribute variables --//
 
     double fTime;        ///< Time in microseconds.
@@ -128,14 +125,17 @@ namespace detinfo {
     double fFrequency;   ///< Clock speed in MHz.
 
   public:
-
     //-- Setters --//
 
     /**
      * @brief Directly sets the current time on the clock.
      * @param time reference time (expected in microseconds)
      */
-    void SetTime(double time) { fTime = time; }
+    void
+    SetTime(double time)
+    {
+      fTime = time;
+    }
 
     /**
      * @brief Sets the current time on the clock from frame and sample number.
@@ -145,9 +145,11 @@ namespace detinfo {
      * The current clock time is set to the instant of the start of the
      * specified sample.
      */
-    void SetTime(int sample,
-		 int frame)
-    { fTime = Time(sample, frame); }
+    void
+    SetTime(int sample, int frame)
+    {
+      fTime = Time(sample, frame);
+    }
 
     /**
      * @brief Sets the current time on the clock from frame and sample number.
@@ -157,9 +159,11 @@ namespace detinfo {
      * The current clock time is set to the instant of the start of the
      * specified sample.
      */
-    void SetTime(unsigned int sample,
-		 unsigned int frame)
-    { SetTime(int(sample),int(frame)); }
+    void
+    SetTime(unsigned int sample, unsigned int frame)
+    {
+      SetTime(int(sample), int(frame));
+    }
 
     /**
      * @brief Sets the current time on the clock from tick number.
@@ -168,8 +172,11 @@ namespace detinfo {
      * The current clock time is set to the instant of the start of the
      * specified tick.
      */
-    void SetTime(int ticks)
-    { fTime = Time(ticks,0); }
+    void
+    SetTime(int ticks)
+    {
+      fTime = Time(ticks, 0);
+    }
 
     /**
      * @brief Sets the current time on the clock from tick number.
@@ -178,8 +185,11 @@ namespace detinfo {
      * The current clock time is set to the instant of the start of the
      * specified tick.
      */
-    void SetTime(unsigned int ticks)
-    { SetTime(int(ticks)); }
+    void
+    SetTime(unsigned int ticks)
+    {
+      SetTime(int(ticks));
+    }
 
     //-- Getters --//
 
@@ -188,7 +198,11 @@ namespace detinfo {
      *
      * Note that this is different than `Time(Time())`, which is discretized.
      */
-    double Time() const { return fTime; }
+    double
+    Time() const
+    {
+      return fTime;
+    }
 
     /**
      * @brief Returns the absolute time of the start of the specified sample.
@@ -201,7 +215,11 @@ namespace detinfo {
      *
      * The returned time is not related to the current time of the clock.
      */
-    double Time(int sample, int frame) const { return (sample / fFrequency + frame * fFramePeriod); }
+    double
+    Time(int sample, int frame) const
+    {
+      return (sample / fFrequency + frame * fFramePeriod);
+    }
 
     /**
      * @brief Returns the discretized value of the specified time.
@@ -212,7 +230,11 @@ namespace detinfo {
      *
      * It is not related to the current time of the clock.
      */
-    double Time(double time) const { return Time(Sample(time),Frame(time)); }
+    double
+    Time(double time) const
+    {
+      return Time(Sample(time), Frame(time));
+    }
 
     /**
      * @brief Returns the absolute start time of the specified tick.
@@ -223,16 +245,32 @@ namespace detinfo {
      *
      * It is not related to the current time of the clock.
      */
-    double Time(int ticks) const {return ticks/fFrequency; }
+    double
+    Time(int ticks) const
+    {
+      return ticks / fFrequency;
+    }
 
     /// Frequency in MHz.
-    double Frequency() const { return fFrequency; }
+    double
+    Frequency() const
+    {
+      return fFrequency;
+    }
 
     /// A single frame period in microseconds.
-    double FramePeriod() const { return fFramePeriod; }
+    double
+    FramePeriod() const
+    {
+      return fFramePeriod;
+    }
 
     /// Current clock tick (that is, the number of tick `Time()` falls in).
-    int Ticks() const { return Ticks(fTime); }
+    int
+    Ticks() const
+    {
+      return Ticks(fTime);
+    }
 
     /**
      * @brief Returns the number of tick the specified time falls in.
@@ -244,7 +282,11 @@ namespace detinfo {
      * @note The returned value (number of tick) can wrap if the real number of
      *       the tick is beyond the range of the returned data type (`int`).
      */
-    int Ticks(double time) const { return (int)(time * fFrequency); }
+    int
+    Ticks(double time) const
+    {
+      return (int)(time * fFrequency);
+    }
 
     /**
      * @brief Returns the number of tick the specified sample falls in.
@@ -257,7 +299,11 @@ namespace detinfo {
      * @note The returned value (number of tick) can wrap if the real number of
      *       the tick is beyond the range of the returned data type (`int`).
      */
-    int Ticks(int sample, int frame) const { return sample + frame * FrameTicks(); }
+    int
+    Ticks(int sample, int frame) const
+    {
+      return sample + frame * FrameTicks();
+    }
 
     /**
      * @brief Returns number of the sample containing the clock current time.
@@ -268,7 +314,11 @@ namespace detinfo {
      * To univocally define the sample, the number of the frame must also be
      * obtained, e.g. via `Frame()`.
      */
-    int Sample() const { return Sample(fTime); }
+    int
+    Sample() const
+    {
+      return Sample(fTime);
+    }
 
     /**
      * @brief Returns the number of the sample containing the specified time.
@@ -283,7 +333,11 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    int Sample(double time) const { return (int)((time - Frame(time) * fFramePeriod) * fFrequency); }
+    int
+    Sample(double time) const
+    {
+      return (int)((time - Frame(time) * fFramePeriod) * fFrequency);
+    }
 
     /**
      * @brief Returns the number of the sample containing the specified tick.
@@ -298,7 +352,11 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    int Sample(int tick) const { return (tick % (int)(FrameTicks())); }
+    int
+    Sample(int tick) const
+    {
+      return (tick % (int)(FrameTicks()));
+    }
 
     /**
      * @brief Returns the number of the frame containing the clock current time.
@@ -307,7 +365,11 @@ namespace detinfo {
      * The returned value is the number of the frame which the current clock
      * time falls in.
      */
-    int Frame() const { return Frame(fTime); }
+    int
+    Frame() const
+    {
+      return Frame(fTime);
+    }
 
     /**
      * @brief Returns the number of the frame containing the specified time.
@@ -320,7 +382,11 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    int Frame(double time) const { return (int)(time / fFramePeriod); }
+    int
+    Frame(double time) const
+    {
+      return (int)(time / fFramePeriod);
+    }
 
     /**
      * @brief Returns the number of the frame containing the specified tick.
@@ -333,14 +399,25 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    int Frame(int tick) const { return (tick / (int)(FrameTicks())); }
+    int
+    Frame(int tick) const
+    {
+      return (tick / (int)(FrameTicks()));
+    }
 
     /// Number ticks in a frame.
-    unsigned int FrameTicks() const { return (int)(fFramePeriod * fFrequency);}
+    unsigned int
+    FrameTicks() const
+    {
+      return (int)(fFramePeriod * fFrequency);
+    }
 
     /// A single tick period in microseconds.
-    double TickPeriod() const { return 1./fFrequency; }
-
+    double
+    TickPeriod() const
+    {
+      return 1. / fFrequency;
+    }
 
     //-- operators --//
 
@@ -348,67 +425,160 @@ namespace detinfo {
     /// @name Operators to modify clock time.
 
     /// Increases the current clock time by a full tick time.
-    ElecClock& operator++()    { fTime += 1./fFrequency; return *this;}
+    ElecClock&
+    operator++()
+    {
+      fTime += 1. / fFrequency;
+      return *this;
+    }
 
     /// Increases the current clock time by a full tick time.
-    ElecClock  operator++(int) {ElecClock tmp(*this); operator++(); return tmp;}
+    ElecClock
+    operator++(int)
+    {
+      ElecClock tmp(*this);
+      operator++();
+      return tmp;
+    }
 
     /// Decreases the current clock time by a full tick time.
-    ElecClock& operator--()    { fTime -= 1./fFrequency; return *this;}
+    ElecClock&
+    operator--()
+    {
+      fTime -= 1. / fFrequency;
+      return *this;
+    }
 
     /// Decreases the current clock time by a full tick time.
-    ElecClock  operator--(int) {ElecClock tmp(*this); operator--(); return tmp;}
+    ElecClock
+    operator--(int)
+    {
+      ElecClock tmp(*this);
+      operator--();
+      return tmp;
+    }
 
     /// Increases the current clock time by the specified time in microseconds.
-    ElecClock& operator+=(const double &rhs) { fTime += rhs; return *this;}
+    ElecClock&
+    operator+=(const double& rhs)
+    {
+      fTime += rhs;
+      return *this;
+    }
     /// Decreases the current clock time by the specified time in microseconds.
-    ElecClock& operator-=(const double &rhs) { fTime -= rhs; return *this;}
+    ElecClock&
+    operator-=(const double& rhs)
+    {
+      fTime -= rhs;
+      return *this;
+    }
 
     /// Increases the current clock time by the specified time in microseconds.
-    ElecClock& operator+=(const float  &rhs) { fTime += (double)rhs; return *this;}
+    ElecClock&
+    operator+=(const float& rhs)
+    {
+      fTime += (double)rhs;
+      return *this;
+    }
     /// Decreases the current clock time by the specified time in microseconds.
-    ElecClock& operator-=(const float  &rhs) { fTime -= (double)rhs; return *this;}
+    ElecClock&
+    operator-=(const float& rhs)
+    {
+      fTime -= (double)rhs;
+      return *this;
+    }
 
     /// Increases the current clock time by the specified number of ticks.
-    ElecClock& operator+=(const int &rhs) { fTime += Time(rhs); return *this;}
+    ElecClock&
+    operator+=(const int& rhs)
+    {
+      fTime += Time(rhs);
+      return *this;
+    }
     /// Decreases the current clock time by the specified number of ticks.
-    ElecClock& operator-=(const int &rhs) { fTime -= Time(rhs); return *this;}
+    ElecClock&
+    operator-=(const int& rhs)
+    {
+      fTime -= Time(rhs);
+      return *this;
+    }
 
     /// Increases the current clock time by the specified number of ticks.
-    ElecClock& operator+=(const unsigned int &rhs) { fTime += Time((int)rhs); return *this;}
+    ElecClock&
+    operator+=(const unsigned int& rhs)
+    {
+      fTime += Time((int)rhs);
+      return *this;
+    }
     /// Decreases the current clock time by the specified number of ticks.
-    ElecClock& operator-=(const unsigned int &rhs) { fTime -= Time((int)rhs); return *this;}
+    ElecClock&
+    operator-=(const unsigned int& rhs)
+    {
+      fTime -= Time((int)rhs);
+      return *this;
+    }
 
     /// Increases the current clock time by the current time of another clock.
-    ElecClock& operator+=(const ElecClock& rhs) { fTime += rhs.Time(); return *this;}
+    ElecClock&
+    operator+=(const ElecClock& rhs)
+    {
+      fTime += rhs.Time();
+      return *this;
+    }
 
     /// Decreases the current clock time by the current time of another clock.
-    ElecClock& operator-=(const ElecClock& rhs) { fTime -= rhs.Time(); return *this;}
+    ElecClock&
+    operator-=(const ElecClock& rhs)
+    {
+      fTime -= rhs.Time();
+      return *this;
+    }
 
     /// Returns a clock like this one, with its current time increased by
     /// the current time of `rhs`.
-    inline ElecClock operator+(const ElecClock& rhs)
-    { return ElecClock(fTime + rhs.Time(),fFramePeriod,fFrequency); }
+    inline ElecClock
+    operator+(const ElecClock& rhs)
+    {
+      return ElecClock(fTime + rhs.Time(), fFramePeriod, fFrequency);
+    }
 
     /// Returns a clock like this one, with its current time decreased by
     /// the current time of `rhs`.
-    inline ElecClock operator-(const ElecClock& rhs)
-    { return ElecClock(fTime - rhs.Time(),fFramePeriod,fFrequency); }
+    inline ElecClock
+    operator-(const ElecClock& rhs)
+    {
+      return ElecClock(fTime - rhs.Time(), fFramePeriod, fFrequency);
+    }
 
     /// @}
 
     /// Compares the current time of this clock with the one of `rhs`.
-    inline bool operator<  (const ElecClock& rhs) const { return fTime <  rhs.Time(); }
+    inline bool
+    operator<(const ElecClock& rhs) const
+    {
+      return fTime < rhs.Time();
+    }
     /// Compares the current time of this clock with the one of `rhs`.
-    inline bool operator>  (const ElecClock& rhs) const { return fTime >  rhs.Time(); }
+    inline bool
+    operator>(const ElecClock& rhs) const
+    {
+      return fTime > rhs.Time();
+    }
     /// Compares the current time of this clock with the one of `rhs`.
-    inline bool operator<= (const ElecClock& rhs) const { return fTime <= rhs.Time(); }
+    inline bool
+    operator<=(const ElecClock& rhs) const
+    {
+      return fTime <= rhs.Time();
+    }
     /// Compares the current time of this clock with the one of `rhs`.
-    inline bool operator>= (const ElecClock& rhs) const { return fTime >= rhs.Time(); }
+    inline bool
+    operator>=(const ElecClock& rhs) const
+    {
+      return fTime >= rhs.Time();
+    }
 
   }; // class ElecClock
 
 }
 #endif
 /** @} */ // end of doxygen group
-

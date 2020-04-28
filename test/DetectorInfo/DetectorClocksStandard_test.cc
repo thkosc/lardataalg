@@ -21,14 +21,11 @@
  * - `detinfo::DetectorClocks const* Provider<detinfo::DetectorClocks>()`
  *
  */
-using TestEnvironment
-  = testing::TesterEnvironment<testing::BasicEnvironmentConfiguration>;
-
+using TestEnvironment = testing::TesterEnvironment<testing::BasicEnvironmentConfiguration>;
 
 //------------------------------------------------------------------------------
 //---  The tests
 //---
-
 
 /** ****************************************************************************
  * @brief Runs the test
@@ -47,7 +44,9 @@ using TestEnvironment
  *
  */
 //------------------------------------------------------------------------------
-int main(int argc, char const** argv) {
+int
+main(int argc, char const** argv)
+{
 
   testing::BasicEnvironmentConfiguration config("clocks_test");
 
@@ -57,10 +56,10 @@ int main(int argc, char const** argv) {
   int iParam = 0;
 
   // first argument: configuration file (mandatory)
-  if (++iParam < argc) config.SetConfigurationPath(argv[iParam]);
+  if (++iParam < argc)
+    config.SetConfigurationPath(argv[iParam]);
   else {
-    std::cerr << "FHiCL configuration file path required as first argument!"
-      << std::endl;
+    std::cerr << "FHiCL configuration file path required as first argument!" << std::endl;
     return 1;
   }
 
@@ -70,11 +69,9 @@ int main(int argc, char const** argv) {
 
   // third argument: path of the parameter set for DetectorClocks configuration
   // (optional; default: "services.DetectorClocks" from the inherited object)
-  if (++iParam < argc)
-    config.SetServiceParameterSetPath("DetectorClocksService", argv[iParam]);
+  if (++iParam < argc) config.SetServiceParameterSetPath("DetectorClocksService", argv[iParam]);
 
-
-  unsigned int nErrors = 0 /* Tester.Run() */ ;
+  unsigned int nErrors = 0 /* Tester.Run() */;
 
   //
   // testing environment setup
@@ -95,35 +92,28 @@ int main(int argc, char const** argv) {
   //
 
   // 1. we initialize it from the configuration in the environment,
-//  MyTestAlgo Tester(TestEnv.TesterParameters());
+  //  MyTestAlgo Tester(TestEnv.TesterParameters());
 
   // 2. we set it up with the geometry from the environment
-//  Tester.Setup(*(TestEnv.Provider<detinfo::DetectorClocks>()));
+  //  Tester.Setup(*(TestEnv.Provider<detinfo::DetectorClocks>()));
 
   // 3. then we run it!
   // Note that here we are querying the abstract DetectorClocks interface;
   // this is the right way to go.
-  detinfo::DetectorClocks const* detClocks
-    = TestEnv.Provider<detinfo::DetectorClocks>();
-  mf::LogVerbatim("clocks_test")
-    << "TPC clock period: " << detClocks->TPCClock().FramePeriod() << " us";
+  detinfo::DetectorClocks const* detClocks = TestEnv.Provider<detinfo::DetectorClocks>();
+  mf::LogVerbatim("clocks_test") << "TPC clock period: " << detClocks->TPCClock().FramePeriod()
+                                 << " us";
 
   // here we cheat and use the knowledge of which implementation we are using
   // (need to use pointers to use the feature of nullptr on conversion failure)
-  auto const* detClocksStd
-    = dynamic_cast<detinfo::DetectorClocksStandard const*>(detClocks);
-  if (detClocksStd) {
-    detClocksStd->debugReport();
-  }
+  auto const* detClocksStd = dynamic_cast<detinfo::DetectorClocksStandard const*>(detClocks);
+  if (detClocksStd) { detClocksStd->debugReport(); }
   else {
-    mf::LogWarning("clocks_test")
-      << "Can't run DetectorClocksStandard-specific diagnostics.";
+    mf::LogWarning("clocks_test") << "Can't run DetectorClocksStandard-specific diagnostics.";
   }
 
   // 4. And finally we cross fingers.
-  if (nErrors > 0) {
-    mf::LogError("clocks_test") << nErrors << " errors detected!";
-  }
+  if (nErrors > 0) { mf::LogError("clocks_test") << nErrors << " errors detected!"; }
 
   return nErrors;
 } // main()

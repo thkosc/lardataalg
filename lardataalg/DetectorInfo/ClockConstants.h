@@ -2,8 +2,8 @@
 #ifndef CLOCKCONSTANTS_H
 #define CLOCKCONSTANTS_H
 
-#include <limits>
 #include <climits>
+#include <limits>
 
 namespace detinfo {
 
