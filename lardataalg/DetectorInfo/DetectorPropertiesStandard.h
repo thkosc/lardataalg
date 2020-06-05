@@ -35,8 +35,7 @@ namespace detinfo {
   class DetectorPropertiesStandard final : public DetectorProperties {
   public:
     /// List of service providers we depend on
-    using providers_type =
-      lar::ProviderPack<geo::GeometryCore, detinfo::LArProperties, detinfo::DetectorClocks>;
+    using providers_type = lar::ProviderPack<geo::GeometryCore, detinfo::LArProperties>;
 
     /// Structure for configuration parameters
     struct Configuration_t {
@@ -231,8 +230,7 @@ namespace detinfo {
       return fSimpleBoundary;
     }
 
-    DetectorPropertiesData DataFor(
-      detinfo::DetectorClocksData const& clock_data) const override;
+    DetectorPropertiesData DataFor(detinfo::DetectorClocksData const& clock_data) const override;
 
   private:
     /**
