@@ -15,8 +15,8 @@ detinfo::DetectorClocksStandard::DetectorClocksStandard(fhicl::ParameterSet cons
                 "DefaultTrigTime",
                 "DefaultBeamTime"}
   , fConfigValue{pset.get<double>(fConfigName[kG4RefTime]),
-                 pset.get<double>(fConfigName[kFramePeriod]),
                  pset.get<double>(fConfigName[kTriggerOffsetTPC]),
+                 pset.get<double>(fConfigName[kFramePeriod]),
                  pset.get<double>(fConfigName[kClockSpeedTPC]),
                  pset.get<double>(fConfigName[kClockSpeedOptical]),
                  pset.get<double>(fConfigName[kClockSpeedTrigger]),
