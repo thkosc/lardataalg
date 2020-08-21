@@ -1,6 +1,8 @@
 #include "lardataalg/DetectorInfo/DetectorClocksStandard.h"
 #include "fhiclcpp/ParameterSet.h"
 
+#include "larcorealg/CoreUtils/zip.h"
+
 #include <iostream>
 
 //-------------------------------------------------------------------------
@@ -50,3 +52,19 @@ detinfo::DetectorClocksStandard::IsRightConfig(const fhicl::ParameterSet& ps) co
     return ps.has_key(config_name);
   });
 }
+
+
+void
+detinfo::DetectorClocksStandard::debugReport() const
+{
+  std::cout << "fConfigValues contents: " << std::endl;
+  
+  for(auto const& [ name, value ]: util::zip(fConfigName, fConfigValue))
+    std::cout << "\n    " << name << " ... " << value;
+  std::cout << std::endl;
+
+  DataForJob().debugReport(std::cout);
+  std::cout.flush();
+
+} // detinfo::DetectorClocksStandard::debugReport()
+

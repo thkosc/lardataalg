@@ -503,6 +503,28 @@ namespace detinfo {
     {
       return (G4ToElecTime(g4time) - doTPCTime()) / fTPCClock.TickPeriod();
     }
+    
+    
+    template <typename Stream>
+    void debugReport(Stream& out) const
+    {
+      out
+        <<   "Trigger  time @ " << fTriggerTime
+        << "\nBeamGate time @ " << fBeamGateTime
+        << "\nTrigOffsetTPC @ " << TriggerOffsetTPC()
+        << "\nG4RefTime     @ " << fG4RefTime
+        << "\nTPC     Freq. @ " << fTPCClock.Frequency()
+        << "\nOptical Freq. @ " << fOpticalClock.Frequency()
+        << "\nTrigger Freq. @ " << fTriggerClock.Frequency()
+        << "\nExternal Freq. @ " << fExternalClock.Frequency()
+        << "\nTPC start tick [tdc]             : " << TPCTick2TDC(0)
+        << "\nTPC start tick from trigger [us] : " << TPCTick2TrigTime(0)
+        << "\nTPC start tick from beam    [us] : " << TPCTick2BeamTime(0)
+        << "\nTPC tdc=0 in tick     : " << TPCTDC2Tick(0)
+        << "\nTPC G4 time 0 in tick : " << TPCG4Time2Tick(0)
+        << "\nTrigger in TPC tick   : " << Time2Tick(TriggerTime())
+        << "\n";
+    }
 
   private:
     /// Trigger time in [us]

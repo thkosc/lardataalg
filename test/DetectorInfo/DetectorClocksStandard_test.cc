@@ -83,17 +83,11 @@ main(int argc, char const** argv)
   // Note that here we are querying the abstract DetectorClocks interface;
   // this is the right way to go.
   auto const* detClocks = TestEnv.Provider<detinfo::DetectorClocks>();
+  auto const& detClocksData = detClocks->DataForJob();
   mf::LogVerbatim("clocks_test")
-    << "TPC clock period: " << detClocks->DataForJob().TPCClock().FramePeriod() << " us";
+    << "TPC clock period: " << detClocksData.TPCClock().FramePeriod() << " us";
 
-  // here we cheat and use the knowledge of which implementation we are using
-  // (need to use pointers to use the feature of nullptr on conversion failure)
-  auto const* detClocksStd
-    = dynamic_cast<detinfo::DetectorClocksStandard const*>(detClocks);
-  if (detClocksStd == nullptr) {
-    mf::LogWarning("clocks_test")
-      << "Can't run DetectorClocksStandard-specific diagnostics.";
-  }
+  detClocksData.debugReport(std::cout);
 
   // 4. And finally we cross fingers.
   if (nErrors > 0) { mf::LogError("clocks_test") << nErrors << " errors detected!"; }
