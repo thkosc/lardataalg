@@ -204,6 +204,9 @@ namespace detinfo {
     /// data file
     bool IsRightConfig(const fhicl::ParameterSet& ps) const;
 
+    /// Dumps the current configuration to screen.
+    void debugReport() const;
+    
   private:
     /**
      * @brief Setter for trigger times.

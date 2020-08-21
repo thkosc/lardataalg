@@ -1,6 +1,8 @@
 #include "lardataalg/DetectorInfo/DetectorClocksStandard.h"
 #include "fhiclcpp/ParameterSet.h"
 
+#include "larcorealg/CoreUtils/zip.h"
+
 #include <iostream>
 
 //-------------------------------------------------------------------------
@@ -15,8 +17,8 @@ detinfo::DetectorClocksStandard::DetectorClocksStandard(fhicl::ParameterSet cons
                 "DefaultTrigTime",
                 "DefaultBeamTime"}
   , fConfigValue{pset.get<double>(fConfigName[kG4RefTime]),
-                 pset.get<double>(fConfigName[kFramePeriod]),
                  pset.get<double>(fConfigName[kTriggerOffsetTPC]),
+                 pset.get<double>(fConfigName[kFramePeriod]),
                  pset.get<double>(fConfigName[kClockSpeedTPC]),
                  pset.get<double>(fConfigName[kClockSpeedOptical]),
                  pset.get<double>(fConfigName[kClockSpeedTrigger]),
@@ -50,3 +52,19 @@ detinfo::DetectorClocksStandard::IsRightConfig(const fhicl::ParameterSet& ps) co
     return ps.has_key(config_name);
   });
 }
+
+
+void
+detinfo::DetectorClocksStandard::debugReport() const
+{
+  std::cout << "fConfigValues contents: " << std::endl;
+  
+  for(auto const& [ name, value ]: util::zip(fConfigName, fConfigValue))
+    std::cout << "\n    " << name << " ... " << value;
+  std::cout << std::endl;
+
+  DataForJob().debugReport(std::cout);
+  std::cout.flush();
+
+} // detinfo::DetectorClocksStandard::debugReport()
+
