@@ -245,6 +245,8 @@ namespace detinfo {
     void ValidateAndConfigure(fhicl::ParameterSet const& p,
                               std::set<std::string> const& ignore_params);
 
+    std::string CheckTimeOffsets(std::set<geo::View_t> const& requested_views) const;
+
     /// Parameters for Sternheimer density effect corrections
     struct SternheimerParameters_t {
       double a;    ///< parameter a

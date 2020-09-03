@@ -63,6 +63,24 @@ namespace detinfo {
     fNumberTimeSamples = config().NumberTimeSamples();
     fReadOutWindowSize = config().ReadOutWindowSize();
 
+    std::set<geo::View_t> present_views;
+    if (config().TimeOffsetU(fTimeOffsetU))
+      present_views.insert(geo::kU);
+    if (config().TimeOffsetV(fTimeOffsetV))
+      present_views.insert(geo::kV);
+    if (config().TimeOffsetZ(fTimeOffsetZ))
+      present_views.insert(geo::kZ);
+    if (config().TimeOffsetY(fTimeOffsetY))
+      present_views.insert(geo::kY);
+    if (config().TimeOffsetX(fTimeOffsetX))
+      present_views.insert(geo::kX);
+
+    std::string const errors = CheckTimeOffsets(present_views);
+    if (!errors.empty()) {
+      throw cet::exception("DetectorPropertiesStandard")
+        << "Detected configuration errors: \n" << errors;
+    }
+
     fSternheimerParameters.a = config().SternheimerA();
     fSternheimerParameters.k = config().SternheimerK();
     fSternheimerParameters.x0 = config().SternheimerX0();
@@ -407,4 +425,36 @@ namespace detinfo {
       *this, x_ticks_coefficient, move(x_ticks_offsets), move(drift_direction)};
   }
 
+
+  std::string
+  DetectorPropertiesStandard::CheckTimeOffsets(std::set<geo::View_t> const& requested_views) const
+  {
+    auto const& present_views = fGeo->Views();
+
+    auto view_diff = [&present_views, &requested_views](geo::View_t const view) {
+                       return static_cast<int>(present_views.count(view)) -
+                              static_cast<int>(requested_views.count(view));
+                     };
+
+    // It is not an error to specify an offset if the view does not
+    // exist.  However, if a view does exist, and an offset does not,
+    // then that will end the job.
+    std::ostringstream errors;
+    if (auto diff = view_diff(geo::kU); diff > 0) {
+      errors << "TimeOffsetU missing for view U.\n";
+    }
+    if (auto diff = view_diff(geo::kV); diff > 0) {
+      errors << "TimeOffsetV missing for view V.\n";
+    }
+    if (auto diff = view_diff(geo::kZ); diff > 0) {
+      errors << "TimeOffsetZ missing for view Z.\n";
+    }
+    if (auto diff = view_diff(geo::kY); diff > 0) {
+      errors << "TimeOffsetY missing for view Y.\n";
+    }
+    if (auto diff = view_diff(geo::kX); diff > 0) {
+      errors << "TimeOffsetX missing for view X.\n";
+    }
+    return errors.str();
+  }
 } // namespace
