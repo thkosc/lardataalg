@@ -649,5 +649,5 @@ main(int argc, char const** argv)
   // 4. And finally we cross fingers.
   if (nErrors > 0) { mf::LogError("clocks_test") << nErrors << " errors detected!"; }
 
-  return nErrors;
+  return (nErrors > 0U)? 1: 0;
 } // main()

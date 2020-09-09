@@ -43,7 +43,7 @@ namespace detinfo {
   class DetectorClocksWithUnits {
 
     /// The backend instance of `detinfo::DetectorClocksData` this object uses.
-    detinfo::DetectorClocksData const* fClockData = nullptr;
+    detinfo::DetectorClocksData fClockData; // non-const to allow copy
 
   public:
     // import types
@@ -55,10 +55,10 @@ namespace detinfo {
     // @{
     /// Constructor: uses `detClocks` for internal conversions.
     explicit DetectorClocksWithUnits(detinfo::DetectorClocksData const* detClocks)
-      : fClockData(detClocks)
+      : DetectorClocksWithUnits(*detClocks)
     {}
     explicit DetectorClocksWithUnits(detinfo::DetectorClocksData const& detClocks)
-      : DetectorClocksWithUnits(&detClocks)
+      : fClockData(detClocks)
     {}
     // @}
 
@@ -66,7 +66,7 @@ namespace detinfo {
     detinfo::DetectorClocksData const&
     clockData() const
     {
-      return *fClockData;
+      return fClockData;
     }
 
     /// Equivalent to `detinfo::DetectorClocks::TriggerTime()`.
