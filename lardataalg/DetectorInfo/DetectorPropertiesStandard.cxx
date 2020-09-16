@@ -278,9 +278,15 @@ namespace detinfo {
   // parameters:
   //  dQdX in electrons/cm, charge (amplitude or integral obtained) divided by
   //         effective pitch for a given 3D track.
+  //  Electric Field in the drift region in KV/cm/
   // returns dEdX in MeV/cm
   double
   DetectorPropertiesStandard::BirksCorrection(double dQdx) const
+  {
+    return BirksCorrection(dQdx, Efield());
+  }
+  double
+  DetectorPropertiesStandard::BirksCorrection(double dQdx, double E_field) const
   {
     // Correction for charge quenching using parameterization from
     // S.Amoruso et al., NIM A 523 (2004) 275
@@ -289,7 +295,6 @@ namespace detinfo {
     double K3t = util::kRecombk;                           // in KV/cm*(g/cm^2)/MeV
     double const rho = Density();                          // LAr density in g/cm^3
     constexpr double Wion = 1000. / util::kGeVToElectrons; // 23.6 eV = 1e, Wion in MeV/e
-    double const E_field = Efield(); // Electric Field in the drift region in KV/cm
     K3t /= rho;                      // KV/MeV
     double const dEdx = dQdx / (A3t / Wion - K3t / E_field * dQdx); // MeV/cm
 
@@ -301,11 +306,15 @@ namespace detinfo {
   double
   DetectorPropertiesStandard::ModBoxCorrection(double dQdx) const
   {
+    return ModBoxCorrection(dQdx, Efield());
+  }
+  double
+  DetectorPropertiesStandard::ModBoxCorrection(double dQdx, double E_field) const
+  {
     // Modified Box model correction has better behavior than the Birks
     // correction at high values of dQ/dx.
     double const rho = Density();                          // LAr density in g/cm^3
     constexpr double Wion = 1000. / util::kGeVToElectrons; // 23.6 eV = 1e, Wion in MeV/e
-    double const E_field = Efield(); // Electric Field in the drift region in KV/cm
     double const Beta = util::kModBoxB / (rho * E_field);
     constexpr double Alpha = util::kModBoxA;
     double const dEdx = (exp(Beta * Wion * dQdx) - Alpha) / Beta;

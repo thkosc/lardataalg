@@ -28,13 +28,23 @@ detinfo::DetectorPropertiesData::DriftVelocity(double const efield, double const
 double
 detinfo::DetectorPropertiesData::BirksCorrection(double const dQdX) const
 {
-  return fProperties.BirksCorrection(dQdX);
+  return fProperties.BirksCorrection(dQdX, Efield());
+}
+double
+detinfo::DetectorPropertiesData::BirksCorrection(double const dQdX, double const EField) const
+{
+  return fProperties.BirksCorrection(dQdX, EField);
 }
 
 double
 detinfo::DetectorPropertiesData::ModBoxCorrection(double const dQdX) const
 {
-  return fProperties.ModBoxCorrection(dQdX);
+  return fProperties.ModBoxCorrection(dQdX, Efield());
+}
+double
+detinfo::DetectorPropertiesData::ModBoxCorrection(double const dQdX, double const EField) const
+{
+  return fProperties.ModBoxCorrection(dQdX, EField);
 }
 
 double
