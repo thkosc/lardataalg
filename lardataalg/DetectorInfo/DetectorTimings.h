@@ -23,22 +23,24 @@ namespace detinfo {
 
   // ---------------------------------------------------------------------------
   /**
-   * @brief A partial `detinfo::DetectorClocks` supporting units.
+   * @brief A partial `detinfo::DetectorClocksData` supporting units.
    *
-   * This class is instantiated based on a `detinfo::DetectorClocks`, which
+   * This class is instantiated based on a `detinfo::DetectorClocksData`, which
    * is relied upon to provide the underlying functionality.
    *
    * Example of usage:
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
    * detinfo::DetectorClocksWithUnits const& detClocks
    *   = detinfo::makeDetectorClocksWithUnits
-   *   (lar::providerFrom<detinfo::DetectorClocks>())
+   *   (art::ServiceHandle<detinfo::DetectorClocksService const>()->DataForJob())
    *   ;
    *
    * util::quantities::nanosecond simulStartTime
    *   = detClocks.G4ToElecTime(0.0);
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    *
+   * The timing data is copied locally; see `detinfo::DetectorClocksData` for
+   * considerations on the validity time span of the timing information.
    */
   class DetectorClocksWithUnits {
 
@@ -69,21 +71,21 @@ namespace detinfo {
       return fClockData;
     }
 
-    /// Equivalent to `detinfo::DetectorClocks::TriggerTime()`.
+    /// Equivalent to `detinfo::DetectorClocksData::TriggerTime()`.
     microsecond
     TriggerTime() const
     {
       return microsecond{clockData().TriggerTime()};
     }
 
-    /// Equivalent to `detinfo::DetectorClocks::BeamGateTime()`.
+    /// Equivalent to `detinfo::DetectorClocksData::BeamGateTime()`.
     microsecond
     BeamGateTime() const
     {
       return microsecond{clockData().BeamGateTime()};
     }
 
-    /// Equivalent to `detinfo::DetectorClocks::TPCTime()`.
+    /// Equivalent to `detinfo::DetectorClocksData::TPCTime()`.
     microsecond
     TPCTime() const
     {
@@ -91,7 +93,7 @@ namespace detinfo {
     }
 
     // @{
-    /// Equivalent to `detinfo::DetectorClocks::G4ToElecTime()`.
+    /// Equivalent to `detinfo::DetectorClocksData::G4ToElecTime()`.
     microsecond
     G4ToElecTime(nanosecond simTime) const
     {
@@ -105,7 +107,7 @@ namespace detinfo {
     // @}
 
     // @{
-    /// Equivalent to `detinfo::DetectorClocks::G4ToElecTime()`.
+    /// Equivalent to `detinfo::DetectorClocksData::G4ToElecTime()`.
     ticks_d
     TPCTick2TDC(ticks_d tpcticks) const
     {
@@ -119,7 +121,7 @@ namespace detinfo {
     // @}
 
     /// Equivalent to
-    /// `detinfo::DetectorClocks::OpticalClock().TickPeriod()`.
+    /// `detinfo::DetectorClocksData::OpticalClock().TickPeriod()`.
     microsecond
     OpticalClockPeriod() const
     {
@@ -127,7 +129,7 @@ namespace detinfo {
     }
 
     /// Equivalent to
-    /// `detinfo::DetectorClocks::OpticalClock().TickPeriod()`.
+    /// `detinfo::DetectorClocksData::OpticalClock().TickPeriod()`.
     megahertz
     OpticalClockFrequency() const
     {
@@ -136,7 +138,7 @@ namespace detinfo {
 
   }; // class DetectorClocksWithUnits
 
-  /// Transforms a `detinfo::DetectorClocks` into a
+  /// Transforms a `detinfo::DetectorClocksData` into a
   /// `detinfo::DetectorClocksWithUnits`.
   inline detinfo::DetectorClocksWithUnits
   makeDetectorClocksWithUnits(detinfo::DetectorClocksData const& clockData)
@@ -146,24 +148,31 @@ namespace detinfo {
 
   // ---------------------------------------------------------------------------
   /**
-   * @brief A class exposing an updated version of `detinfo::DetectorClocks`.
+   * @brief A class exposing an upgraded interface of
+   *        `detinfo::DetectorClocksData`.
    *
-   * This object actually wraps around an existing `detinfo::DetectorClocks`
-   * object. For example, in _art_/LArSoft, one can be created as:
+   * This object extends `detinfo::DetectorClocksData` interface.
+   * For example, in _art_/LArSoft, one can be created as:
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
    * auto const& detTimings = detinfo::makeDetectorTimings
-   *   (lar::provider_from<detinfo::DetectorClocksService>());
+   *   (art::ServiceHandle<detinfo::DetectorClocksService const>()->DataForJob());
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   * in a non-event context or, if a current event is available:
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
+   * auto const& detTimings = detinfo::makeDetectorTimings
+   *   (art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(event));
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    * It can also wrap around an existing `detinfo::DetectorClocksWithUnits`
    * object:
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
    * auto detClocksWU = detinfo::makeDetectorClocksWithUnits
-   *   (lar::provider_from<detinfo::DetectorClocksService>());
+   *   (lar::provider_from<detinfo::DetectorClocksService const>()->DataFor(event));
    * auto const& timings = detinfo::makeDetectorTimings(detClocksWU);
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   * In this case, the `detinfo::DetectorClocksWithUnits` object must exist for
-   * all the lifetime of `timings`, since it is referenced by the latter.
    *
+   * The timing data is copied locally; see `detinfo::DetectorClocksData` for
+   * considerations on the validity time span of the timing information.
+   * 
    *
    * Data types
    * ===========
@@ -284,7 +293,7 @@ namespace detinfo {
 
     // note that `makeDetectorTimings()` provides an additional construction way
     // @{
-    /// Constructor: wraps around a specified `detinfo::DetectorClocks` object.
+    /// Constructor: wraps around a specified `detinfo::DetectorClocksData` object.
     explicit DetectorTimings(detinfo::DetectorClocksData const& clockData)
       : detinfo::DetectorClocksWithUnits(clockData)
     {}
@@ -317,7 +326,7 @@ namespace detinfo {
     // --- BEGIN -- Electronics times ------------------------------------------
 
     /// Returns the trigger time as a point in electronics time.
-    /// @see `detinfo::DetectorClocks::TriggerTime()`
+    /// @see `detinfo::DetectorClocksData::TriggerTime()`
     electronics_time
     TriggerTime() const
     {
@@ -325,7 +334,7 @@ namespace detinfo {
     }
 
     /// Returns the beam gate time as a point in electronics time.
-    /// @see `detinfo::DetectorClocks::BeamGateTime()`
+    /// @see `detinfo::DetectorClocksData::BeamGateTime()`
     electronics_time
     BeamGateTime() const
     {
@@ -351,7 +360,7 @@ namespace detinfo {
      * electronics_time nuElecTime
      *   = timings.toTimeScale<electronics_time>(nuTime);
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * is equivalent to use `detinfo::DetectorClocks::G4ToElecTime(47.5)`.
+     * is equivalent to use `detinfo::DetectorClocksData::G4ToElecTime(47.5)`.
      */
     template <typename TargetTime, typename FromTime>
     TargetTime toTimeScale(FromTime time) const;
@@ -401,7 +410,7 @@ namespace detinfo {
      * simulation_time nuTime = 47.5_ns;
      * electronics_time nuElecTime = timings.toElectronicsTime(nuTime);
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * is equivalent to use `detinfo::DetectorClocks::G4ToElecTime(47.5)`.
+     * is equivalent to use `detinfo::DetectorClocksData::G4ToElecTime(47.5)`.
      */
     template <typename FromTime>
     electronics_time
@@ -624,7 +633,7 @@ namespace detinfo {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * sets `TPCstartTime` to the instant the TPC electronics time starts,
      * in the electronics time scale. This example in particular is yielding
-     * the same value as calling `detinfo::DetectorClocks::TPCTime()`.
+     * the same value as calling `detinfo::DetectorClocksData::TPCTime()`.
      *
      *
      * Implemented scales
@@ -657,7 +666,7 @@ namespace detinfo {
      * sets `TPCstartTime` to the instant the TPC electronics time starts,
      * in the electronics time tick scale. This example in particular is
      * yielding the same value as calling
-     * `detinfo::DetectorClocks::TPCTick2TDC(0)`.
+     * `detinfo::DetectorClocksData::TPCTick2TDC(0)`.
      *
      * @todo The example is not even supported yet!
      *
@@ -678,18 +687,21 @@ namespace detinfo {
     // --- END -- Reference times ----------------------------------------------
 
   private:
-    friend detinfo::DetectorTimings makeDetectorTimings(detinfo::DetectorClocksWithUnits const&);
+    friend detinfo::DetectorTimings makeDetectorTimings
+      (detinfo::DetectorClocksWithUnits const&);
 
   }; // class DetectorTimings
 
-  /// Returns `DetectorTimings` object from specified `detinfo::DetectorClocks`.
+  /// Returns `DetectorTimings` object from specified
+  /// `detinfo::DetectorClocksData`.
   inline detinfo::DetectorTimings
   makeDetectorTimings(detinfo::DetectorClocksData const& detClocks)
   {
     return detinfo::DetectorTimings{detClocks};
   }
 
-  /// Returns `DetectorTimings` object from specified `detinfo::DetectorClocks`.
+  /// Returns `DetectorTimings` object from specified
+  /// `detinfo::DetectorClocksData`.
   inline detinfo::DetectorTimings
   makeDetectorTimings(detinfo::DetectorClocksData const* detClocks)
   {

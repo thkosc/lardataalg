@@ -1,7 +1,38 @@
 #ifndef LARDATAALG_DETECTORINFO_DETECTORCLOCKSDATA_H
 #define LARDATAALG_DETECTORINFO_DETECTORCLOCKSDATA_H
 
-/** **************************************************************************
+
+#include "lardataalg/DetectorInfo/ElecClock.h"
+
+namespace detinfo {
+
+  /** **************************************************************************
+   * @brief Contains all timing reference information for the detector.
+   * 
+   * The timing information object can be obtained in _art_ from any
+   * implementation of `detinfo::DetectorClocksService`, and in non-_art_
+   * contexts from any `detinfo::DetectorClocks` provider implementation:
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
+   * detinfo::DetectorClocksData const detClocks
+   *   = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataForJob();
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   * in _art_ context without a current event, and better:
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
+   * detinfo::DetectorClocksData const detClocks
+   *   = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(event);
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   * in _art_ context when a current event is defined and available.
+   * 
+   * 
+   * Validity of the information
+   * ----------------------------
+   * 
+   * The content of this object is static and disconnected from the context it
+   * was extracted from.
+   * The actual timing information can be updated event by event.
+   * In general, a new object might be needed for each event or run change.
+   * 
+   * 
    * Time definitions
    * =================
    *
@@ -112,14 +143,14 @@
    *     @ref DetectorClocksPhysicsEvent "main physics event"; this is
    *     stored in the trajectory points of `simb::MCParticle` (usually the
    *     generators store a single trajectory point for each particle) _[ns]_
-   * * *Geant4 time*:
+   * * *GEANT4 time*:
    *     @anchor DetectorClocksGeant4Time
-   *     from the @ref DetectorClocksGeant4TimeStart "Geant4 time start"; this
+   *     from the @ref DetectorClocksGeant4TimeStart "GEANT4 time start"; this
    *     is stored into each trajectory point of `simb::MCParticle` produced by
    *     `LArG4` module or equivalent _[ns]_
    * * *simulation time*:
    *     @anchor DetectorClocksSimulationTime
-   *     the same as @ref DetectorClocksGeant4Time "Geant4 time" (and also
+   *     the same as @ref DetectorClocksGeant4Time "GEANT4 time" (and also
    *     generation time, which in LArSoft happens to match the former) _[ns]_
    *
    * The list above reports in square brackets the "standard" unit, used for
@@ -136,9 +167,10 @@
    * Time conversions
    * =================
    *
-   * While this system is carefully designed to give physicists an headache, the
-   * `detinfo::DetectorClocks` service provider attempts to tame this complexity
+   * While this system is carefully designed to give physicists an headache,
+   * `detinfo::DetectorClocksData` attempts to tame this complexity
    * by providing methods to convert from one time to the other.
+   * Also see `detinfo::DetectorTimings` for a higher level interface.
    *
    * The following table represents the available conversion functions, with the
    * time in the first column as the time to be converted and in the columns the
@@ -163,7 +195,7 @@
    *
    * Note that the complete definition of optical and external time requires
    * additional information: see the
-   * @ref DetectorClocksElectronicsTimesNote "note on electonics time frames"
+   * @ref DetectorClocksElectronicsTimesNote "note on electronics time frames"
    * below.
    *
    * The names are not thoroughly consistent, but they roughly follow the
@@ -215,7 +247,7 @@
    * -------
    *
    * A clock object (`ElecClock`) contains settings for a specific
-   * hardware clock. `DetectorClocks` provides four clock objects:
+   * hardware clock. `DetectorClocksData` provides four clock objects:
    *
    * clock name        | purpose                               | default time
    * ----------------- | ------------------------------------- | ---------------
@@ -248,13 +280,49 @@
    *       happened.
    *
    */
-
-#include "lardataalg/DetectorInfo/ElecClock.h"
-
-namespace detinfo {
-
   class DetectorClocksData {
   public:
+    /**
+     * @brief Returns a complete `detinfo::DetectorClocksData` object.
+     * @param g4_ref_time start of simulation time in electronics time scale [ns]
+     * @param trigger_offset_tpc hardware trigger time in electronics time
+     *                           (see the full description below)
+     * @param trigger_time the default hardware trigger time in electronics time
+     * @param beam_time the default beam gate opening time in electronics time
+     * @param tpc_clock use a copy of this as TPC clock object
+     * @param optical_clock use a copy of this as optical detector clock object
+     * @param trigger_clock use a copy of this as trigger clock object
+     * @param external_clock use a copy of this as external clock object
+     * 
+     * Details of the definition of the different parameters:
+     * 
+     * * `g4_ref_time` is the @ref DetectorClocksSimulationTime "simulation (Geant4) start time"
+     *   in @ref DetectorClocksElectronicsTime "electronics time scale", i.e. when
+     *   time `0.0` of simulation happens in the electronics time scale
+     * *`trigger_offset_tpc`: time elapsed between the
+     *   @ref DetectorClocksTPCelectronicsStartTime "start of the TPC readout clock"
+     *   and the @ref DetectorClocksHardwareTrigger "hardware trigger";
+     *   it can be expressed in one of two ways:
+     *       * negative number [&micro;s]: the offset of the start of the TPC
+     *         readout clock start respect to the trigger time (where negative
+     *         means that the clock starts _before_ the trigger arrives)
+     *       * positive number [ticks]: the number of TPC readout clock tick at
+     *         which the trigger arrives; despite this being a tick number, it can
+     *         be fractional for added precision
+     *
+     *   For example, `trigger_offset_tpc` of `-1600.0` means that the TDC clock
+     *   starts 1.6 milliseconds before the hardware trigger. `trigger_offset_tpc`
+     *   of `3200.0` means that the trigger arrives at the exact start of tick
+     *   3200 of the TPC readout. In this example, if the sampling frequency of
+     *   that readout is 2 MHz, these two settings are equivalent.
+     * * *trigger_time* (_microseconds_): the default
+     *     @ref DetectorClocksHardwareTrigger "hardware trigger time", measured
+     *     in the @ref DetectorClocksElectronicsTime "electronics time frame"
+     * * *beam_time* (_microseconds_): the default
+     *     @ref DetectorClocksBeamGateOpening "beam gate opening time", measured
+     *     in the @ref DetectorClocksElectronicsTime "electronics time frame"
+     * 
+     */
     DetectorClocksData(double const g4_ref_time,
                        double const trigger_offset_tpc,
                        double const trig_time,
