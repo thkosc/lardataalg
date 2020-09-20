@@ -244,7 +244,14 @@ void dump::raw::OpDetWaveformDumper::dump
   if (Extrema.min() != Extrema.max()) {
     out.newline()
       << "  range of " << data.size()
-      << " samples: [" << Extrema.min() << ";" << Extrema.max() << "]";
+      << " samples: [" << Extrema.min() << ";" << Extrema.max() << "] (span: "
+      << (Extrema.max() - Extrema.min());
+    if (fPedestal != 0) {
+      out << ", from pedestal: ["
+        << (Extrema.min() - fPedestal) << ";"
+        << (Extrema.max() - fPedestal) << "]";
+    }
+    out << ")";
   }
   
   restoreIndentSettings();
