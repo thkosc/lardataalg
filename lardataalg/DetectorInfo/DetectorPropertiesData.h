@@ -22,7 +22,9 @@ namespace detinfo {
 
     /// dQ/dX in electrons/cm, returns dE/dX in MeV/cm.
     double BirksCorrection(double dQdX) const;
+    double BirksCorrection(double dQdX, double EField) const;
     double ModBoxCorrection(double dQdX) const;
+    double ModBoxCorrection(double dQdX, double EField) const;
 
     double ElectronLifetime() const;
 
