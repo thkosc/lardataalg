@@ -123,6 +123,8 @@ main(int argc, char const** argv)
                                << " kV/cm"
                                << "\nSampling rate:       " << TDCtick << " ns"
                                << "\nArgon temperature:   " << detp.Temperature() << " K"
+                               << "\nArgon density:       " << detp.Density() << " kg/dm^3 (at " << detp.Temperature() << " K)"
+                               << "\nArgon density:       " << detp.Density(87.0) << " kg/dm^3 (at 87 K)"
                                << "\nDrift velocity:      " << driftVelocity << " cm/us"
                                << "\nReadout window:      " << nReadoutWindowTicks << " ticks ("
                                << (nReadoutWindowTicks * TDCtick / 1000) << " us)"
