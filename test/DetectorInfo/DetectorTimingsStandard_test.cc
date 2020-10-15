@@ -23,6 +23,35 @@
 #include <limits>
 
 //------------------------------------------------------------------------------
+//---  static tests
+//------------------------------------------------------------------------------
+void StaticChecks() {
+  using namespace detinfo::timescales;
+  static_assert(!is_tick_v<electronics_time>);
+  static_assert( is_tick_v<electronics_tick>);
+  static_assert( is_tick_v<electronics_tick_d>);
+  static_assert( is_tick_v<electronics_time_ticks>);
+  static_assert( is_tick_v<electronics_time_ticks_d>);
+  static_assert(!is_tick_v<TPCelectronics_time>);
+  static_assert( is_tick_v<TPCelectronics_tick>);
+  static_assert( is_tick_v<TPCelectronics_tick_d>);
+  static_assert( is_tick_v<TPCelectronics_time_ticks>);
+  static_assert( is_tick_v<TPCelectronics_time_ticks_d>);
+  static_assert(!is_tick_v<trigger_time>);
+  static_assert( is_tick_v<trigger_tick>);
+  static_assert( is_tick_v<trigger_tick_d>);
+  static_assert( is_tick_v<trigger_time_ticks>);
+  static_assert( is_tick_v<trigger_time_ticks_d>);
+  static_assert(!is_tick_v<simulation_time>);
+  static_assert(!is_tick_v<optical_time>);
+  static_assert( is_tick_v<optical_tick>);
+  static_assert( is_tick_v<optical_tick_d>);
+  static_assert( is_tick_v<optical_time_ticks>);
+  static_assert( is_tick_v<optical_time_ticks_d>);
+} // StaticChecks()
+
+
+//------------------------------------------------------------------------------
 //---  The test environment
 //---
 
@@ -433,7 +462,7 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
   //
   // time conversions
   //
-  double const inputTick_count = 100.5;
+  double const inputTick_count = 900.5;
 
   //
   // to electronics time (real tick):
@@ -448,7 +477,7 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
 
   if (time.value() == expectedTime_us) {
     mf::LogVerbatim("DetectorTimingsStandard_test")
-      << "DetectorTimings::toElectronicsTime<optical_tick>(" << inputTick_d << ") => " << time;
+      << "DetectorTimings::toElectronicsTime<optical_tick_d>(" << inputTick_d << ") => " << time;
   }
   else {
     ++nErrors;
@@ -463,7 +492,7 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
 
   if (tick == inputTick_d) {
     mf::LogVerbatim("DetectorTimingsStandard_test")
-      << "DetectorTimings::toTick<optical_tick, "
+      << "DetectorTimings::toTick<optical_tick_d, "
       << detinfo::timescales::timescale_traits<decltype(time)::category_t>::name() << ">(" << time
       << ") => " << tick;
   }
@@ -500,8 +529,10 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
   }
 
   // back to optical tick:
-  auto const trigTick = timings.toTick<optical_tick>(trigger_time{expectedTrigTime_us});
-  static_assert(util::is_same_decay_v<decltype(trigTick.quantity()), util::quantities::tick>);
+  auto const trigTick
+    = timings.toTick<optical_tick>(trigger_time{expectedTrigTime_us});
+  static_assert
+    (util::is_same_decay_v<decltype(trigTick.quantity()), util::quantities::tick>);
 
   if (trigTick == inputTick) {
     mf::LogVerbatim("DetectorTimingsStandard_test")
@@ -513,6 +544,54 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
     mf::LogProblem("DetectorTimingsStandard_test")
       << "Trigger time " << expectedTrigTime_us << " us is expected to be optical tick "
       << inputTick << ", but got " << trigTick << " instead";
+  }
+
+  //
+  // to electronics tick
+  //
+  
+  auto const expectedElecTick = timings.toTick<electronics_tick>(time);
+  
+  auto const elecTick = timings.toTick<electronics_tick>(inputTick);
+  static_assert
+    (util::is_same_decay_v<decltype(elecTick.quantity()), util::quantities::tick>);
+
+  if (elecTick == expectedElecTick) {
+    mf::LogVerbatim("DetectorTimingsStandard_test")
+      << "DetectorTimings::toTick<electronics_tick>(" << inputTick << ") => "
+      << elecTick;
+  }
+  else {
+    ++nErrors;
+    mf::LogProblem("DetectorTimingsStandard_test")
+      << "Optical tick #" << inputTick_count << " is expected to be "
+      << expectedElecTick << " (electronics tick), but got "
+      << elecTick << " instead";
+  }
+  
+  // back to optical tick:
+  optical_tick const expectedOptTick
+    = timings.toTick<optical_tick>(timings.toElectronicsTime(expectedElecTick));
+  
+  auto const tickFromElecTick = timings.toTick<optical_tick>(elecTick);
+  static_assert(
+    util::is_same_decay_v
+      <decltype(tickFromElecTick.quantity()), util::quantities::tick>
+    );
+
+  if (tickFromElecTick == expectedOptTick) {
+    mf::LogVerbatim("DetectorTimingsStandard_test")
+      << "DetectorTimings::toTick<optical_tick, "
+      << detinfo::timescales::timescale_traits<decltype(elecTick)::category_t>::name()
+      << ">(" << elecTick << ") => " << tickFromElecTick;
+  }
+  else {
+    ++nErrors;
+    mf::LogProblem("DetectorTimingsStandard_test")
+      << detinfo::timescales::timescale_traits<decltype(elecTick)::category_t>::name()
+      << " " << elecTick
+      << " is expected to be optical tick " << expectedOptTick
+      << ", but got " << tickFromElecTick << " instead";
   }
 
   //

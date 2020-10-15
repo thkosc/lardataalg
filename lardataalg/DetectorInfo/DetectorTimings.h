@@ -948,15 +948,40 @@ namespace detinfo {
     template <typename FromTime, typename TargetTick, typename = void>
     struct TickConverter {
 
-      static TargetTick
-      convert(FromTime time, DetectorTimings const* timings)
+      
+      static TargetTick convert
+      (FromTime time, DetectorTimings const* timings)
       {
+        // dispatcher
+        if constexpr(detinfo::timescales::is_tick_v<FromTime>)
+          return convertTick(time, timings);
+        else
+          return convertTime(time, timings);
+      } // convert()
+
+      
+      static TargetTick
+      convertTime(FromTime time, DetectorTimings const* timings)
+      {
+        static_assert(!detinfo::timescales::is_tick_v<FromTime>);
         using TargetTime = typename detinfo::timescales::timescale_traits<
           typename TargetTick::category_t>::time_point_t;
         auto const timeFromStart = time - timings->startTime<TargetTime, FromTime>();
         auto const clockPeriod = timings->ClockPeriodFor<TargetTick>();
         return TargetTick::castFrom(timeFromStart / clockPeriod);
-      } // convert()
+      } // convertTime()
+
+      static TargetTick
+      convertTick(FromTime tick, DetectorTimings const* timings)
+      {
+        static_assert(detinfo::timescales::is_tick_v<FromTime>);
+        // effectively we must go very close to the times from the tick;
+        // so we go all the way there
+        using TargetTime = typename detinfo::timescales::timescale_traits<
+          typename TargetTick::category_t>::time_point_t;
+        auto const time = timings->toTimeScale<TargetTime>(tick);
+        return timings->toTick<TargetTick>(time);
+      } // convertTick()
 
     }; // TickConverter
 

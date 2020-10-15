@@ -85,7 +85,7 @@ main(int argc, char const** argv)
   auto const* detClocks = TestEnv.Provider<detinfo::DetectorClocks>();
   auto const& detClocksData = detClocks->DataForJob();
   mf::LogVerbatim("clocks_test")
-    << "TPC clock period: " << detClocksData.TPCClock().FramePeriod() << " us";
+    << "TPC clock frame: " << detClocksData.TPCClock().FramePeriod() << " us";
 
   detClocksData.debugReport(std::cout);
 
