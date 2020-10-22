@@ -58,7 +58,7 @@ void
 detinfo::DetectorClocksStandard::debugReport() const
 {
   std::cout << "fConfigValues contents: " << std::endl;
-  
+
   for(auto const& [ name, value ]: util::zip(fConfigName, fConfigValue))
     std::cout << "\n    " << name << " ... " << value;
   std::cout << std::endl;

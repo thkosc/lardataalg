@@ -172,7 +172,7 @@ namespace detinfo {
    *
    * The timing data is copied locally; see `detinfo::DetectorClocksData` for
    * considerations on the validity time span of the timing information.
-   * 
+   *
    *
    * Data types
    * ===========
@@ -948,7 +948,7 @@ namespace detinfo {
     template <typename FromTime, typename TargetTick, typename = void>
     struct TickConverter {
 
-      
+
       static TargetTick convert
       (FromTime time, DetectorTimings const* timings)
       {
@@ -959,7 +959,7 @@ namespace detinfo {
           return convertTime(time, timings);
       } // convert()
 
-      
+
       static TargetTick
       convertTime(FromTime time, DetectorTimings const* timings)
       {

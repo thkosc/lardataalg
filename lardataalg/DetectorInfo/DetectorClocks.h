@@ -44,7 +44,7 @@ namespace detinfo {
    * The only use of this provider in LArSoft version 9 and newer is to provide
    * an instance of `detinfo::DetectorClocksData` containing all the relevant
    * information.
-   * 
+   *
    * Helper functions may be available to extract the necessary information
    * from specific implementations of `detinfo::DetectorClocks`.
    */
@@ -64,7 +64,7 @@ namespace detinfo {
 
     /**
      * @brief Returns a complete `detinfo::DetectorClocksData` object.
-     * 
+     *
      * The returned timing information is based on information independent
      * of the current input file, run or event.
      * It is recommended that `DataFor()` is used instead whenever possible.
@@ -76,13 +76,13 @@ namespace detinfo {
      * @param g4_ref_time start of simulation time in electronics time scale [ns]
      * @param trigger_time the default hardware trigger time in electronics time
      * @param beam_time the default beam gate opening time in electronics time
-     * 
+     *
      * The returned timing information reflects the current context, defined
      * by the parameters passed to this method.
-     * 
+     *
      * If the information required by the parameters is not available, users
      * will be forced to use `DataForJob()` instead.
-     * 
+     *
      * For more details on the definition of the parameters, see the
      * documentation of `detinfo::DetectorClocksData` constructor.
      */

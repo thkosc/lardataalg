@@ -8,7 +8,7 @@ namespace detinfo {
 
   /** **************************************************************************
    * @brief Contains all timing reference information for the detector.
-   * 
+   *
    * The timing information object can be obtained in _art_ from any
    * implementation of `detinfo::DetectorClocksService`, and in non-_art_
    * contexts from any `detinfo::DetectorClocks` provider implementation:
@@ -22,17 +22,17 @@ namespace detinfo {
    *   = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(event);
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    * in _art_ context when a current event is defined and available.
-   * 
-   * 
+   *
+   *
    * Validity of the information
    * ----------------------------
-   * 
+   *
    * The content of this object is static and disconnected from the context it
    * was extracted from.
    * The actual timing information can be updated event by event.
    * In general, a new object might be needed for each event or run change.
-   * 
-   * 
+   *
+   *
    * Time definitions
    * =================
    *
@@ -293,9 +293,9 @@ namespace detinfo {
      * @param optical_clock use a copy of this as optical detector clock object
      * @param trigger_clock use a copy of this as trigger clock object
      * @param external_clock use a copy of this as external clock object
-     * 
+     *
      * Details of the definition of the different parameters:
-     * 
+     *
      * * `g4_ref_time` is the @ref DetectorClocksSimulationTime "simulation (Geant4) start time"
      *   in @ref DetectorClocksElectronicsTime "electronics time scale", i.e. when
      *   time `0.0` of simulation happens in the electronics time scale
@@ -321,7 +321,7 @@ namespace detinfo {
      * * *beam_time* (_microseconds_): the default
      *     @ref DetectorClocksBeamGateOpening "beam gate opening time", measured
      *     in the @ref DetectorClocksElectronicsTime "electronics time frame"
-     * 
+     *
      */
     DetectorClocksData(double const g4_ref_time,
                        double const trigger_offset_tpc,
@@ -571,8 +571,8 @@ namespace detinfo {
     {
       return (G4ToElecTime(g4time) - doTPCTime()) / fTPCClock.TickPeriod();
     }
-    
-    
+
+
     template <typename Stream>
     void debugReport(Stream& out) const
     {

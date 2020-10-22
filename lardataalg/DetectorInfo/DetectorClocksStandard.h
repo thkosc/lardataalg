@@ -206,7 +206,7 @@ namespace detinfo {
 
     /// Dumps the current configuration to screen.
     void debugReport() const;
-    
+
   private:
     /**
      * @brief Setter for trigger times.
