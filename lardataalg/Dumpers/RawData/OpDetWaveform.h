@@ -247,9 +247,9 @@ void dump::raw::OpDetWaveformDumper::dump
       << " samples: [" << Extrema.min() << ";" << Extrema.max() << "] (span: "
       << (Extrema.max() - Extrema.min());
     if (fPedestal != 0) {
-      out << ", from pedestal: ["
-        << (Extrema.min() - fPedestal) << ";"
-        << (Extrema.max() - fPedestal) << "]";
+      out << ", absolute: ["
+        << (Extrema.min() + fPedestal) << ";"
+        << (Extrema.max() + fPedestal) << "]";
     }
     out << ")";
   }
