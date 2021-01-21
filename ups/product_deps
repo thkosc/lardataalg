@@ -9,18 +9,16 @@ fcldir product_dir job
 product         version
 larcorealg	v09_00_02
 lardataobj	v09_00_06
-cetbuildtools	v7_15_01	-	only_for_build
+cetbuildtools	v7_17_01	-	only_for_build
 end_product_list
 
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
 # Make a table by adding columns before "notes".
 qualifier	larcorealg	lardataobj	notes
-c7:py2:debug	c7:py2:debug	c7:py2:debug
-c7:py2:prof	c7:py2:prof	c7:py2:prof
 c7:debug	c7:debug	c7:debug
 c7:prof		c7:prof		c7:prof
-e19:py2:debug	e19:py2:debug	e19:py2:debug
-e19:py2:prof	e19:py2:prof	e19:py2:prof
+e20:debug	e20:debug	e20:debug
+e20:prof	e20:prof	e20:prof
 e19:debug	e19:debug	e19:debug
 e19:prof	e19:prof	e19:prof
 end_qualifier_list
