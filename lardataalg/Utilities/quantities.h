@@ -824,7 +824,7 @@ namespace util::quantities {
 
       /// Convert this quantity into the specified one.
       template <typename OQ>
-      OQ convertInto() { return OQ(*this); }
+      constexpr OQ convertInto() const { return OQ(*this); }
 
 
       /**

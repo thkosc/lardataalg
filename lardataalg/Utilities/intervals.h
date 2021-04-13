@@ -413,7 +413,7 @@ namespace util::quantities {
 
       /// Convert this interval into the specified one.
       template <typename IV>
-      IV convertInto() { return IV(*this); }
+      constexpr IV convertInto() const { return IV(*this); }
 
       /**
        * @brief Returns a new interval initialized with the specified value.
@@ -977,7 +977,7 @@ namespace util::quantities {
 
       /// Convert this interval into the specified one.
       template <typename PT>
-      std::enable_if_t<is_point_v<PT>, PT> convertInto() { return PT(*this); }
+      constexpr std::enable_if_t<is_point_v<PT>, PT> convertInto() const { return PT(*this); }
 
       /**
        * @brief Returns a new point initialized with the specified value.
