@@ -32,6 +32,7 @@ find_ups_product( larcoreobj )
 find_ups_product( larcorealg )
 find_ups_product( lardataobj )
 find_ups_product( nusimdata )
+find_ups_product( cetlib_except )
 find_ups_root()
 
 # macros for artdaq_dictionary and simple_plugin
