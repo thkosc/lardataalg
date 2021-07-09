@@ -19,7 +19,6 @@
 // support libraries
 #include "fhiclcpp/types/Table.h"
 #include "fhiclcpp/types/Atom.h"
-#include "fhiclcpp/make_ParameterSet.h"
 #include "fhiclcpp/ParameterSet.h"
 
 // C/C++ standard libraries
@@ -49,7 +48,7 @@ fhicl::Table<Config> validateConfig(fhicl::ParameterSet const& pset) {
 template <typename Config>
 fhicl::Table<Config> validateConfig(std::string const& configStr) {
   fhicl::ParameterSet pset;
-  fhicl::make_ParameterSet(configStr, pset);
+  pset = fhicl::ParameterSet::make(configStr);
   return validateConfig<Config>(pset);
 } // validateConfig(Config)
 
