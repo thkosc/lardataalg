@@ -9,8 +9,7 @@
 
 // Boost libraries
 #define BOOST_TEST_MODULE ( MultipleChoiceSelection_test )
-#include <cetlib/quiet_unit_test.hpp> // BOOST_AUTO_TEST_CASE()
-#include <boost/test/test_tools.hpp> // BOOST_CHECK(), BOOST_CHECK_EQUAL()
+#include <boost/test/unit_test.hpp>
 
 // LArSoft libraries
 #include "lardataalg/Utilities/MultipleChoiceSelection.h"
@@ -32,7 +31,7 @@ void MultipleChoiceSelection_test() {
     { Color::gray, "gray", "grey" }
     };
   
-  BOOST_CHECK_EQUAL(options.size(), 2U);
+  BOOST_TEST(options.size() == 2U);
   
   BOOST_CHECK_THROW(
     options.addAlias(Color::white, "blanche"), // Color::white not yet added
@@ -41,18 +40,18 @@ void MultipleChoiceSelection_test() {
   
   auto const& opWhite0 = options.addOption(Color::white, "white");
   auto const& opWhite0again = options.addAlias(Color::white, "blanche");
-  BOOST_CHECK_EQUAL(&opWhite0again, &opWhite0);
-  BOOST_CHECK_EQUAL(options.size(), 3U);
+  BOOST_TEST(&opWhite0again == &opWhite0);
+  BOOST_TEST(options.size() == 3U);
   
   std::cout << "Options:\n" << options.optionListDump(" * ") << std::endl;
 
-  BOOST_CHECK( options.hasOption(Color::white));
-  BOOST_CHECK( options.hasOption(Color::gray));
-  BOOST_CHECK(!options.hasOption(Color::blue));
-  BOOST_CHECK( options.hasOption("white"));
-  BOOST_CHECK( options.hasOption("blanche"));
-  BOOST_CHECK( options.hasOption("wHite"));
-  BOOST_CHECK(!options.hasOption("blue"));
+  BOOST_TEST( options.hasOption(Color::white));
+  BOOST_TEST( options.hasOption(Color::gray));
+  BOOST_TEST(!options.hasOption(Color::blue));
+  BOOST_TEST( options.hasOption("white"));
+  BOOST_TEST( options.hasOption("blanche"));
+  BOOST_TEST( options.hasOption("wHite"));
+  BOOST_TEST(!options.hasOption("blue"));
   
   //
   // white
@@ -63,25 +62,25 @@ void MultipleChoiceSelection_test() {
   static_assert(std::is_same_v
     <std::decay_t<decltype(opWhite1)>, OptionSelector_t::Option_t>
     );
-  BOOST_CHECK(opWhite1 == Color::white);
-  BOOST_CHECK_EQUAL(opWhite1, "white");
-  BOOST_CHECK_EQUAL(opWhite1, opWhite0);
+  BOOST_TEST((opWhite1 == Color::white));
+  BOOST_TEST(opWhite1 == "white");
+  BOOST_TEST(opWhite1 == opWhite0);
   
   auto const opWhite2 = options.parse("blanche");
   static_assert(std::is_same_v
     <std::decay_t<decltype(opWhite2)>, OptionSelector_t::Option_t>
     );
-  BOOST_CHECK(opWhite2 == Color::white);
-  BOOST_CHECK_EQUAL(opWhite2, "white");
-  BOOST_CHECK_EQUAL(opWhite2, "blanche");
-  BOOST_CHECK_EQUAL(opWhite2, "Blanche");
-  BOOST_CHECK_EQUAL(opWhite2, opWhite0);
+  BOOST_TEST((opWhite2 == Color::white));
+  BOOST_TEST(opWhite2 == "white");
+  BOOST_TEST(opWhite2 == "blanche");
+  BOOST_TEST(opWhite2 == "Blanche");
+  BOOST_TEST(opWhite2 == opWhite0);
   
   auto const opWhite3 = options.get("white");
   static_assert(std::is_same_v
     <std::decay_t<decltype(opWhite1)>, OptionSelector_t::Option_t>
     );
-  BOOST_CHECK_EQUAL(opWhite3, "white");
+  BOOST_TEST(opWhite3 == "white");
   
   //
   // gray
@@ -90,19 +89,19 @@ void MultipleChoiceSelection_test() {
   static_assert(std::is_same_v
     <std::decay_t<decltype(opWhite1)>, OptionSelector_t::Option_t>
     );
-  BOOST_CHECK_EQUAL(opWhite0, "white");
+  BOOST_TEST(opWhite0 == "white");
   
   auto const opGray1 = options.parse("gray");
   static_assert(std::is_same_v
     <std::decay_t<decltype(opWhite1)>, OptionSelector_t::Option_t>
     );
-  BOOST_CHECK(opGray1 == Color::gray);
-  BOOST_CHECK_EQUAL(opGray1, "gray");
-  BOOST_CHECK_EQUAL(opGray1, "grey");
-  BOOST_CHECK_EQUAL(opGray1, opGray0);
+  BOOST_TEST((opGray1 == Color::gray));
+  BOOST_TEST(opGray1 == "gray");
+  BOOST_TEST(opGray1 == "grey");
+  BOOST_TEST(opGray1 == opGray0);
   
   Color color = opGray1;
-  BOOST_CHECK(color == Color::gray);
+  BOOST_TEST((color == Color::gray));
   
   //
   // blue

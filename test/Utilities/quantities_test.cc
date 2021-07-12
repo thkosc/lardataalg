@@ -9,8 +9,7 @@
 
 // Boost libraries
 #define BOOST_TEST_MODULE ( quantities_test )
-#include <cetlib/quiet_unit_test.hpp> // BOOST_AUTO_TEST_CASE()
-#include <boost/test/test_tools.hpp> // BOOST_CHECK(), BOOST_CHECK_EQUAL()
+#include <boost/test/unit_test.hpp>
 
 // LArSoft libraries
 #include "lardataalg/Utilities/quantities/spacetime.h"
@@ -121,22 +120,22 @@ void test_quantities_sign() {
 
   util::quantities::microseconds t { -4.0 };
 
-  BOOST_CHECK_EQUAL(t, -4_us); // just to be safe
+  BOOST_TEST((t == -4_us)); // just to be safe
   static_assert(
     std::is_same<decltype(+t), util::quantities::microseconds>(),
     "Positive sign converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(+t, -4_us);
+  BOOST_TEST((+t == -4_us));
   static_assert(
     std::is_same<decltype(-t), util::quantities::microseconds>(),
     "Negative sign converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(-t, 4_us);
+  BOOST_TEST((-t == 4_us));
   static_assert(
     std::is_same<decltype(t.abs()), util::quantities::microseconds>(),
     "Negative sign converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(t.abs(), 4.0_us);
+  BOOST_TEST((t.abs() == 4.0_us));
 
 } // test_quantities_sign()
 
@@ -151,21 +150,21 @@ void test_quantities_conversions() {
   //
   util::quantities::seconds t_s { 7.0 };
 
-  BOOST_CHECK_EQUAL(t_s.value(), 7.0);
+  BOOST_TEST((t_s.value() == 7.0));
 
   util::quantities::microseconds t_us(t_s);
   t_us = t_s;
-  BOOST_CHECK_EQUAL(t_us, 7'000'000.0_us);
+  BOOST_TEST((t_us == 7'000'000.0_us));
 
   util::quantities::seconds t(t_us);
-  BOOST_CHECK_EQUAL(t, 7.0_s);
+  BOOST_TEST((t == 7.0_s));
 
   static_assert(std::is_same<
     decltype(t.convertInto<util::quantities::microseconds>()),
     util::quantities::microseconds
     >());
-  BOOST_CHECK_EQUAL
-    (t.convertInto<util::quantities::microseconds>(), 7'000'000_us);
+  BOOST_TEST
+    ((t.convertInto<util::quantities::microseconds>() == 7'000'000_us));
 
 } // test_quantities_conversions()
 
@@ -176,137 +175,133 @@ void test_quantities_comparisons() {
   // comparisons between quantities
   //
   util::quantities::microseconds t_us { 7.0 };
-  BOOST_CHECK_EQUAL(t_us, t_us);
-  BOOST_CHECK( (t_us == t_us));
-  BOOST_CHECK(!(t_us != t_us));
-  BOOST_CHECK( (t_us >= t_us));
-  BOOST_CHECK( (t_us <= t_us));
-  BOOST_CHECK(!(t_us >  t_us));
-  BOOST_CHECK(!(t_us <  t_us));
+  BOOST_TEST( (t_us == t_us));
+  BOOST_TEST(!(t_us != t_us));
+  BOOST_TEST( (t_us >= t_us));
+  BOOST_TEST( (t_us <= t_us));
+  BOOST_TEST(!(t_us >  t_us));
+  BOOST_TEST(!(t_us <  t_us));
 
   util::quantities::nanoseconds  t_ns { 7.0 };
-  BOOST_CHECK_NE(t_us, t_ns);
-  BOOST_CHECK(!(t_us == t_ns));
-  BOOST_CHECK( (t_us != t_ns));
-  BOOST_CHECK( (t_us >= t_ns));
-  BOOST_CHECK(!(t_us <= t_ns));
-  BOOST_CHECK( (t_us >  t_ns));
-  BOOST_CHECK(!(t_us <  t_ns));
+  BOOST_TEST( (t_us != t_ns));
+  BOOST_TEST(!(t_us == t_ns));
+  BOOST_TEST( (t_us != t_ns));
+  BOOST_TEST( (t_us >= t_ns));
+  BOOST_TEST(!(t_us <= t_ns));
+  BOOST_TEST( (t_us >  t_ns));
+  BOOST_TEST(!(t_us <  t_ns));
 
   util::quantities::nanoseconds t2_ns { 7000.0 };
-  BOOST_CHECK_EQUAL(t_us, t2_ns);
-  BOOST_CHECK( (t_us == t2_ns));
-  BOOST_CHECK(!(t_us != t2_ns));
-  BOOST_CHECK( (t_us >= t2_ns));
-  BOOST_CHECK( (t_us <= t2_ns));
-  BOOST_CHECK(!(t_us >  t2_ns));
-  BOOST_CHECK(!(t_us <  t2_ns));
+  BOOST_TEST( (t_us == t2_ns));
+  BOOST_TEST(!(t_us != t2_ns));
+  BOOST_TEST( (t_us >= t2_ns));
+  BOOST_TEST( (t_us <= t2_ns));
+  BOOST_TEST(!(t_us >  t2_ns));
+  BOOST_TEST(!(t_us <  t2_ns));
 
-  BOOST_CHECK_NE(t_ns, t2_ns);
-  BOOST_CHECK(!(t_ns == t2_ns));
-  BOOST_CHECK( (t_ns != t2_ns));
-  BOOST_CHECK(!(t_ns >= t2_ns));
-  BOOST_CHECK( (t_ns <= t2_ns));
-  BOOST_CHECK(!(t_ns >  t2_ns));
-  BOOST_CHECK( (t_ns <  t2_ns));
+  BOOST_TEST( (t_ns != t2_ns));
+  BOOST_TEST(!(t_ns == t2_ns));
+  BOOST_TEST( (t_ns != t2_ns));
+  BOOST_TEST(!(t_ns >= t2_ns));
+  BOOST_TEST( (t_ns <= t2_ns));
+  BOOST_TEST(!(t_ns >  t2_ns));
+  BOOST_TEST( (t_ns <  t2_ns));
 
 #ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
   //
   // comparisons between quantity and base value number
   //
-  BOOST_CHECK_NE(t_us, 8.0);
-  BOOST_CHECK(!(t_us == 8.0));
-  BOOST_CHECK( (t_us != 8.0));
-  BOOST_CHECK(!(t_us >= 8.0));
-  BOOST_CHECK( (t_us <= 8.0));
-  BOOST_CHECK(!(t_us >  8.0));
-  BOOST_CHECK( (t_us <  8.0));
+  BOOST_TEST( (t_us != 8.0));
+  BOOST_TEST(!(t_us == 8.0));
+  BOOST_TEST( (t_us != 8.0));
+  BOOST_TEST(!(t_us >= 8.0));
+  BOOST_TEST( (t_us <= 8.0));
+  BOOST_TEST(!(t_us >  8.0));
+  BOOST_TEST( (t_us <  8.0));
 
-  BOOST_CHECK_EQUAL(t_us, 7.0);
-  BOOST_CHECK( (t_us == 7.0));
-  BOOST_CHECK(!(t_us != 7.0));
-  BOOST_CHECK( (t_us >= 7.0));
-  BOOST_CHECK( (t_us <= 7.0));
-  BOOST_CHECK(!(t_us >  7.0));
-  BOOST_CHECK(!(t_us <  7.0));
+  BOOST_TEST( (t_us == 7.0));
+  BOOST_TEST(!(t_us != 7.0));
+  BOOST_TEST( (t_us >= 7.0));
+  BOOST_TEST( (t_us <= 7.0));
+  BOOST_TEST(!(t_us >  7.0));
+  BOOST_TEST(!(t_us <  7.0));
 
-  BOOST_CHECK_NE(t_us, 6.0);
-  BOOST_CHECK(!(t_us == 6.0));
-  BOOST_CHECK( (t_us != 6.0));
-  BOOST_CHECK( (t_us >= 6.0));
-  BOOST_CHECK(!(t_us <= 6.0));
-  BOOST_CHECK( (t_us >  6.0));
-  BOOST_CHECK(!(t_us <  6.0));
+  BOOST_TEST( (t_us != 6.0));
+  BOOST_TEST(!(t_us == 6.0));
+  BOOST_TEST( (t_us != 6.0));
+  BOOST_TEST( (t_us >= 6.0));
+  BOOST_TEST(!(t_us <= 6.0));
+  BOOST_TEST( (t_us >  6.0));
+  BOOST_TEST(!(t_us <  6.0));
 
-  BOOST_CHECK(!(8.0 == t_us));
-  BOOST_CHECK( (8.0 != t_us));
-  BOOST_CHECK( (8.0 >= t_us));
-  BOOST_CHECK(!(8.0 <= t_us));
-  BOOST_CHECK( (8.0 >  t_us));
-  BOOST_CHECK(!(8.0 <  t_us));
+  BOOST_TEST(!(8.0 == t_us));
+  BOOST_TEST( (8.0 != t_us));
+  BOOST_TEST( (8.0 >= t_us));
+  BOOST_TEST(!(8.0 <= t_us));
+  BOOST_TEST( (8.0 >  t_us));
+  BOOST_TEST(!(8.0 <  t_us));
 
-  BOOST_CHECK( (7.0 == t_us));
-  BOOST_CHECK(!(7.0 != t_us));
-  BOOST_CHECK( (7.0 >= t_us));
-  BOOST_CHECK( (7.0 <= t_us));
-  BOOST_CHECK(!(7.0 >  t_us));
-  BOOST_CHECK(!(7.0 <  t_us));
+  BOOST_TEST( (7.0 == t_us));
+  BOOST_TEST(!(7.0 != t_us));
+  BOOST_TEST( (7.0 >= t_us));
+  BOOST_TEST( (7.0 <= t_us));
+  BOOST_TEST(!(7.0 >  t_us));
+  BOOST_TEST(!(7.0 <  t_us));
 
-  BOOST_CHECK(!(6.0 == t_us));
-  BOOST_CHECK( (6.0 != t_us));
-  BOOST_CHECK(!(6.0 >= t_us));
-  BOOST_CHECK( (6.0 <= t_us));
-  BOOST_CHECK(!(6.0 >  t_us));
-  BOOST_CHECK( (6.0 <  t_us));
+  BOOST_TEST(!(6.0 == t_us));
+  BOOST_TEST( (6.0 != t_us));
+  BOOST_TEST(!(6.0 >= t_us));
+  BOOST_TEST( (6.0 <= t_us));
+  BOOST_TEST(!(6.0 >  t_us));
+  BOOST_TEST( (6.0 <  t_us));
 
   //
   // comparisons between quantity and number
   //
-  BOOST_CHECK_NE(t_us, 8);
-  BOOST_CHECK(!(t_us == 8));
-  BOOST_CHECK( (t_us != 8));
-  BOOST_CHECK(!(t_us >= 8));
-  BOOST_CHECK( (t_us <= 8));
-  BOOST_CHECK(!(t_us >  8));
-  BOOST_CHECK( (t_us <  8));
+  BOOST_TEST( (t_us != 8));
+  BOOST_TEST(!(t_us == 8));
+  BOOST_TEST( (t_us != 8));
+  BOOST_TEST(!(t_us >= 8));
+  BOOST_TEST( (t_us <= 8));
+  BOOST_TEST(!(t_us >  8));
+  BOOST_TEST( (t_us <  8));
 
-  BOOST_CHECK_EQUAL(t_us, 7);
-  BOOST_CHECK( (t_us == 7));
-  BOOST_CHECK(!(t_us != 7));
-  BOOST_CHECK( (t_us >= 7));
-  BOOST_CHECK( (t_us <= 7));
-  BOOST_CHECK(!(t_us >  7));
-  BOOST_CHECK(!(t_us <  7));
+  BOOST_TEST( (t_us == 7));
+  BOOST_TEST(!(t_us != 7));
+  BOOST_TEST( (t_us >= 7));
+  BOOST_TEST( (t_us <= 7));
+  BOOST_TEST(!(t_us >  7));
+  BOOST_TEST(!(t_us <  7));
 
-  BOOST_CHECK_NE(t_us, 6);
-  BOOST_CHECK(!(t_us == 6));
-  BOOST_CHECK( (t_us != 6));
-  BOOST_CHECK( (t_us >= 6));
-  BOOST_CHECK(!(t_us <= 6));
-  BOOST_CHECK( (t_us >  6));
-  BOOST_CHECK(!(t_us <  6));
+  BOOST_TEST( (t_us != 6));
+  BOOST_TEST(!(t_us == 6));
+  BOOST_TEST( (t_us != 6));
+  BOOST_TEST( (t_us >= 6));
+  BOOST_TEST(!(t_us <= 6));
+  BOOST_TEST( (t_us >  6));
+  BOOST_TEST(!(t_us <  6));
 
-  BOOST_CHECK(!(8 == t_us));
-  BOOST_CHECK( (8 != t_us));
-  BOOST_CHECK( (8 >= t_us));
-  BOOST_CHECK(!(8 <= t_us));
-  BOOST_CHECK( (8 >  t_us));
-  BOOST_CHECK(!(8 <  t_us));
+  BOOST_TEST(!(8 == t_us));
+  BOOST_TEST( (8 != t_us));
+  BOOST_TEST( (8 >= t_us));
+  BOOST_TEST(!(8 <= t_us));
+  BOOST_TEST( (8 >  t_us));
+  BOOST_TEST(!(8 <  t_us));
 
-  BOOST_CHECK( (7 == t_us));
-  BOOST_CHECK(!(7 != t_us));
-  BOOST_CHECK( (7 >= t_us));
-  BOOST_CHECK( (7 <= t_us));
-  BOOST_CHECK(!(7 >  t_us));
-  BOOST_CHECK(!(7 <  t_us));
+  BOOST_TEST( (7 == t_us));
+  BOOST_TEST(!(7 != t_us));
+  BOOST_TEST( (7 >= t_us));
+  BOOST_TEST( (7 <= t_us));
+  BOOST_TEST(!(7 >  t_us));
+  BOOST_TEST(!(7 <  t_us));
 
-  BOOST_CHECK(!(6 == t_us));
-  BOOST_CHECK( (6 != t_us));
-  BOOST_CHECK(!(6 >= t_us));
-  BOOST_CHECK( (6 <= t_us));
-  BOOST_CHECK(!(6 >  t_us));
-  BOOST_CHECK( (6 <  t_us));
+  BOOST_TEST(!(6 == t_us));
+  BOOST_TEST( (6 != t_us));
+  BOOST_TEST(!(6 >= t_us));
+  BOOST_TEST( (6 <= t_us));
+  BOOST_TEST(!(6 >  t_us));
+  BOOST_TEST( (6 <  t_us));
 
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
 
@@ -331,7 +326,7 @@ void test_quantities_multiply_scalar() {
       <std::decay_t<decltype(twice_t)>, util::quantities::seconds>(),
     "Multiplication by a scalar converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(twice_t, 6.0_s);
+  BOOST_TEST((twice_t == 6.0_s));
 
   auto const t_twice = t * 2.0;
   static_assert(
@@ -339,25 +334,25 @@ void test_quantities_multiply_scalar() {
       <std::decay_t<decltype(t_twice)>, util::quantities::seconds>(),
     "Multiplication by a scalar converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(twice_t, 6.0_s);
+  BOOST_TEST((twice_t == 6.0_s));
 
   static_assert(
     std::is_same<decltype(twice_t / 2.0), util::quantities::seconds>(),
     "Division by a scalar converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(twice_t / 2.0, 3.0_s);
+  BOOST_TEST((twice_t / 2.0 == 3.0_s));
 
   static_assert(
     std::is_same<decltype(twice_t / t), double>(),
     "Division by a scalar is not the base type!"
     );
-  BOOST_CHECK_EQUAL(twice_t / t, 2.0);
+  BOOST_TEST((twice_t / t == 2.0));
 
   static_assert(
     std::is_same<decltype(t / 300_us), double>(),
     "Division by a scalar is not the base type!"
     );
-  BOOST_CHECK_EQUAL(t / 300_us, 10'000.0);
+  BOOST_TEST((t / 300_us == 10'000.0));
 
 } // test_quantities_multiply_scalar()
 
@@ -379,13 +374,13 @@ void test_quantities_addition() {
     std::is_same<std::decay_t<decltype(45_s + 5_s)>, util::quantities::seconds>(),
     "Addition converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(45_s + 5_s, 50_s);
+  BOOST_TEST((45_s + 5_s == 50_s));
 
   static_assert(
     std::is_same<decltype(5_s - 55_s), util::quantities::seconds>(),
     "Subtraction converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(5_s - 55_s, -50_s);
+  BOOST_TEST((5_s - 55_s == -50_s));
 
 
   constexpr util::quantities::seconds t = 45_s;
@@ -394,15 +389,15 @@ void test_quantities_addition() {
       <std::decay_t<decltype(t.plus(5000_ms))>, util::quantities::seconds>(),
     "Addition converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(t.plus(5000_ms), 50_s);
-  BOOST_CHECK_EQUAL(t, 45_s);
+  BOOST_TEST((t.plus(5000_ms) == 50_s));
+  BOOST_TEST((t == 45_s));
 
   static_assert(
     std::is_same<decltype(t.minus(55000_ms)), util::quantities::seconds>(),
     "Subtraction converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(t.minus(55000_ms), -10_s);
-  BOOST_CHECK_EQUAL(t, 45_s);
+  BOOST_TEST((t.minus(55000_ms) == -10_s));
+  BOOST_TEST((t == 45_s));
 
 
 } // test_quantities_addition()
@@ -423,28 +418,28 @@ void test_quantities_increment() {
     std::is_same<decltype(t += 0.05_s), util::quantities::seconds&>(),
     "Increment converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(t, 0.1_s);
+  BOOST_TEST((t == 0.1_s));
 
   t -= 0.05_s;
   static_assert(
     std::is_same<decltype(t -= 0.05_s), util::quantities::seconds&>(),
     "Decrement converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(t, 0.05_s);
+  BOOST_TEST((t == 0.05_s));
 
   t += 50_ms;
   static_assert(
     std::is_same<decltype(t += 50_ms), util::quantities::seconds&>(),
     "Increment converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(t, 0.1_s);
+  BOOST_TEST((t == 0.1_s));
 
   t -= 50_ms;
   static_assert(
     std::is_same<decltype(t -= 50_ms), util::quantities::seconds&>(),
     "Decrement converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(t, 0.05_s);
+  BOOST_TEST((t == 0.05_s));
 
 } // test_quantities_multiply_scalar()
 
@@ -463,14 +458,14 @@ void test_quantities_scale() {
     std::is_same<decltype(t *= 2.0), util::quantities::microseconds&>(),
     "Scaling converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(t, 22.0_us);
+  BOOST_TEST((t == 22.0_us));
 
   t /= 2.0;
   static_assert(
     std::is_same<decltype(t /= 2.0), util::quantities::microseconds&>(),
     "Scaling (division) converts to a different type!"
     );
-  BOOST_CHECK_EQUAL(t, 11.0_us);
+  BOOST_TEST((t == 11.0_us));
 
 } // test_quantities_scale()
 
@@ -488,8 +483,8 @@ void test_quantities_literals() {
 
   util::quantities::microsecond t3;
   t3 = 7.0_s;
-  BOOST_CHECK_EQUAL(t3.value(), 7000000.0);
-  BOOST_CHECK_EQUAL(t3, 7000000_us);
+  BOOST_TEST((t3.value() == 7000000.0));
+  BOOST_TEST((t3 == 7000000_us));
 
   static_assert(7000000_us == 7_s, "Literal conversion failed.");
 
@@ -512,15 +507,15 @@ void test_quantities() {
   //
 //  t1 = 4.0; // error!
   t1 = util::quantities::microseconds { 4.0 };
-  BOOST_CHECK_EQUAL(util::to_string(t1.unit()), "us");
-  BOOST_CHECK_EQUAL(util::to_string(t1), "4.000000 us");
-  BOOST_CHECK_EQUAL(t1.value(), 4.0);
+  BOOST_TEST((util::to_string(t1.unit()) == "us"));
+  BOOST_TEST((util::to_string(t1) == "4.000000 us"));
+  BOOST_TEST((t1.value() == 4.0));
 
   // ---------------------------------------------------------------------------
   // value constructor
   //
   util::quantities::microseconds t2 { 7.0 };
-  BOOST_CHECK_EQUAL(t2, 7.0_us);
+  BOOST_TEST((t2 == 7.0_us));
 
 
   // ---------------------------------------------------------------------------

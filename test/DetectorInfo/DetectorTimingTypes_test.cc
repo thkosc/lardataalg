@@ -7,8 +7,7 @@
 
 // Boost libraries
 #define BOOST_TEST_MODULE ( DetectorTimingTypes_test )
-#include <cetlib/quiet_unit_test.hpp> // BOOST_AUTO_TEST_CASE()
-#include <boost/test/test_tools.hpp> // BOOST_CHECK(), BOOST_CHECK_EQUAL()
+#include <boost/test/unit_test.hpp>
 
 // LArSoft libraries
 #include "lardataalg/DetectorInfo/DetectorTimingTypes.h"
@@ -130,17 +129,17 @@ void test_time_operations() {
   time_interval_t dt { 500_ns };
   
   static_assert(util::is_same_decay_v<decltype(p + dt), time_point_t>);
-  BOOST_CHECK_EQUAL(p + dt    , 10.5_us);
+  BOOST_TEST((p + dt == 10.5_us));
   static_assert(util::is_same_decay_v<decltype(p + 500_ns), time_point_t>);
-  BOOST_CHECK_EQUAL(p + 500_ns, 10.5_us);
+  BOOST_TEST((p + 500_ns == 10.5_us));
   
   static_assert(util::is_same_decay_v<decltype(p - dt), time_point_t>);
-  BOOST_CHECK_EQUAL(p - dt    ,  9.5_us);
+  BOOST_TEST((p - dt == 9.5_us));
   static_assert(util::is_same_decay_v<decltype(p - 500_ns), time_point_t>);
-  BOOST_CHECK_EQUAL(p - 500_ns,  9.5_us);
+  BOOST_TEST((p - 500_ns ==  9.5_us));
   
   static_assert(util::is_same_decay_v<decltype(p - p2), time_interval_t>);
-  BOOST_CHECK_EQUAL(p - p2    ,  5.0_us);
+  BOOST_TEST((p - p2 == 5.0_us));
   
   
 } // test_time_operations()
@@ -158,8 +157,6 @@ void test_integral_tick_operations() {
   
   using tick_t            = typename traits_t::tick_t;
   using tick_interval_t   = typename traits_t::tick_interval_t;
-//   using tick_d_t          = typename traits_t::tick_d_t;
-//   using tick_interval_d_t = typename traits_t::tick_interval_d_t;
   
   //
   // ticks
@@ -170,17 +167,17 @@ void test_integral_tick_operations() {
   tick_interval_t dtick { 30_tick };
   
   static_assert(util::is_same_decay_v<decltype(tick + dtick), tick_t>);
-  BOOST_CHECK_EQUAL(tick + dtick    , 130.0_tick);
+  BOOST_TEST((tick + dtick == 130.0_tick));
   static_assert(util::is_same_decay_v<decltype(tick + 30.0_tick), tick_t>);
-  BOOST_CHECK_EQUAL(tick + 30.0_tick, 130.0_tick);
+  BOOST_TEST((tick + 30.0_tick == 130.0_tick));
   
   static_assert(util::is_same_decay_v<decltype(tick - dtick), tick_t>);
-  BOOST_CHECK_EQUAL(tick - dtick    , 70.0_tick);
+  BOOST_TEST((tick - dtick == 70.0_tick));
   static_assert(util::is_same_decay_v<decltype(tick - 30.0_tick), tick_t>);
-  BOOST_CHECK_EQUAL(tick - 30.0_tick, 70.0_tick);
+  BOOST_TEST((tick - 30.0_tick == 70.0_tick));
   
   static_assert(util::is_same_decay_v<decltype(tick - tick2), tick_interval_t>);
-  BOOST_CHECK_EQUAL(tick - tick2    , 50_tick);
+  BOOST_TEST((tick - tick2 == 50_tick));
   
   
 } // test_integral_tick_operations()
@@ -196,8 +193,6 @@ void test_real_tick_operations() {
   
   BOOST_TEST_MESSAGE("Testing category: " << traits_t::name());
   
-//   using tick_t            = typename traits_t::tick_t;
-//   using tick_interval_t   = typename traits_t::tick_interval_t;
   using tick_d_t          = typename traits_t::tick_d_t;
   using tick_interval_d_t = typename traits_t::tick_interval_d_t;
   
@@ -210,18 +205,18 @@ void test_real_tick_operations() {
   tick_interval_d_t dtick { 30_tickd };
   
   static_assert(util::is_same_decay_v<decltype(tick + dtick), tick_d_t>);
-  BOOST_CHECK_EQUAL(tick + dtick    , 130.5_tickd);
+  BOOST_TEST((tick + dtick == 130.5_tickd));
   static_assert(util::is_same_decay_v<decltype(tick + 30.0_tickd), tick_d_t>);
-  BOOST_CHECK_EQUAL(tick + 30.0_tickd, 130.5_tickd);
+  BOOST_TEST((tick + 30.0_tickd == 130.5_tickd));
   
   static_assert(util::is_same_decay_v<decltype(tick - dtick), tick_d_t>);
-  BOOST_CHECK_EQUAL(tick - dtick    , 70.5_tickd);
+  BOOST_TEST((tick - dtick == 70.5_tickd));
   static_assert(util::is_same_decay_v<decltype(tick - 30.0_tickd), tick_d_t>);
-  BOOST_CHECK_EQUAL(tick - 30.0_tickd, 70.5_tickd);
+  BOOST_TEST((tick - 30.0_tickd == 70.5_tickd));
   
   static_assert
     (util::is_same_decay_v<decltype(tick - tick2), tick_interval_d_t>);
-  BOOST_CHECK_EQUAL(tick - tick2    , 50.5_tickd);
+  BOOST_TEST((tick - tick2 == 50.5_tickd));
   
   
   /// Type of a point in time, measured in ticks.
@@ -234,7 +229,7 @@ void test_real_tick_operations() {
   ClockTicks_t mydelay { 5_tick };
   
   ClockTick_t delayedTick = mytick + mydelay;
-  BOOST_CHECK_EQUAL(delayedTick, 15_tick);
+  BOOST_TEST((delayedTick == 15_tick));
   
   
 } // test_real_tick_operations()
