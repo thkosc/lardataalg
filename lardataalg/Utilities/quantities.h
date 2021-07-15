@@ -910,6 +910,7 @@ namespace util::quantities {
     // -- END Arithmetic operations --------------------------------------------
 
 
+    // -------------------------------------------------------------------------
     /**
      * @brief Alias for a quantity based on a scaled unit.
      * @tparam Unit type of unit (unscaled)

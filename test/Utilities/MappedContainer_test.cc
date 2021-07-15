@@ -114,11 +114,11 @@ void copyTest() {
   util::MappedContainer const mappedData1
     (data, mapping1, expectedMappedData1.size(), defaultValue);
 
-  BOOST_CHECK_EQUAL(mappedData1.size(), expectedMappedData1.size());
-  BOOST_CHECK_EQUAL(mappedData1.minimal_size(), expectedMappedData1.size());
+  BOOST_TEST(mappedData1.size() == expectedMappedData1.size());
+  BOOST_TEST(mappedData1.minimal_size() == expectedMappedData1.size());
 
-  BOOST_CHECK_EQUAL(mappedData1.front(), expectedMappedData1.front());
-  BOOST_CHECK_EQUAL(mappedData1.back(), expectedMappedData1.back());
+  BOOST_TEST(mappedData1.front() == expectedMappedData1.front());
+  BOOST_TEST(mappedData1.back() == expectedMappedData1.back());
 
   std::size_t i = 0;
   auto const beginIterator = mappedData1.begin();
@@ -132,50 +132,50 @@ void copyTest() {
       ? mappedData1.defaultValue()
       : data[mapping1[i]]
       ;
-    BOOST_CHECK_EQUAL(expectedRef, expectedValue); // test the test
+    BOOST_TEST(expectedRef == expectedValue); // test the test
 
-    BOOST_CHECK_EQUAL(mappedValue, expectedMappedData1[i]);
-    BOOST_CHECK_EQUAL(mappedData1[i], expectedMappedData1[i]);
-    BOOST_CHECK_EQUAL(mappedData1.at(i), expectedMappedData1[i]);
-    BOOST_CHECK_EQUAL(beginIterator[i], expectedMappedData1[i]);
-    BOOST_CHECK_EQUAL(*(beginIterator + i), expectedMappedData1[i]);
-    BOOST_CHECK_EQUAL(*mappedIterator, expectedMappedData1[i]);
+    BOOST_TEST(mappedValue == expectedMappedData1[i]);
+    BOOST_TEST(mappedData1[i] == expectedMappedData1[i]);
+    BOOST_TEST(mappedData1.at(i) == expectedMappedData1[i]);
+    BOOST_TEST(beginIterator[i] == expectedMappedData1[i]);
+    BOOST_TEST(*(beginIterator + i) == expectedMappedData1[i]);
+    BOOST_TEST(*mappedIterator == expectedMappedData1[i]);
     if (i >= 1) {
-      BOOST_CHECK_EQUAL(secondIterator[i-1], expectedMappedData1[i]);
-      BOOST_CHECK_EQUAL(*(secondIterator + i - 1), expectedMappedData1[i]);
-      BOOST_CHECK( (mappedIterator != beginIterator));
-      BOOST_CHECK(!(mappedIterator == beginIterator));
-      BOOST_CHECK( (mappedIterator >  beginIterator));
-      BOOST_CHECK( (mappedIterator >= beginIterator));
-      BOOST_CHECK(!(mappedIterator <  beginIterator));
-      BOOST_CHECK(!(mappedIterator <= beginIterator));
-      BOOST_CHECK( (beginIterator != mappedIterator));
-      BOOST_CHECK(!(beginIterator == mappedIterator));
-      BOOST_CHECK(!(beginIterator >  mappedIterator));
-      BOOST_CHECK(!(beginIterator >= mappedIterator));
-      BOOST_CHECK( (beginIterator <  mappedIterator));
-      BOOST_CHECK( (beginIterator <= mappedIterator));
+      BOOST_TEST(secondIterator[i-1] == expectedMappedData1[i]);
+      BOOST_TEST(*(secondIterator + i - 1) == expectedMappedData1[i]);
+      BOOST_TEST( (mappedIterator != beginIterator));
+      BOOST_TEST(!(mappedIterator == beginIterator));
+      BOOST_TEST( (mappedIterator >  beginIterator));
+      BOOST_TEST( (mappedIterator >= beginIterator));
+      BOOST_TEST(!(mappedIterator <  beginIterator));
+      BOOST_TEST(!(mappedIterator <= beginIterator));
+      BOOST_TEST( (beginIterator != mappedIterator));
+      BOOST_TEST(!(beginIterator == mappedIterator));
+      BOOST_TEST(!(beginIterator >  mappedIterator));
+      BOOST_TEST(!(beginIterator >= mappedIterator));
+      BOOST_TEST( (beginIterator <  mappedIterator));
+      BOOST_TEST( (beginIterator <= mappedIterator));
     }
     else {
-      BOOST_CHECK(!(mappedIterator != beginIterator));
-      BOOST_CHECK( (mappedIterator == beginIterator));
-      BOOST_CHECK(!(mappedIterator >  beginIterator));
-      BOOST_CHECK( (mappedIterator >= beginIterator));
-      BOOST_CHECK(!(mappedIterator <  beginIterator));
-      BOOST_CHECK( (mappedIterator <= beginIterator));
-      BOOST_CHECK(!(beginIterator != mappedIterator));
-      BOOST_CHECK( (beginIterator == mappedIterator));
-      BOOST_CHECK(!(beginIterator >  mappedIterator));
-      BOOST_CHECK( (beginIterator >= mappedIterator));
-      BOOST_CHECK(!(beginIterator <  mappedIterator));
-      BOOST_CHECK( (beginIterator <= mappedIterator));
+      BOOST_TEST(!(mappedIterator != beginIterator));
+      BOOST_TEST( (mappedIterator == beginIterator));
+      BOOST_TEST(!(mappedIterator >  beginIterator));
+      BOOST_TEST( (mappedIterator >= beginIterator));
+      BOOST_TEST(!(mappedIterator <  beginIterator));
+      BOOST_TEST( (mappedIterator <= beginIterator));
+      BOOST_TEST(!(beginIterator != mappedIterator));
+      BOOST_TEST( (beginIterator == mappedIterator));
+      BOOST_TEST(!(beginIterator >  mappedIterator));
+      BOOST_TEST( (beginIterator >= mappedIterator));
+      BOOST_TEST(!(beginIterator <  mappedIterator));
+      BOOST_TEST( (beginIterator <= mappedIterator));
     }
 
-    BOOST_CHECK_NE(&(mappedData1[i]), &(expectedMappedData1[i]));
+    BOOST_TEST(&mappedData1[i] != &expectedMappedData1[i]);
     ++i;
     ++mappedIterator;
   } // for
-  BOOST_CHECK_EQUAL(i, expectedMappedData1.size());
+  BOOST_TEST(i == expectedMappedData1.size());
 
   // let's check a bit of overflow
   while (i < expectedMappedData1.size() + 3U) {
@@ -229,11 +229,11 @@ void referenceTest() {
       >
     );
 
-  BOOST_CHECK_EQUAL(mappedData1.size(), expectedMappedData1.size());
-  BOOST_CHECK_EQUAL(mappedData1.minimal_size(), expectedMappedData1.size());
+  BOOST_TEST(mappedData1.size() == expectedMappedData1.size());
+  BOOST_TEST(mappedData1.minimal_size() == expectedMappedData1.size());
 
-  BOOST_CHECK_EQUAL(mappedData1.front(), expectedMappedData1.front());
-  BOOST_CHECK_EQUAL(mappedData1.back(), expectedMappedData1.back());
+  BOOST_TEST(mappedData1.front() == expectedMappedData1.front());
+  BOOST_TEST(mappedData1.back() == expectedMappedData1.back());
 
   std::size_t i = 0;
   auto const beginIterator = mappedData1.begin();
@@ -248,64 +248,64 @@ void referenceTest() {
       ? mappedData1.defaultValue()
       : data[expectedMappedIndex]
       ;
-    BOOST_CHECK_EQUAL(expectedRef, expectedValue); // test the test
+    BOOST_TEST(expectedRef == expectedValue); // test the test
 
     decltype(auto) mappedDataRef = mappedData1[i];
     static_assert(std::is_reference_v<decltype(mappedDataRef)>);
 
-    BOOST_CHECK_EQUAL(mappedData1.map_index(i), expectedMappedIndex);
-    BOOST_CHECK_EQUAL(mappedValue, expectedValue);
-    BOOST_CHECK_EQUAL(mappedDataRef, expectedValue);
-    BOOST_CHECK_EQUAL(mappedData1.at(i), expectedValue);
-    BOOST_CHECK_EQUAL(beginIterator[i], expectedValue);
-    BOOST_CHECK_EQUAL(*(beginIterator + i), expectedValue);
-    BOOST_CHECK_EQUAL(*mappedIterator, expectedValue);
+    BOOST_TEST(mappedData1.map_index(i) == expectedMappedIndex);
+    BOOST_TEST(mappedValue == expectedValue);
+    BOOST_TEST(mappedDataRef == expectedValue);
+    BOOST_TEST(mappedData1.at(i) == expectedValue);
+    BOOST_TEST(beginIterator[i] == expectedValue);
+    BOOST_TEST(*(beginIterator + i) == expectedValue);
+    BOOST_TEST(*mappedIterator == expectedValue);
     if (i >= 1) {
-      BOOST_CHECK_EQUAL(secondIterator[i-1], expectedValue);
-      BOOST_CHECK_EQUAL(*(secondIterator + i - 1), expectedValue);
-      BOOST_CHECK( (mappedIterator != beginIterator));
-      BOOST_CHECK(!(mappedIterator == beginIterator));
-      BOOST_CHECK( (mappedIterator >  beginIterator));
-      BOOST_CHECK( (mappedIterator >= beginIterator));
-      BOOST_CHECK(!(mappedIterator <  beginIterator));
-      BOOST_CHECK(!(mappedIterator <= beginIterator));
-      BOOST_CHECK( (beginIterator != mappedIterator));
-      BOOST_CHECK(!(beginIterator == mappedIterator));
-      BOOST_CHECK(!(beginIterator >  mappedIterator));
-      BOOST_CHECK(!(beginIterator >= mappedIterator));
-      BOOST_CHECK( (beginIterator <  mappedIterator));
-      BOOST_CHECK( (beginIterator <= mappedIterator));
+      BOOST_TEST(secondIterator[i-1] == expectedValue);
+      BOOST_TEST(*(secondIterator + i - 1) == expectedValue);
+      BOOST_TEST( (mappedIterator != beginIterator));
+      BOOST_TEST(!(mappedIterator == beginIterator));
+      BOOST_TEST( (mappedIterator >  beginIterator));
+      BOOST_TEST( (mappedIterator >= beginIterator));
+      BOOST_TEST(!(mappedIterator <  beginIterator));
+      BOOST_TEST(!(mappedIterator <= beginIterator));
+      BOOST_TEST( (beginIterator != mappedIterator));
+      BOOST_TEST(!(beginIterator == mappedIterator));
+      BOOST_TEST(!(beginIterator >  mappedIterator));
+      BOOST_TEST(!(beginIterator >= mappedIterator));
+      BOOST_TEST( (beginIterator <  mappedIterator));
+      BOOST_TEST( (beginIterator <= mappedIterator));
     }
     else {
-      BOOST_CHECK(!(mappedIterator != beginIterator));
-      BOOST_CHECK( (mappedIterator == beginIterator));
-      BOOST_CHECK(!(mappedIterator >  beginIterator));
-      BOOST_CHECK( (mappedIterator >= beginIterator));
-      BOOST_CHECK(!(mappedIterator <  beginIterator));
-      BOOST_CHECK( (mappedIterator <= beginIterator));
-      BOOST_CHECK(!(beginIterator != mappedIterator));
-      BOOST_CHECK( (beginIterator == mappedIterator));
-      BOOST_CHECK(!(beginIterator >  mappedIterator));
-      BOOST_CHECK( (beginIterator >= mappedIterator));
-      BOOST_CHECK(!(beginIterator <  mappedIterator));
-      BOOST_CHECK( (beginIterator <= mappedIterator));
+      BOOST_TEST(!(mappedIterator != beginIterator));
+      BOOST_TEST( (mappedIterator == beginIterator));
+      BOOST_TEST(!(mappedIterator >  beginIterator));
+      BOOST_TEST( (mappedIterator >= beginIterator));
+      BOOST_TEST(!(mappedIterator <  beginIterator));
+      BOOST_TEST( (mappedIterator <= beginIterator));
+      BOOST_TEST(!(beginIterator != mappedIterator));
+      BOOST_TEST( (beginIterator == mappedIterator));
+      BOOST_TEST(!(beginIterator >  mappedIterator));
+      BOOST_TEST( (beginIterator >= mappedIterator));
+      BOOST_TEST(!(beginIterator <  mappedIterator));
+      BOOST_TEST( (beginIterator <= mappedIterator));
     }
 
     // since `data` is captured via reference, the returned elements should be
     // exactly the same object (same physical memory location) as in the
     // original collection:
-    BOOST_CHECK_EQUAL(&mappedDataRef, &expectedRef);
+    BOOST_TEST(&mappedDataRef == &expectedRef);
 
     // mapping by reference should be equivalent to mapping by value;
     // because of out test choice, the default values are different though
     if (mapping1[i] != InvalidIndex)
-      BOOST_CHECK_EQUAL(mappedData2[i], mappedData1[i]);
-    BOOST_CHECK_EQUAL(&mappedData2.map_index(i), &expectedMappedIndex);
+      BOOST_TEST(mappedData2[i] == mappedData1[i]);
+    BOOST_TEST(&mappedData2.map_index(i) == &expectedMappedIndex);
 
     ++i;
     ++mappedIterator;
   } // for
-  BOOST_CHECK_EQUAL(i, expectedMappedData1.size());
+  BOOST_TEST(i == expectedMappedData1.size());
 
   // let's check a bit of overflow
   while (i < expectedMappedData1.size() + 3U) {
@@ -350,8 +350,8 @@ void autosizeTest() {
 
   util::MappedContainer const mappedData(std::ref(data), mapping);
 
-  BOOST_CHECK_EQUAL(mappedData.size(), mapping.size());
-  BOOST_CHECK_EQUAL(mappedData.defaultValue(), double{});
+  BOOST_TEST(mappedData.size() == mapping.size());
+  BOOST_TEST(mappedData.defaultValue() == double{});
 
 } // autosizeTest()
 

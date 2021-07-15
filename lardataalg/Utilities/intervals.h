@@ -481,6 +481,10 @@ namespace util::quantities {
       (Quantity<Args...> const a, Interval<Q, Cat> const b) noexcept
       { return b < a; }
 
+    /// @}
+    // -- END Comparison operations --------------------------------------------
+
+
     // -- BEGIN Arithmetic operations ------------------------------------------
     /**
      * @name Arithmetic operations on `Quantity`
@@ -905,6 +909,8 @@ namespace util::quantities {
       (Quantity<Args...> const a, Point<Q, Cat, IV> const b) noexcept
       { return b < a; }
 
+    /// @}
+    // -- END Comparison operations --------------------------------------------
 
     // -- BEGIN Arithmetic operations ------------------------------------------
     /**

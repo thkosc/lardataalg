@@ -33,11 +33,12 @@
  */
 #define BOOST_TEST_MODULE ( StatCollector_test )
 #include <boost/test/unit_test.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp> // BOOST_CHECK_CLOSE()
 
 // LArSoft libraries
 #include "lardataalg/Utilities/StatCollector.h"
 
+
+using boost::test_tools::tolerance;
 
 //------------------------------------------------------------------------------
 //--- Test code
@@ -55,18 +56,18 @@ void CheckStats(
 
   using Weight_t = W;
 
-  BOOST_CHECK_EQUAL(stats.N(),       n);
+  BOOST_TEST(stats.N() == n);
   if (n == 0) {
     BOOST_CHECK_THROW(stats.AverageWeight(), std::range_error);
   }
   else {
     const Weight_t average = weights / n;
-    BOOST_CHECK_CLOSE(double(stats.AverageWeight()), double(average), 0.1);
+    BOOST_TEST(double(stats.AverageWeight()) == double(average), 0.1% tolerance());
   }
   if (weights == 0.) {
-    BOOST_CHECK_SMALL(double(stats.Weights()), 0.01);
-    BOOST_CHECK_SMALL(double(stats.Sum()),     0.01);
-    BOOST_CHECK_SMALL(double(stats.SumSq()),   0.01);
+    BOOST_TEST(double(stats.Weights()) == 0, 0.01% tolerance());
+    BOOST_TEST(double(stats.Sum()) == 0,     0.01% tolerance());
+    BOOST_TEST(double(stats.SumSq()) == 0,   0.01% tolerance());
     BOOST_CHECK_THROW(stats.Average(),  std::range_error);
     BOOST_CHECK_THROW(stats.Variance(), std::range_error);
     BOOST_CHECK_THROW(stats.RMS(),      std::range_error);
@@ -74,12 +75,12 @@ void CheckStats(
   else {
     const Weight_t average = sum / weights;
     // check at precision 0.01% or 0.1%
-    BOOST_CHECK_CLOSE(double(stats.Weights()),  double(weights), 0.01);
-    BOOST_CHECK_CLOSE(double(stats.Sum()),      double(sum),     0.01);
-    BOOST_CHECK_CLOSE(double(stats.SumSq()),    double(sumsq),   0.01);
-    BOOST_CHECK_CLOSE(double(stats.Average()),  double(average), 0.1);
-    BOOST_CHECK_CLOSE(double(stats.Variance()), double(rms*rms), 0.1);
-    BOOST_CHECK_CLOSE(double(stats.RMS()),      double(rms),     0.1);
+    BOOST_TEST(double(stats.Weights()) ==  double(weights), 0.01% tolerance());
+    BOOST_TEST(double(stats.Sum()) ==      double(sum),     0.01% tolerance());
+    BOOST_TEST(double(stats.SumSq()) ==    double(sumsq),   0.01% tolerance());
+    BOOST_TEST(double(stats.Average()) ==  double(average), 0.1% tolerance());
+    BOOST_TEST(double(stats.Variance()) == double(rms*rms), 0.1% tolerance());
+    BOOST_TEST(double(stats.RMS()) ==      double(rms),     0.1% tolerance());
   }
 } // CheckStats<>(StatCollector)
 
@@ -101,28 +102,28 @@ void CheckStats(
 
   using Weight_t = W;
 
-  BOOST_CHECK_EQUAL(stats.N(),       n);
+  BOOST_TEST(stats.N() ==       n);
   if (n == 0) {
     BOOST_CHECK_THROW(stats.AverageWeight(), std::range_error);
   }
   else {
     const Weight_t average = weights / n;
-    BOOST_CHECK_CLOSE(double(stats.AverageWeight()), double(average), 0.1);
+    BOOST_TEST(double(stats.AverageWeight()) == double(average), 0.1% tolerance());
   }
 
   if (weights == 0.) {
-    BOOST_CHECK_SMALL(double(stats.Weights()),  0.01);
-    BOOST_CHECK_SMALL(double(stats.SumX()),     0.01);
-    BOOST_CHECK_SMALL(double(stats.SumSqX()),   0.01);
+    BOOST_TEST(double(stats.Weights()) == 0,  0.01% tolerance());
+    BOOST_TEST(double(stats.SumX()) == 0,     0.01% tolerance());
+    BOOST_TEST(double(stats.SumSqX()) == 0,   0.01% tolerance());
     BOOST_CHECK_THROW(stats.AverageX(),          std::range_error);
     BOOST_CHECK_THROW(stats.VarianceX(),         std::range_error);
     BOOST_CHECK_THROW(stats.RMSx(),              std::range_error);
-    BOOST_CHECK_SMALL(double(stats.SumY()),     0.01);
-    BOOST_CHECK_SMALL(double(stats.SumSqY()),   0.01);
+    BOOST_TEST(double(stats.SumY()) == 0,     0.01% tolerance());
+    BOOST_TEST(double(stats.SumSqY()) == 0,   0.01% tolerance());
     BOOST_CHECK_THROW(stats.AverageY(),          std::range_error);
     BOOST_CHECK_THROW(stats.VarianceY(),         std::range_error);
     BOOST_CHECK_THROW(stats.RMSy(),              std::range_error);
-    BOOST_CHECK_SMALL(double(stats.SumXY()),    0.01);
+    BOOST_TEST(double(stats.SumXY()) == 0,    0.01% tolerance());
     BOOST_CHECK_THROW(stats.Covariance(),        std::range_error);
     BOOST_CHECK_THROW(stats.LinearCorrelation(), std::range_error);
   }
@@ -130,20 +131,21 @@ void CheckStats(
     const Weight_t averageX = sumX / weights;
     const Weight_t averageY = sumY / weights;
     // check at precision 0.01% or 0.1%
-    BOOST_CHECK_CLOSE(double(stats.Weights()),           double(weights),   0.01);
-    BOOST_CHECK_CLOSE(double(stats.SumX()),              double(sumX),      0.01);
-    BOOST_CHECK_CLOSE(double(stats.SumSqX()),            double(sumsqX),    0.01);
-    BOOST_CHECK_CLOSE(double(stats.AverageX()),          double(averageX),  0.1);
-    BOOST_CHECK_CLOSE(double(stats.VarianceX()),         double(rmsX*rmsX), 0.1);
-    BOOST_CHECK_CLOSE(double(stats.RMSx()),              double(rmsX),      0.1);
-    BOOST_CHECK_CLOSE(double(stats.SumY()),              double(sumY),      0.01);
-    BOOST_CHECK_CLOSE(double(stats.SumSqY()),            double(sumsqY),    0.01);
-    BOOST_CHECK_CLOSE(double(stats.AverageY()),          double(averageY),  0.1);
-    BOOST_CHECK_CLOSE(double(stats.VarianceY()),         double(rmsY*rmsY), 0.1);
-    BOOST_CHECK_CLOSE(double(stats.RMSy()),              double(rmsY),      0.1);
-    BOOST_CHECK_CLOSE(double(stats.SumXY()),             double(sumXY),     0.01);
-    BOOST_CHECK_CLOSE(double(stats.Covariance()),        double(cov),       0.1);
-    BOOST_CHECK_CLOSE(double(stats.LinearCorrelation()), double(lin_corr),  0.1);
+
+    BOOST_TEST(double(stats.Weights()) ==           double(weights),   0.01% tolerance());
+    BOOST_TEST(double(stats.SumX()) ==              double(sumX),      0.01% tolerance());
+    BOOST_TEST(double(stats.SumSqX()) ==            double(sumsqX),    0.01% tolerance());
+    BOOST_TEST(double(stats.AverageX()) ==          double(averageX),  0.1% tolerance());
+    BOOST_TEST(double(stats.VarianceX()) ==         double(rmsX*rmsX), 0.1% tolerance());
+    BOOST_TEST(double(stats.RMSx()) ==              double(rmsX),      0.1% tolerance());
+    BOOST_TEST(double(stats.SumY()) ==              double(sumY),      0.01% tolerance());
+    BOOST_TEST(double(stats.SumSqY()) ==            double(sumsqY),    0.01% tolerance());
+    BOOST_TEST(double(stats.AverageY()) ==          double(averageY),  0.1% tolerance());
+    BOOST_TEST(double(stats.VarianceY()) ==         double(rmsY*rmsY), 0.1% tolerance());
+    BOOST_TEST(double(stats.RMSy()) ==              double(rmsY),      0.1% tolerance());
+    BOOST_TEST(double(stats.SumXY()) ==             double(sumXY),     0.01% tolerance());
+    BOOST_TEST(double(stats.Covariance()) ==        double(cov),       0.1% tolerance());
+    BOOST_TEST(double(stats.LinearCorrelation()) == double(lin_corr),  0.1% tolerance());
   }
 
 } // CheckStats<>(StatCollector2D)
@@ -459,22 +461,22 @@ void MinMaxCollectorTest() {
   collector.reset(new lar::util::MinMaxCollector<Data_t>);
 
   // there should be no data now
-  BOOST_CHECK(!collector->has_data());
+  BOOST_TEST(!collector->has_data());
 
   collector->add(Data_t(10));
   // there should be some data now
-  BOOST_CHECK(collector->has_data());
+  BOOST_TEST(collector->has_data());
 
-  BOOST_CHECK_EQUAL(collector->min(), Data_t(  10));
-  BOOST_CHECK_EQUAL(collector->max(), Data_t(  10));
+  BOOST_TEST(collector->min() == Data_t(  10));
+  BOOST_TEST(collector->max() == Data_t(  10));
 
   collector->add(more_data);
-  BOOST_CHECK_EQUAL(collector->min(), Data_t( -20));
-  BOOST_CHECK_EQUAL(collector->max(), Data_t( 121));
+  BOOST_TEST(collector->min() == Data_t( -20));
+  BOOST_TEST(collector->max() == Data_t( 121));
 
   collector->add(even_more_data.begin(), even_more_data.end());
-  BOOST_CHECK_EQUAL(collector->min(), Data_t( -20));
-  BOOST_CHECK_EQUAL(collector->max(), Data_t( 123));
+  BOOST_TEST(collector->min() == Data_t( -20));
+  BOOST_TEST(collector->max() == Data_t( 123));
 
   //
   // 2. from initializer list constructor
@@ -482,22 +484,22 @@ void MinMaxCollectorTest() {
   collector.reset(new lar::util::MinMaxCollector<Data_t>{ -25, 3, 1 });
 
   // there should be data already
-  BOOST_CHECK(collector->has_data());
+  BOOST_TEST(collector->has_data());
 
   collector->add(Data_t(10));
   // there should still be some data
-  BOOST_CHECK(collector->has_data());
+  BOOST_TEST(collector->has_data());
 
-  BOOST_CHECK_EQUAL(collector->min(), Data_t(  -25));
-  BOOST_CHECK_EQUAL(collector->max(), Data_t(  10));
+  BOOST_TEST(collector->min() == Data_t(  -25));
+  BOOST_TEST(collector->max() == Data_t(  10));
 
   collector->add(more_data);
-  BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
-  BOOST_CHECK_EQUAL(collector->max(), Data_t( 121));
+  BOOST_TEST(collector->min() == Data_t( -25));
+  BOOST_TEST(collector->max() == Data_t( 121));
 
   collector->add(even_more_data.begin(), even_more_data.end());
-  BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
-  BOOST_CHECK_EQUAL(collector->max(), Data_t( 123));
+  BOOST_TEST(collector->min() == Data_t( -25));
+  BOOST_TEST(collector->max() == Data_t( 123));
 
 
   //
@@ -511,22 +513,22 @@ void MinMaxCollectorTest() {
     );
 
   // there should be data already
-  BOOST_CHECK(collector->has_data());
+  BOOST_TEST(collector->has_data());
 
   collector->add(Data_t(10));
   // there should still be some data
-  BOOST_CHECK(collector->has_data());
+  BOOST_TEST(collector->has_data());
 
-  BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
-  BOOST_CHECK_EQUAL(collector->max(), Data_t(  10));
+  BOOST_TEST(collector->min() == Data_t( -25));
+  BOOST_TEST(collector->max() == Data_t(  10));
 
   collector->add(more_data);
-  BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
-  BOOST_CHECK_EQUAL(collector->max(), Data_t( 121));
+  BOOST_TEST(collector->min() == Data_t( -25));
+  BOOST_TEST(collector->max() == Data_t( 121));
 
   collector->add(even_more_data.begin(), even_more_data.end());
-  BOOST_CHECK_EQUAL(collector->min(), Data_t( -25));
-  BOOST_CHECK_EQUAL(collector->max(), Data_t( 123));
+  BOOST_TEST(collector->min() == Data_t( -25));
+  BOOST_TEST(collector->max() == Data_t( 123));
 
 } // MinMaxCollectorTest()
 
