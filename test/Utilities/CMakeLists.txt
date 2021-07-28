@@ -2,13 +2,13 @@ cet_test(constexpr_math_test)
 cet_test(quantities_test USE_BOOST_UNIT)
 cet_test(quantities_fhicl_test USE_BOOST_UNIT
   LIBRARIES
-    ${FHICLCPP}
+    fhiclcpp::fhiclcpp
     ${CETLIB_EXCEPT}
   )
 cet_test(intervals_test USE_BOOST_UNIT)
 cet_test(intervals_fhicl_test USE_BOOST_UNIT
   LIBRARIES
-    ${FHICLCPP}
+    fhiclcpp::fhiclcpp
     ${CETLIB_EXCEPT}
   )
 cet_test(space_test USE_BOOST_UNIT)
