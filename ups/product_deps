@@ -9,7 +9,7 @@ fcldir product_dir job
 product         version
 larcorealg	v09_01_02_01
 lardataobj	v09_01_04_01
-cetbuildtools	v8_12_00	-	only_for_build
+cetbuildtools	v8_13_01	-	only_for_build
 end_product_list
 
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
