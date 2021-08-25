@@ -1,15 +1,15 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	lardataalg	v09_04_07
+parent	lardataalg	v09_04_07_01
 defaultqual	e20
 
 fcldir product_dir job
 
 #
 product         version
-larcorealg	v09_01_02_03
-lardataobj	v09_01_04_03
-cetbuildtools	v8_14_02	-	only_for_build
+larcorealg	v09_02_01_01
+lardataobj	v09_01_06_01
+cetbuildtools	v8_15_00	-	only_for_build
 end_product_list
 
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
