@@ -109,10 +109,9 @@ namespace detinfo {
                 "calculation (as suggested by DriftVel Stancari")};
 
       fhicl::Atom<bool> UseIcarusMicrobooneDriftModel{
-	Name("UseIcarusMicrobooneDriftModel"),
-	Comment("Allows user to decide to use the ICARUS+MicroBooNE drift "
-		"model for velocity calculation as in arXiv:2008.09765")
-      };
+        Name("UseIcarusMicrobooneDriftModel"),
+        Comment("Allows user to decide to use the ICARUS+MicroBooNE drift "
+                "model for velocity calculation as in arXiv:2008.09765")};
 
       fhicl::Atom<bool> SimpleBoundary{Name("SimpleBoundaryProcess"), Comment("")};
 
