@@ -89,6 +89,8 @@ namespace detinfo {
 
     fDriftVelFudgeFactor = config().DriftVelFudgeFactor();
 
+    fUseIcarusMicrobooneDriftModel = config().UseIcarusMicrobooneDriftModel();
+
     fSimpleBoundary = config().SimpleBoundary();
   }
 
@@ -193,6 +195,10 @@ namespace detinfo {
     // Drift Velocity as a function of Electric Field and LAr Temperature
     // from : W. Walkowiak, NIM A 449 (2000) 288-294
     //
+    // Option to use MicroBooNE+ICARUS model (as in arXiv:2008.09765) provided as
+    // well, with temperature depenence as prescribed by Mike Mooney based on
+    // looking at the Walkowiak data.
+    //
     // Efield should have units of kV/cm
     // Temperature should have units of Kelvin
 
@@ -216,54 +222,71 @@ namespace detinfo {
         << " parameterization. Returned value may not be"
         << " correct";
 
-    double const tshift = -87.203 + temperature;
-    double const xFit = 0.0938163 - 0.0052563 * tshift - 0.0001470 * tshift * tshift;
-    double const uFit =
-      5.18406 + 0.01448 * tshift - 0.003497 * tshift * tshift - 0.000516 * tshift * tshift * tshift;
-
-    // Icarus Parameter Set, use as default
-    constexpr double P1 = -0.04640; // K^-1
-    constexpr double P2 = 0.01712;  // K^-1
-    constexpr double P3 = 1.88125;  // (kV/cm)^-1
-    constexpr double P4 = 0.99408;  // kV/cm
-    constexpr double P5 = 0.01172;  // (kV/cm)^-P6
-    constexpr double P6 = 4.20214;
-    constexpr double T0 = 105.749; // K
-
-    // Walkowiak Parameter Set
-    constexpr double P1W = -0.01481; // K^-1
-    constexpr double P2W = -0.0075;  // K^-1
-    constexpr double P3W = 0.141;    // (kV/cm)^-1
-    constexpr double P4W = 12.4;     // kV/cm
-    constexpr double P5W = 1.627;    // (kV/cm)^-P6
-    constexpr double P6W = 0.317;
-    constexpr double T0W = 90.371; // K
-
-    // From Craig Thorne . . . currently not documented
-    // smooth transition from linear at small fields to
-    //     icarus fit at most fields to Walkowiak at very high fields
     double vd;
-    if (efield < xFit)
-      vd = efield * uFit;
-    else if (efield < 0.619) {
-      vd = ((P1 * (temperature - T0) + 1) *
+
+    if (!fUseIcarusMicrobooneDriftModel) {
+      double const tshift = -87.203 + temperature;
+      double const xFit = 0.0938163 - 0.0052563 * tshift - 0.0001470 * tshift * tshift;
+      double const uFit =
+	5.18406 + 0.01448 * tshift - 0.003497 * tshift * tshift - 0.000516 * tshift * tshift * tshift;
+
+      // Icarus Parameter Set, use as default
+      constexpr double P1 = -0.04640; // K^-1
+      constexpr double P2 = 0.01712;  // K^-1
+      constexpr double P3 = 1.88125;  // (kV/cm)^-1
+      constexpr double P4 = 0.99408;  // kV/cm
+      constexpr double P5 = 0.01172;  // (kV/cm)^-P6
+      constexpr double P6 = 4.20214;
+      constexpr double T0 = 105.749; // K
+
+      // Walkowiak Parameter Set
+      constexpr double P1W = -0.01481; // K^-1
+      constexpr double P2W = -0.0075;  // K^-1
+      constexpr double P3W = 0.141;    // (kV/cm)^-1
+      constexpr double P4W = 12.4;     // kV/cm
+      constexpr double P5W = 1.627;    // (kV/cm)^-P6
+      constexpr double P6W = 0.317;
+      constexpr double T0W = 90.371; // K
+
+      // From Craig Thorne . . . currently not documented
+      // smooth transition from linear at small fields to
+      //     icarus fit at most fields to Walkowiak at very high fields
+      if (efield < xFit)
+	vd = efield * uFit;
+      else if (efield < 0.619) {
+	vd = ((P1 * (temperature - T0) + 1) *
               (P3 * efield * std::log(1 + P4 / efield) + P5 * std::pow(efield, P6)) +
-            P2 * (temperature - T0));
-    }
-    else if (efield < 0.699) {
-      vd = 12.5 * (efield - 0.619) *
-             ((P1W * (temperature - T0W) + 1) *
+	      P2 * (temperature - T0));
+      }
+      else if (efield < 0.699) {
+        vd = 12.5 * (efield - 0.619) *
+               ((P1W * (temperature - T0W) + 1) *
+                  (P3W * efield * std::log(1 + P4W / efield) + P5W * std::pow(efield, P6W)) +
+                P2W * (temperature - T0W)) +
+             12.5 * (0.699 - efield) *
+               ((P1 * (temperature - T0) + 1) *
+                  (P3 * efield * std::log(1 + P4 / efield) + P5 * std::pow(efield, P6)) +
+                P2 * (temperature - T0));
+      }
+      else {
+	vd = ((P1W * (temperature - T0W) + 1) *
                 (P3W * efield * std::log(1 + P4W / efield) + P5W * std::pow(efield, P6W)) +
-              P2W * (temperature - T0W)) +
-           12.5 * (0.699 - efield) *
-             ((P1 * (temperature - T0) + 1) *
-                (P3 * efield * std::log(1 + P4 / efield) + P5 * std::pow(efield, P6)) +
-              P2 * (temperature - T0));
+              P2W * (temperature - T0W));
+      }
     }
-    else {
-      vd = ((P1W * (temperature - T0W) + 1) *
-              (P3W * efield * std::log(1 + P4W / efield) + P5W * std::pow(efield, P6W)) +
-            P2W * (temperature - T0W));
+
+    // MicroBooNE+ICARUS model (arXiv:2008.09765) with temperature dependence given by
+    // Mike Mooney based on looking at Walkowiak data (NIM A 449 (2000) 288-294)
+    if (fUseIcarusMicrobooneDriftModel) {
+      constexpr double P0 = 0.;
+      constexpr double P1 = 5.53416;
+      constexpr double P2 = -6.53093;
+      constexpr double P3 = 3.20752;
+      constexpr double P4 = 0.389696;
+      constexpr double P5 = -0.556184;
+      vd = (1.0 - 0.0184*(temperature - 89.0))*(P0 + P1*std::pow(efield,1) +
+						P2*std::pow(efield,2) + P3*std::pow(efield,3) +
+						P4*std::pow(efield,4) + P5*std::pow(efield,5));
     }
 
     vd *= fDriftVelFudgeFactor / 10.;
