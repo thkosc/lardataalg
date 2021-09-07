@@ -207,104 +207,6 @@ void test_quantities_comparisons() {
   BOOST_TEST(!(t_ns >  t2_ns));
   BOOST_TEST( (t_ns <  t2_ns));
 
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-  //
-  // comparisons between quantity and base value number
-  //
-  BOOST_TEST( (t_us != 8.0));
-  BOOST_TEST(!(t_us == 8.0));
-  BOOST_TEST( (t_us != 8.0));
-  BOOST_TEST(!(t_us >= 8.0));
-  BOOST_TEST( (t_us <= 8.0));
-  BOOST_TEST(!(t_us >  8.0));
-  BOOST_TEST( (t_us <  8.0));
-
-  BOOST_TEST( (t_us == 7.0));
-  BOOST_TEST(!(t_us != 7.0));
-  BOOST_TEST( (t_us >= 7.0));
-  BOOST_TEST( (t_us <= 7.0));
-  BOOST_TEST(!(t_us >  7.0));
-  BOOST_TEST(!(t_us <  7.0));
-
-  BOOST_TEST( (t_us != 6.0));
-  BOOST_TEST(!(t_us == 6.0));
-  BOOST_TEST( (t_us != 6.0));
-  BOOST_TEST( (t_us >= 6.0));
-  BOOST_TEST(!(t_us <= 6.0));
-  BOOST_TEST( (t_us >  6.0));
-  BOOST_TEST(!(t_us <  6.0));
-
-  BOOST_TEST(!(8.0 == t_us));
-  BOOST_TEST( (8.0 != t_us));
-  BOOST_TEST( (8.0 >= t_us));
-  BOOST_TEST(!(8.0 <= t_us));
-  BOOST_TEST( (8.0 >  t_us));
-  BOOST_TEST(!(8.0 <  t_us));
-
-  BOOST_TEST( (7.0 == t_us));
-  BOOST_TEST(!(7.0 != t_us));
-  BOOST_TEST( (7.0 >= t_us));
-  BOOST_TEST( (7.0 <= t_us));
-  BOOST_TEST(!(7.0 >  t_us));
-  BOOST_TEST(!(7.0 <  t_us));
-
-  BOOST_TEST(!(6.0 == t_us));
-  BOOST_TEST( (6.0 != t_us));
-  BOOST_TEST(!(6.0 >= t_us));
-  BOOST_TEST( (6.0 <= t_us));
-  BOOST_TEST(!(6.0 >  t_us));
-  BOOST_TEST( (6.0 <  t_us));
-
-  //
-  // comparisons between quantity and number
-  //
-  BOOST_TEST( (t_us != 8));
-  BOOST_TEST(!(t_us == 8));
-  BOOST_TEST( (t_us != 8));
-  BOOST_TEST(!(t_us >= 8));
-  BOOST_TEST( (t_us <= 8));
-  BOOST_TEST(!(t_us >  8));
-  BOOST_TEST( (t_us <  8));
-
-  BOOST_TEST( (t_us == 7));
-  BOOST_TEST(!(t_us != 7));
-  BOOST_TEST( (t_us >= 7));
-  BOOST_TEST( (t_us <= 7));
-  BOOST_TEST(!(t_us >  7));
-  BOOST_TEST(!(t_us <  7));
-
-  BOOST_TEST( (t_us != 6));
-  BOOST_TEST(!(t_us == 6));
-  BOOST_TEST( (t_us != 6));
-  BOOST_TEST( (t_us >= 6));
-  BOOST_TEST(!(t_us <= 6));
-  BOOST_TEST( (t_us >  6));
-  BOOST_TEST(!(t_us <  6));
-
-  BOOST_TEST(!(8 == t_us));
-  BOOST_TEST( (8 != t_us));
-  BOOST_TEST( (8 >= t_us));
-  BOOST_TEST(!(8 <= t_us));
-  BOOST_TEST( (8 >  t_us));
-  BOOST_TEST(!(8 <  t_us));
-
-  BOOST_TEST( (7 == t_us));
-  BOOST_TEST(!(7 != t_us));
-  BOOST_TEST( (7 >= t_us));
-  BOOST_TEST( (7 <= t_us));
-  BOOST_TEST(!(7 >  t_us));
-  BOOST_TEST(!(7 <  t_us));
-
-  BOOST_TEST(!(6 == t_us));
-  BOOST_TEST( (6 != t_us));
-  BOOST_TEST(!(6 >= t_us));
-  BOOST_TEST( (6 <= t_us));
-  BOOST_TEST(!(6 >  t_us));
-  BOOST_TEST( (6 <  t_us));
-
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
 } // test_quantities_conversions()
 
 
@@ -535,9 +437,6 @@ void test_constexpr_operations() {
 
   static_assert(t1.value() == 10.0, "value()");
   static_assert(double(t1) == 10.0, "explicit conversion to plain number");
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_IMPLICIT_CONVERSION
-  static_assert(t1 == 10.0, "implicit conversion to plain number");
-#endif
   static_assert(+t1 == 10_us, "unary +");
   static_assert(-t1 == -10_us, "unary -");
   static_assert(t1.abs() == 10_us, "abs()");

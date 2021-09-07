@@ -263,48 +263,6 @@ void test_interval_comparisons() {
   static_assert(!(8000_ns <  t1     ));
   static_assert(!(t1      <  t2     ));
   
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS  
-  
-  static_assert(  t1      == 6       );
-  static_assert(  6       == t1      );
-  static_assert(!(t1      == 5      ));
-  static_assert(!(5       == t1     ));
-  
-  static_assert(!(t1      != 6      ));
-  static_assert(!(6       != t1     ));
-  static_assert(  t1      != 5       );
-  static_assert(  5       != t1      );
-  
-  static_assert(  t1      >= 6       );
-  static_assert(  6       >= t1      );
-  static_assert(  t1      >= 5       );
-  static_assert(!(5       >= t1     ));
-  static_assert(!(t1      >= 8      ));
-  static_assert(  8       >= t1      );
-  
-  static_assert(!(t1      >  6      ));
-  static_assert(!(6       >  t1     ));
-  static_assert(  t1      >  5       );
-  static_assert(!(5       >  t1     ));
-  static_assert(!(t1      >  8      ));
-  static_assert(  8       >  t1      );
-  
-  static_assert(  t1      <= 6       );
-  static_assert(  6       <= t1      );
-  static_assert(!(t1      <= 5      ));
-  static_assert(  5       <= t1      );
-  static_assert(  t1      <= 8       );
-  static_assert(!(8       <= t1     ));
-  
-  static_assert(!(t1      <  6      ));
-  static_assert(!(6       <  t1     ));
-  static_assert(!(t1      <  5      ));
-  static_assert(  5       <  t1      );
-  static_assert(  t1      <  8       );
-  static_assert(!(8       <  t1     ));
-  
-#endif // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS  
-  
 } // test_interval_comparisons()
 
 
@@ -326,15 +284,6 @@ void test_interval_queries() {
   static_assert(t2.quantity() == -4_us   );
   static_assert(t1.value()    ==     6.0 );
   static_assert(t2.value()    == -4000.0 );
-  
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION  
-  // implicit conversion
-  constexpr double const scalar_t1 = t1;
-  static_assert(scalar_t1 ==     6.0); // in microseconds
-  constexpr double const scalar_t2 = t2;
-  static_assert(scalar_t2 == -4000.0); // in nanoseconds
-#endif // LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION  
-  
   
 } // test_interval_queries()
 
@@ -537,48 +486,6 @@ void test_point_comparisons() {
   static_assert(!(8000_ns <  t1     ));
   static_assert(!(t1      <  t2     ));
   
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS  
-  
-  static_assert(  t1      == 6       );
-  static_assert(  6       == t1      );
-  static_assert(!(t1      == 5      ));
-  static_assert(!(5       == t1     ));
-  
-  static_assert(!(t1      != 6      ));
-  static_assert(!(6       != t1     ));
-  static_assert(  t1      != 5       );
-  static_assert(  5       != t1      );
-  
-  static_assert(  t1      >= 6       );
-  static_assert(  6       >= t1      );
-  static_assert(  t1      >= 5       );
-  static_assert(!(5       >= t1     ));
-  static_assert(!(t1      >= 8      ));
-  static_assert(  8       >= t1      );
-  
-  static_assert(!(t1      >  6      ));
-  static_assert(!(6       >  t1     ));
-  static_assert(  t1      >  5       );
-  static_assert(!(5       >  t1     ));
-  static_assert(!(t1      >  8      ));
-  static_assert(  8       >  t1      );
-  
-  static_assert(  t1      <= 6       );
-  static_assert(  6       <= t1      );
-  static_assert(!(t1      <= 5      ));
-  static_assert(  5       <= t1      );
-  static_assert(  t1      <= 8       );
-  static_assert(!(8       <= t1     ));
-  
-  static_assert(!(t1      <  6      ));
-  static_assert(!(6       <  t1     ));
-  static_assert(!(t1      <  5      ));
-  static_assert(  5       <  t1      );
-  static_assert(  t1      <  8       );
-  static_assert(!(8       <  t1     ));
-  
-#endif // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS  
-  
 } // test_point_comparisons()
 
 
@@ -600,14 +507,6 @@ void test_point_queries() {
   static_assert(t2.quantity() == -4_us   );
   static_assert(t1.value()    ==     6.0 );
   static_assert(t2.value()    == -4000.0 );
-  
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION  
-  // implicit conversion
-  constexpr double const scalar_t1 = t1;
-  static_assert(scalar_t1 ==     6.0); // in microseconds
-  constexpr double const scalar_t2 = t2;
-  static_assert(scalar_t2 == -4000.0); // in nanoseconds
-#endif // LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION  
   
 } // test_points_queries()
 
