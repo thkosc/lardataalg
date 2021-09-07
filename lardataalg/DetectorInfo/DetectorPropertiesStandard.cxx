@@ -279,8 +279,8 @@ namespace detinfo {
       constexpr double P4 = 0.389696;
       constexpr double P5 = -0.556184;
       vd = (1.0 - 0.0184 * (temperature - 89.0)) *
-           (P0 + P1 * std::pow(efield, 1) + P2 * std::pow(efield, 2) + P3 * std::pow(efield, 3) +
-            P4 * std::pow(efield, 4) + P5 * std::pow(efield, 5));
+           (P0 + P1 * cet::pow<1>(efield) + P2 * cet::pow<2>(efield) + P3 * cet::pow<3>(efield) +
+            P4 * cet::pow<4>(efield) + P5 * cet::pow<5>(efield));
     }
 
     vd *= fDriftVelFudgeFactor / 10.;
