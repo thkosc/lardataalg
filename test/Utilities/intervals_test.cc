@@ -19,7 +19,16 @@
 
 
 // C/C++ standard libraries
-#include <type_traits> // std::decay_t<>
+#include <type_traits>
+
+namespace {
+  template <typename T, typename U>
+  void
+  static_assert_type(U&&)
+  {
+    static_assert(std::is_same_v<T, U>);
+  }
+}
 
 // -----------------------------------------------------------------------------
 // --- implementation detail tests
@@ -178,10 +187,10 @@ void test_interval_comparisons() {
   using util::quantities::intervals::microseconds;
   using util::quantities::intervals::nanoseconds;
 
-  constexpr microseconds const t1 {         +6.0_us };
-  constexpr nanoseconds  const t2 { -4'000'000.0_ps };
+  constexpr microseconds t1 {         +6.0_us };
+  constexpr nanoseconds  t2 { -4'000'000.0_ps };
 
-  constexpr microseconds const t1s = t1;
+  constexpr microseconds t1s = t1;
 
   static_assert(  t1      == 6_us    );
   static_assert(  t1      == 6000_ns );
@@ -288,7 +297,6 @@ void test_interval_queries() {
 
 } // test_interval_queries()
 
-
 // -----------------------------------------------------------------------------
 void test_interval_operations() {
 
@@ -300,63 +308,69 @@ void test_interval_operations() {
   constexpr microseconds ct1 {    +6.0_us };
   constexpr microseconds ct2 { -4000.0_ns };
 
-  static_assert(std::is_same_v<decltype(ct1 + -4000.0_ns), microseconds>);
+  static_assert_type<microseconds>(ct1 + -4000.0_ns);
   static_assert(ct1 + -4000.0_ns == 2_us);
 
-  static_assert(std::is_same_v<decltype(ct1 + ct2), microseconds>);
+  static_assert_type<microseconds>(ct1 + ct2);
   static_assert(ct1 + ct2 == 2_us);
 
-  static_assert(std::is_same_v<decltype(ct1 - -4000.0_ns), microseconds>);
+  static_assert_type<microseconds>(ct1 - -4000.0_ns);
   static_assert(ct1 - -4000.0_ns == 10_us);
 
-  static_assert(std::is_same_v<decltype(ct1 - ct2), microseconds>);
+  static_assert_type<microseconds>(ct1 - ct2);
   static_assert(ct1 - ct2 == 10_us);
 
-  static_assert(std::is_same_v<decltype(+ct1), microseconds>);
+  static_assert_type<microseconds>(+ct1);
   static_assert(+ct1 == 6_us);
 
-  static_assert(std::is_same_v<decltype(-ct1), microseconds>);
+  static_assert_type<microseconds>(-ct1);
   static_assert(-ct1 == -6_us);
 
-  static_assert(std::is_same_v<decltype(ct1.abs()), microseconds>);
+  static_assert_type<microseconds>(ct1.abs());
   static_assert(ct1.abs() == 6_us);
   static_assert(ct2.abs() == 4_us);
 
-  static_assert(std::is_same_v<decltype(ct1 * 3.0), microseconds>);
+  static_assert_type<microseconds>(ct1 * 3.0);
   static_assert(ct1 * 3.0 == 6_us * 3.0);
 
-  static_assert(std::is_same_v<decltype(3.0 * ct1), microseconds>);
+  static_assert_type<microseconds>(3.0 * ct1);
   static_assert(3.0 * ct1 == 6_us * 3.0);
 
-  static_assert(std::is_same_v<decltype(ct1 / 2.0), microseconds>);
+  static_assert_type<microseconds>(ct1 / 2.0);
   static_assert(ct1 / 2.0 == 6_us / 2.0);
 
-  microseconds t1 {    +6.0_us };
-  nanoseconds t2  { -4000.0_ns };
+  microseconds t1      {    +6.0_us };
+  nanoseconds const t2 { -4000.0_ns };
 
-  microseconds& incr = (t1 += 2000_ns);
+  decltype(auto) incr = (t1 += 2000_ns);
+  static_assert_type<microseconds&>(incr);
   BOOST_TEST(t1 == 8_us);
   BOOST_TEST(&incr == &t1);
 
-  microseconds& incr2 = (t1 += t2);
+  decltype(auto) incr2 = (t1 += t2);
+  static_assert_type<microseconds&>(incr2);
   BOOST_TEST(t1 ==  4_us);
   BOOST_TEST(t2 == -4_us);
   BOOST_TEST(&incr2 == &t1);
 
-  microseconds& decr = (t1 -= 2000_ns);
+  decltype(auto) decr = (t1 -= 2000_ns);
+  static_assert_type<microseconds&>(decr);
   BOOST_TEST(t1 == 2_us);
   BOOST_TEST(&decr == &t1);
 
-  microseconds& decr2 = (t1 -= t2);
+  decltype(auto) decr2 = (t1 -= t2);
+  static_assert_type<microseconds&>(decr2);
   BOOST_TEST(t1 ==  6_us);
   BOOST_TEST(t2 == -4_us);
   BOOST_TEST(&decr2 == &t1);
 
-  microseconds& expand = (t1 *= 2);
+  decltype(auto) expand = (t1 *= 2);
+  static_assert_type<microseconds&>(expand);
   BOOST_TEST(t1 == 12_us);
   BOOST_TEST(&expand == &t1);
 
-  microseconds& shrink = (t1 /= 2);
+  decltype(auto) shrink = (t1 /= 2);
+  static_assert_type<microseconds&>(shrink);
   BOOST_TEST(t1 == 6_us);
   BOOST_TEST(&shrink == &t1);
 
@@ -517,42 +531,46 @@ void test_point_operations() {
   constexpr microsecond cp1 {    +6.0_us };
   constexpr util::quantities::intervals::microseconds ct { 3.0_us };
 
-  static_assert(std::is_same_v<decltype(cp1 + 3000_ns), microsecond>);
+  static_assert_type<microsecond>(cp1 + 3000_ns);
   static_assert(cp1 + 3000_ns == 9_us);
 
-  static_assert(std::is_same_v<decltype(cp1 + ct), microsecond>);
+  static_assert_type<microsecond>(cp1 + ct);
   static_assert(cp1 + ct == 9_us);
 
-  static_assert(std::is_same_v<decltype(cp1 - 3000_ns), microsecond>);
+  static_assert_type<microsecond>(cp1 - 3000_ns);
   static_assert(cp1 - 3000_ns == 3_us);
 
-  static_assert(std::is_same_v<decltype(cp1 - ct), microsecond>);
+  static_assert_type<microsecond>(cp1 - ct);
   static_assert(cp1 - ct == 3_us);
 
-  static_assert(std::is_same_v<decltype(+cp1), microsecond>);
+  static_assert_type<microsecond>(+cp1);
   static_assert(+cp1 == 6_us);
 
-  static_assert(std::is_same_v<decltype(-cp1), microsecond>);
+  static_assert_type<microsecond>(-cp1);
   static_assert(-cp1 == -6_us);
 
   microsecond p1 {    +6.0_us };
   microsecond p2 { -4000.0_ns };
   util::quantities::intervals::nanoseconds t { 3000.0_ns };
 
-  microsecond& incr = (p1 += 2000_ns);
+  decltype(auto) incr = (p1 += 2000_ns);
+  static_assert_type<microsecond&>(incr);
   BOOST_TEST(p1 == 8_us);
   BOOST_TEST(&incr == &p1);
 
-  microsecond& incr2 = (p1 += t);
+  decltype(auto) incr2 = (p1 += t);
+  static_assert_type<microsecond&>(incr2);
   BOOST_TEST(p1 == 11_us);
   BOOST_TEST(t ==   3_us);
   BOOST_TEST(&incr2 == &p1);
 
-  microsecond& decr = (p1 -= 2000_ns);
+  decltype(auto) decr = (p1 -= 2000_ns);
+  static_assert_type<microsecond&>(decr);
   BOOST_TEST(p1 == 9_us);
   BOOST_TEST(&decr == &p1);
 
-  microsecond& decr2 = (p1 -= t);
+  decltype(auto) decr2 = (p1 -= t);
+  static_assert_type<microsecond&>(decr2);
   BOOST_TEST(p1 ==  6_us);
   BOOST_TEST(t ==   3_us);
   BOOST_TEST(&decr2 == &p1);
