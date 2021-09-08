@@ -27,7 +27,7 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 template <typename Config>
-fhicl::Table<Config> validateConfig(fhicl::ParameterSet const& pset) {
+Config validateConfig(fhicl::ParameterSet const& pset) {
   fhicl::Table<Config> validatedConfig { fhicl::Name("validatedConfig") };
 
   std::cout << std::string(80, '-') << std::endl;
@@ -40,15 +40,14 @@ fhicl::Table<Config> validateConfig(fhicl::ParameterSet const& pset) {
   std::cout << std::endl;
 
   validatedConfig.validate_ParameterSet(pset);
-  return validatedConfig;
+  return validatedConfig();
 } // validateConfig()
 
 
 // -----------------------------------------------------------------------------
 template <typename Config>
-fhicl::Table<Config> validateConfig(std::string const& configStr) {
-  auto pset = fhicl::ParameterSet::make(configStr);
-  return validateConfig<Config>(pset);
+Config validateConfig(std::string const& configStr) {
+  return validateConfig<Config>(fhicl::ParameterSet::make(configStr));
 } // validateConfig(Config)
 
 
@@ -171,7 +170,7 @@ void test_read() {
   util::quantities::points::microsecond const expectedEnd { 6_ms };
   util::quantities::intervals::microseconds const expectedDuration { 16_ms };
 
-  auto validatedConfig = validateConfig<Config>(configStr)();
+  auto validatedConfig = validateConfig<Config>(configStr);
   BOOST_TEST(validatedConfig.start() == expectedStart);
   BOOST_TEST(validatedConfig.end() == expectedEnd);
   BOOST_TEST(validatedConfig.duration() == expectedDuration);
@@ -204,7 +203,7 @@ void test_write() {
   pset.put("start", expectedStart);
   pset.put("duration", expectedDuration);
 
-  auto validatedConfig = validateConfig<Config>(pset)();
+  auto validatedConfig = validateConfig<Config>(pset);
   BOOST_TEST(validatedConfig.start() == expectedStart);
   BOOST_TEST(validatedConfig.end() == expectedEnd);
   BOOST_TEST(validatedConfig.duration() == expectedDuration);
