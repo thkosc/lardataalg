@@ -27,11 +27,10 @@
 namespace detinfo {
 
   //--------------------------------------------------------------------
-  DetectorPropertiesStandard::DetectorPropertiesStandard(
-    fhicl::ParameterSet const& pset,
-    const geo::GeometryCore* geo,
-    const detinfo::LArProperties* lp,
-    std::set<std::string> const& ignore_params)
+  DetectorPropertiesStandard::DetectorPropertiesStandard(fhicl::ParameterSet const& pset,
+                                                         const geo::GeometryCore* geo,
+                                                         const detinfo::LArProperties* lp,
+                                                         std::set<std::string> const& ignore_params)
     : fLP(lp), fGeo(geo)
   {
     ValidateAndConfigure(pset, ignore_params);
@@ -64,21 +63,16 @@ namespace detinfo {
     fReadOutWindowSize = config().ReadOutWindowSize();
 
     std::set<geo::View_t> present_views;
-    if (config().TimeOffsetU(fTimeOffsetU))
-      present_views.insert(geo::kU);
-    if (config().TimeOffsetV(fTimeOffsetV))
-      present_views.insert(geo::kV);
-    if (config().TimeOffsetZ(fTimeOffsetZ))
-      present_views.insert(geo::kZ);
-    if (config().TimeOffsetY(fTimeOffsetY))
-      present_views.insert(geo::kY);
-    if (config().TimeOffsetX(fTimeOffsetX))
-      present_views.insert(geo::kX);
+    if (config().TimeOffsetU(fTimeOffsetU)) present_views.insert(geo::kU);
+    if (config().TimeOffsetV(fTimeOffsetV)) present_views.insert(geo::kV);
+    if (config().TimeOffsetZ(fTimeOffsetZ)) present_views.insert(geo::kZ);
+    if (config().TimeOffsetY(fTimeOffsetY)) present_views.insert(geo::kY);
+    if (config().TimeOffsetX(fTimeOffsetX)) present_views.insert(geo::kX);
 
     std::string const errors = CheckTimeOffsets(present_views);
     if (!errors.empty()) {
-      throw cet::exception("DetectorPropertiesStandard")
-        << "Detected configuration errors: \n" << errors;
+      throw cet::exception("DetectorPropertiesStandard") << "Detected configuration errors: \n"
+                                                         << errors;
     }
 
     fSternheimerParameters.a = config().SternheimerA();
@@ -88,6 +82,8 @@ namespace detinfo {
     fSternheimerParameters.cbar = config().SternheimerCbar();
 
     fDriftVelFudgeFactor = config().DriftVelFudgeFactor();
+
+    fUseIcarusMicrobooneDriftModel = config().UseIcarusMicrobooneDriftModel();
 
     fSimpleBoundary = config().SimpleBoundary();
   }
@@ -193,6 +189,10 @@ namespace detinfo {
     // Drift Velocity as a function of Electric Field and LAr Temperature
     // from : W. Walkowiak, NIM A 449 (2000) 288-294
     //
+    // Option to use MicroBooNE+ICARUS model (as in arXiv:2008.09765) provided as
+    // well, with temperature depenence as prescribed by Mike Mooney based on
+    // looking at the Walkowiak data.
+    //
     // Efield should have units of kV/cm
     // Temperature should have units of Kelvin
 
@@ -216,54 +216,71 @@ namespace detinfo {
         << " parameterization. Returned value may not be"
         << " correct";
 
-    double const tshift = -87.203 + temperature;
-    double const xFit = 0.0938163 - 0.0052563 * tshift - 0.0001470 * tshift * tshift;
-    double const uFit =
-      5.18406 + 0.01448 * tshift - 0.003497 * tshift * tshift - 0.000516 * tshift * tshift * tshift;
-
-    // Icarus Parameter Set, use as default
-    constexpr double P1 = -0.04640; // K^-1
-    constexpr double P2 = 0.01712;  // K^-1
-    constexpr double P3 = 1.88125;  // (kV/cm)^-1
-    constexpr double P4 = 0.99408;  // kV/cm
-    constexpr double P5 = 0.01172;  // (kV/cm)^-P6
-    constexpr double P6 = 4.20214;
-    constexpr double T0 = 105.749; // K
-
-    // Walkowiak Parameter Set
-    constexpr double P1W = -0.01481; // K^-1
-    constexpr double P2W = -0.0075;  // K^-1
-    constexpr double P3W = 0.141;    // (kV/cm)^-1
-    constexpr double P4W = 12.4;     // kV/cm
-    constexpr double P5W = 1.627;    // (kV/cm)^-P6
-    constexpr double P6W = 0.317;
-    constexpr double T0W = 90.371; // K
-
-    // From Craig Thorne . . . currently not documented
-    // smooth transition from linear at small fields to
-    //     icarus fit at most fields to Walkowiak at very high fields
     double vd;
-    if (efield < xFit)
-      vd = efield * uFit;
-    else if (efield < 0.619) {
-      vd = ((P1 * (temperature - T0) + 1) *
-              (P3 * efield * std::log(1 + P4 / efield) + P5 * std::pow(efield, P6)) +
-            P2 * (temperature - T0));
-    }
-    else if (efield < 0.699) {
-      vd = 12.5 * (efield - 0.619) *
-             ((P1W * (temperature - T0W) + 1) *
-                (P3W * efield * std::log(1 + P4W / efield) + P5W * std::pow(efield, P6W)) +
-              P2W * (temperature - T0W)) +
-           12.5 * (0.699 - efield) *
-             ((P1 * (temperature - T0) + 1) *
+
+    if (!fUseIcarusMicrobooneDriftModel) {
+      double const tshift = -87.203 + temperature;
+      double const xFit = 0.0938163 - 0.0052563 * tshift - 0.0001470 * tshift * tshift;
+      double const uFit = 5.18406 + 0.01448 * tshift - 0.003497 * tshift * tshift -
+                          0.000516 * tshift * tshift * tshift;
+
+      // Icarus Parameter Set, use as default
+      constexpr double P1 = -0.04640; // K^-1
+      constexpr double P2 = 0.01712;  // K^-1
+      constexpr double P3 = 1.88125;  // (kV/cm)^-1
+      constexpr double P4 = 0.99408;  // kV/cm
+      constexpr double P5 = 0.01172;  // (kV/cm)^-P6
+      constexpr double P6 = 4.20214;
+      constexpr double T0 = 105.749; // K
+
+      // Walkowiak Parameter Set
+      constexpr double P1W = -0.01481; // K^-1
+      constexpr double P2W = -0.0075;  // K^-1
+      constexpr double P3W = 0.141;    // (kV/cm)^-1
+      constexpr double P4W = 12.4;     // kV/cm
+      constexpr double P5W = 1.627;    // (kV/cm)^-P6
+      constexpr double P6W = 0.317;
+      constexpr double T0W = 90.371; // K
+
+      // From Craig Thorne . . . currently not documented
+      // smooth transition from linear at small fields to
+      //     icarus fit at most fields to Walkowiak at very high fields
+      if (efield < xFit)
+        vd = efield * uFit;
+      else if (efield < 0.619) {
+        vd = ((P1 * (temperature - T0) + 1) *
                 (P3 * efield * std::log(1 + P4 / efield) + P5 * std::pow(efield, P6)) +
               P2 * (temperature - T0));
+      }
+      else if (efield < 0.699) {
+        vd = 12.5 * (efield - 0.619) *
+               ((P1W * (temperature - T0W) + 1) *
+                  (P3W * efield * std::log(1 + P4W / efield) + P5W * std::pow(efield, P6W)) +
+                P2W * (temperature - T0W)) +
+             12.5 * (0.699 - efield) *
+               ((P1 * (temperature - T0) + 1) *
+                  (P3 * efield * std::log(1 + P4 / efield) + P5 * std::pow(efield, P6)) +
+                P2 * (temperature - T0));
+      }
+      else {
+        vd = ((P1W * (temperature - T0W) + 1) *
+                (P3W * efield * std::log(1 + P4W / efield) + P5W * std::pow(efield, P6W)) +
+              P2W * (temperature - T0W));
+      }
     }
-    else {
-      vd = ((P1W * (temperature - T0W) + 1) *
-              (P3W * efield * std::log(1 + P4W / efield) + P5W * std::pow(efield, P6W)) +
-            P2W * (temperature - T0W));
+
+    // MicroBooNE+ICARUS model (arXiv:2008.09765) with temperature dependence given by
+    // Mike Mooney based on looking at Walkowiak data (NIM A 449 (2000) 288-294)
+    if (fUseIcarusMicrobooneDriftModel) {
+      constexpr double P0 = 0.;
+      constexpr double P1 = 5.53416;
+      constexpr double P2 = -6.53093;
+      constexpr double P3 = 3.20752;
+      constexpr double P4 = 0.389696;
+      constexpr double P5 = -0.556184;
+      vd = (1.0 - 0.0184 * (temperature - 89.0)) *
+           (P0 + P1 * cet::pow<1>(efield) + P2 * cet::pow<2>(efield) + P3 * cet::pow<3>(efield) +
+            P4 * cet::pow<4>(efield) + P5 * cet::pow<5>(efield));
     }
 
     vd *= fDriftVelFudgeFactor / 10.;
@@ -292,10 +309,10 @@ namespace detinfo {
     // S.Amoruso et al., NIM A 523 (2004) 275
 
     constexpr double A3t = util::kRecombA;
-    double K3t = util::kRecombk;                           // in KV/cm*(g/cm^2)/MeV
-    double const rho = Density();                          // LAr density in g/cm^3
-    constexpr double Wion = 1000. / util::kGeVToElectrons; // 23.6 eV = 1e, Wion in MeV/e
-    K3t /= rho;                      // KV/MeV
+    double K3t = util::kRecombk;                                    // in KV/cm*(g/cm^2)/MeV
+    double const rho = Density();                                   // LAr density in g/cm^3
+    constexpr double Wion = 1000. / util::kGeVToElectrons;          // 23.6 eV = 1e, Wion in MeV/e
+    K3t /= rho;                                                     // KV/MeV
     double const dEdx = dQdx / (A3t / Wion - K3t / E_field * dQdx); // MeV/cm
 
     return dEdx;
@@ -333,8 +350,7 @@ namespace detinfo {
   // Recalculate x<-->ticks conversion parameters from detector constants
 
   DetectorPropertiesData
-  DetectorPropertiesStandard::DataFor(
-    detinfo::DetectorClocksData const& clock_data) const
+  DetectorPropertiesStandard::DataFor(detinfo::DetectorClocksData const& clock_data) const
   {
     double const samplingRate = sampling_rate(clock_data);
     double const efield = Efield();
@@ -434,36 +450,25 @@ namespace detinfo {
       *this, x_ticks_coefficient, move(x_ticks_offsets), move(drift_direction)};
   }
 
-
   std::string
   DetectorPropertiesStandard::CheckTimeOffsets(std::set<geo::View_t> const& requested_views) const
   {
     auto const& present_views = fGeo->Views();
 
     auto view_diff = [&present_views, &requested_views](geo::View_t const view) {
-                       return static_cast<int>(present_views.count(view)) -
-                              static_cast<int>(requested_views.count(view));
-                     };
+      return static_cast<int>(present_views.count(view)) -
+             static_cast<int>(requested_views.count(view));
+    };
 
     // It is not an error to specify an offset if the view does not
     // exist.  However, if a view does exist, and an offset does not,
     // then that will end the job.
     std::ostringstream errors;
-    if (auto diff = view_diff(geo::kU); diff > 0) {
-      errors << "TimeOffsetU missing for view U.\n";
-    }
-    if (auto diff = view_diff(geo::kV); diff > 0) {
-      errors << "TimeOffsetV missing for view V.\n";
-    }
-    if (auto diff = view_diff(geo::kZ); diff > 0) {
-      errors << "TimeOffsetZ missing for view Z.\n";
-    }
-    if (auto diff = view_diff(geo::kY); diff > 0) {
-      errors << "TimeOffsetY missing for view Y.\n";
-    }
-    if (auto diff = view_diff(geo::kX); diff > 0) {
-      errors << "TimeOffsetX missing for view X.\n";
-    }
+    if (auto diff = view_diff(geo::kU); diff > 0) { errors << "TimeOffsetU missing for view U.\n"; }
+    if (auto diff = view_diff(geo::kV); diff > 0) { errors << "TimeOffsetV missing for view V.\n"; }
+    if (auto diff = view_diff(geo::kZ); diff > 0) { errors << "TimeOffsetZ missing for view Z.\n"; }
+    if (auto diff = view_diff(geo::kY); diff > 0) { errors << "TimeOffsetY missing for view Y.\n"; }
+    if (auto diff = view_diff(geo::kX); diff > 0) { errors << "TimeOffsetX missing for view X.\n"; }
     return errors.str();
   }
 } // namespace

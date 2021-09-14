@@ -16,6 +16,8 @@ standard_detproperties :
  SternheimerCbar:  5.2146  # Ar Sternheimer parameter Cbar.
 
  DriftVelFudgeFactor: 1.
+
+ UseIcarusMicrobooneDriftModel: false # if true, use alternative drift velocity formulation
  
  ElectronsToADC:    1.208041e-3  # in ADC/e; 6241.5 electrons = 1fC = 7.54 ADC counts for ArgoNeuT
  NumberTimeSamples: 2048         # ticks of the clock per readout frame

@@ -108,6 +108,12 @@ namespace detinfo {
         Comment("Allows a scaling factor to fudge the drift velocity "
                 "calculation (as suggested by DriftVel Stancari")};
 
+      fhicl::Atom<bool> UseIcarusMicrobooneDriftModel{
+        Name("UseIcarusMicrobooneDriftModel"),
+        Comment("Allows user to decide to use the ICARUS+MicroBooNE drift "
+                "model for velocity calculation as in arXiv:2008.09765"),
+        false};
+
       fhicl::Atom<bool> SimpleBoundary{Name("SimpleBoundaryProcess"), Comment("")};
 
     }; // Configuration_t
@@ -282,6 +288,9 @@ namespace detinfo {
                                      ///< hit times on view X
     double fDriftVelFudgeFactor;     ///< Scaling factor to allow "fudging" of drift
                                      ///< velocity
+
+    bool fUseIcarusMicrobooneDriftModel; ///< if true, use alternative ICARUS-MicroBooNE drift
+                                         ///< model instead of Walkowiak-based one
 
     SternheimerParameters_t fSternheimerParameters; ///< Sternheimer parameters
 
