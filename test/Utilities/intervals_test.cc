@@ -9,8 +9,7 @@
 
 // Boost libraries
 #define BOOST_TEST_MODULE ( intervals_test )
-#include <cetlib/quiet_unit_test.hpp> // BOOST_AUTO_TEST_CASE()
-#include <boost/test/test_tools.hpp> // BOOST_CHECK(), BOOST_CHECK_EQUAL()
+#include <boost/test/unit_test.hpp>
 
 // LArSoft libraries
 #include "lardataalg/Utilities/intervals.h"
@@ -387,35 +386,35 @@ void test_interval_operations() {
 
   decltype(auto) incr = (t1 += 2000_ns);
   static_assert(std::is_same_v<decltype(incr), microseconds&>);
-  BOOST_CHECK_EQUAL(t1, 8_us);
-  BOOST_CHECK_EQUAL(&incr, &t1);
+  BOOST_TEST((t1 == 8_us));
+  BOOST_TEST((&incr == &t1));
   
   decltype(auto) incr2 = (t1 += t2);
   static_assert(std::is_same_v<decltype(incr2), microseconds&>);
-  BOOST_CHECK_EQUAL(t1,  4_us);
-  BOOST_CHECK_EQUAL(t2, -4_us);
-  BOOST_CHECK_EQUAL(&incr2, &t1);
+  BOOST_TEST((t1 ==  4_us));
+  BOOST_TEST((t2 == -4_us));
+  BOOST_TEST((&incr2 == &t1));
   
   decltype(auto) decr = (t1 -= 2000_ns);
   static_assert(std::is_same_v<decltype(decr), microseconds&>);
-  BOOST_CHECK_EQUAL(t1, 2_us);
-  BOOST_CHECK_EQUAL(&decr, &t1);
+  BOOST_TEST((t1 == 2_us));
+  BOOST_TEST((&decr == &t1));
   
   decltype(auto) decr2 = (t1 -= t2);
   static_assert(std::is_same_v<decltype(decr2), microseconds&>);
-  BOOST_CHECK_EQUAL(t1,  6_us);
-  BOOST_CHECK_EQUAL(t2, -4_us);
-  BOOST_CHECK_EQUAL(&decr2, &t1);
+  BOOST_TEST((t1 ==  6_us));
+  BOOST_TEST((t2 == -4_us));
+  BOOST_TEST((&decr2 == &t1));
   
   decltype(auto) expand = (t1 *= 2);
   static_assert(std::is_same_v<decltype(expand), microseconds&>);
-  BOOST_CHECK_EQUAL(t1, 12_us);
-  BOOST_CHECK_EQUAL(&expand, &t1);
+  BOOST_TEST((t1 == 12_us));
+  BOOST_TEST((&expand == &t1));
   
   decltype(auto) shrink = (t1 /= 2);
   static_assert(std::is_same_v<decltype(shrink), microseconds&>);
-  BOOST_CHECK_EQUAL(t1, 6_us);
-  BOOST_CHECK_EQUAL(&shrink, &t1);
+  BOOST_TEST((t1 == 6_us));
+  BOOST_TEST((&shrink == &t1));
   
 } // test_interval_operations()
 
@@ -648,32 +647,32 @@ void test_point_operations() {
 
   decltype(auto) incr = (p1 += 2000_ns);
   static_assert(std::is_same_v<decltype(incr), microsecond&>);
-  BOOST_CHECK_EQUAL(p1, 8_us);
-  BOOST_CHECK_EQUAL(&incr, &p1);
+  BOOST_TEST((p1 == 8_us));
+  BOOST_TEST((&incr == &p1));
   
   decltype(auto) incr2 = (p1 += t);
   static_assert(std::is_same_v<decltype(incr2), microsecond&>);
-  BOOST_CHECK_EQUAL(p1, 11_us);
-  BOOST_CHECK_EQUAL(t,   3_us);
-  BOOST_CHECK_EQUAL(&incr2, &p1);
+  BOOST_TEST((p1 == 11_us));
+  BOOST_TEST((t ==   3_us));
+  BOOST_TEST((&incr2 == &p1));
   
   decltype(auto) decr = (p1 -= 2000_ns);
   static_assert(std::is_same_v<decltype(decr), microsecond&>);
-  BOOST_CHECK_EQUAL(p1, 9_us);
-  BOOST_CHECK_EQUAL(&decr, &p1);
+  BOOST_TEST((p1 == 9_us));
+  BOOST_TEST((&decr == &p1));
   
   decltype(auto) decr2 = (p1 -= t);
   static_assert(std::is_same_v<decltype(decr2), microsecond&>);
-  BOOST_CHECK_EQUAL(p1,  6_us);
-  BOOST_CHECK_EQUAL(t,   3_us);
-  BOOST_CHECK_EQUAL(&decr2, &p1);
+  BOOST_TEST((p1 ==  6_us));
+  BOOST_TEST((t ==   3_us));
+  BOOST_TEST((&decr2 == &p1));
   
   decltype(auto) diff = (p1 - p2);
   static_assert
    (std::is_same_v<decltype(diff), util::quantities::intervals::microseconds>);
-  BOOST_CHECK_EQUAL(p1,  6_us);
-  BOOST_CHECK_EQUAL(p2, -4_us);
-  BOOST_CHECK_EQUAL(diff, 10_us);
+  BOOST_TEST((p1 ==  6_us));
+  BOOST_TEST((p2 == -4_us));
+  BOOST_TEST((diff == 10_us));
   
 } // test_point_operations()
 

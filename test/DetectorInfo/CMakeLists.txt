@@ -1,7 +1,7 @@
 cet_test( LArPropertiesStandard_test
   LIBRARIES
   lardataalg_DetectorInfo
-  cetlib
+  cetlib::cetlib
   DATAFILES lartest_standard.fcl
   TEST_ARGS ./lartest_standard.fcl
   INSTALL_BIN
@@ -26,7 +26,7 @@ cet_test( LArPropertiesBo_test
 cet_test( DetectorClocksStandard_test
   LIBRARIES
   lardataalg_DetectorInfo
-  cetlib
+  cetlib::cetlib
   DATAFILES clockstest_standard.fcl
   TEST_ARGS ./clockstest_standard.fcl
   INSTALL_BIN
@@ -38,7 +38,7 @@ cet_test( DetectorTimingTypes_test USE_BOOST_UNIT)
 cet_test( DetectorTimingsStandard_test
   LIBRARIES
   lardataalg_DetectorInfo
-  cetlib
+  cetlib::cetlib
   DATAFILES clockstest_standard.fcl
   TEST_ARGS ./clockstest_standard.fcl
   INSTALL_BIN
@@ -69,7 +69,7 @@ cet_test( DetectorClocksCSU40L_test
 cet_make_exec( DetectorPropertiesStandard_test
   LIBRARIES
   lardataalg_DetectorInfo
-  cetlib
+  cetlib::cetlib
 )
 
 cet_test( DetectorPropertiesLArTPCdetector_test

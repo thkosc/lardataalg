@@ -9,8 +9,7 @@
 
 // Boost libraries
 #define BOOST_TEST_MODULE ( quantities_fhicl_test )
-#include <cetlib/quiet_unit_test.hpp> // BOOST_AUTO_TEST_CASE()
-#include <boost/test/test_tools.hpp> // BOOST_CHECK(), BOOST_CHECK_EQUAL()
+#include <boost/test/unit_test.hpp>
 
 // LArSoft libraries
 #include "lardataalg/Utilities/quantities/spacetime.h"
@@ -19,7 +18,6 @@
 // support libraries
 #include "fhiclcpp/types/Table.h"
 #include "fhiclcpp/types/Atom.h"
-#include "fhiclcpp/make_ParameterSet.h"
 #include "fhiclcpp/ParameterSet.h"
 
 // C/C++ standard libraries
@@ -49,7 +47,7 @@ fhicl::Table<Config> validateConfig(fhicl::ParameterSet const& pset) {
 template <typename Config>
 fhicl::Table<Config> validateConfig(std::string const& configStr) {
   fhicl::ParameterSet pset;
-  fhicl::make_ParameterSet(configStr, pset);
+  pset = fhicl::ParameterSet::make(configStr);
   return validateConfig<Config>(pset);
 } // validateConfig(Config)
 
@@ -65,15 +63,15 @@ void test_makeQuantity() {
 
   auto t = util::quantities::makeQuantity<microsecond>("-7e1 ms"sv);
   static_assert(std::is_same_v<decltype(t), microsecond>);
-  BOOST_CHECK_EQUAL(t, -70000_us);
-  BOOST_CHECK_EQUAL(t, -70_ms);
+  BOOST_TEST((t == -70000_us));
+  BOOST_TEST((t == -70_ms));
 
   t = util::quantities::makeQuantity<microsecond>("7e1ms"sv);
-  BOOST_CHECK_EQUAL(t, 70000_us);
-  BOOST_CHECK_EQUAL(t, 70_ms);
+  BOOST_TEST((t == 70000_us));
+  BOOST_TEST((t == 70_ms));
 
   t = util::quantities::makeQuantity<microsecond>("7e1"sv, true);
-  BOOST_CHECK_EQUAL(t, 70_us);
+  BOOST_TEST((t == 70_us));
 
   BOOST_CHECK_THROW(
     util::quantities::makeQuantity<microsecond>("7e1"sv),
@@ -127,11 +125,11 @@ void test_readQuantity() {
   
   auto start = validatedConfig.start();
   static_assert(std::is_same_v<decltype(start), util::quantities::microsecond>);
-  BOOST_CHECK_EQUAL(start, expectedStart);
+  BOOST_TEST((start == expectedStart));
   
   auto end = validatedConfig.end();
   static_assert(std::is_same_v<decltype(end), util::quantities::microsecond>);
-  BOOST_CHECK_EQUAL(end, expectedEnd);
+  BOOST_TEST((end == expectedEnd));
   
 } // test_readQuantity()
 
@@ -161,11 +159,11 @@ void test_writeQuantity() {
   
   auto start = validatedConfig.start();
   static_assert(std::is_same_v<decltype(start), util::quantities::microsecond>);
-  BOOST_CHECK_EQUAL(start, expectedStart);
+  BOOST_TEST((start == expectedStart));
   
   auto end = validatedConfig.end();
   static_assert(std::is_same_v<decltype(end), util::quantities::microsecond>);
-  BOOST_CHECK_EQUAL(end, expectedEnd);
+  BOOST_TEST((end == expectedEnd));
   
 } // test_writeQuantity()
 
