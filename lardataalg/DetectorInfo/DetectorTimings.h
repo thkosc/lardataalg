@@ -338,7 +338,7 @@ namespace detinfo {
     electronics_time
     BeamGateTime() const
     {
-      return electronics_time{detClocksUnits().TriggerTime()};
+      return electronics_time{detClocksUnits().BeamGateTime()};
     }
 
     // --- END -- Electronics times --------------------------------------------
