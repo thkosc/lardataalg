@@ -356,8 +356,8 @@ namespace detinfo {
                                                            // us
     }
 
-    /// Returns the @ref DetectorClocksTPCelectronicsStartTime "TPC electronics
-    /// start time" in @ref DetectorClocksElectronicsTime "electronics time".
+    /// Returns the @ref DetectorClocksTPCelectronicsStartTime "TPC electronics start time"
+    /// in @ref DetectorClocksElectronicsTime "electronics time".
     double
     TPCTime() const
     {
