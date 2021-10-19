@@ -17,30 +17,6 @@
 #include <ostream>
 #include <type_traits> // std::enable_if_t<>, ...
 
-/**
- * @def LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
- * @brief Enable implicit conversions of `Point` and `Interval` into `value_t`.
- * @see LARDATAALG_UTILITIES_QUANTITIES_ENABLE_IMPLICIT_CONVERSION
- *
- * This is likely going to break a number of features, and enabling it should
- * be followed by intense scrutiny of the tests.
- */
-#undef LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
-
-/**
- * @def LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
- * @brief Enable comparisons of `Point` and `Interval` with `value_t`.
- * @see LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
- *
- * This is likely going to break some code, and it is dangerous in that a
- * statement like `t > 5` does not really make sure `5` is the right unit.
- * With this feature disabled (which is recommended), the same comparison would
- * be written `t > 5_ms`, thus ensuring the unit is known (this comes with the
- * hassle of `using namespace util::quantities::time_literals` or such).
- */
-#undef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-
-
 namespace util::quantities {
 
   /// Category type for intervals and point not belonging to any category.
@@ -225,10 +201,7 @@ namespace util::quantities {
       using quantity_t::value;
 
       /// Conversion to the base quantity.
-#ifndef LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
-      explicit
-#endif // !LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
-      constexpr operator value_t() const
+      explicit constexpr operator value_t() const
         { return value(); }
 
 
@@ -508,140 +481,6 @@ namespace util::quantities {
       (Quantity<Args...> const a, Interval<Q, Cat> const b) noexcept
       { return b < a; }
 
-
-    /*
-     * To refrain the wild matching of every type with `V`, and still retain
-     * the ability to compare to e.g. an integer rather than a double, instead
-     * of forcing `V` and `T` to match, we ask `V` to be _implicitly_
-     * convertible into `T`.
-     * In particular, any requirement must exclude `Quantity` types from
-     * matching to `V`, or the interplay with the `Quantity` vs. `Quantity`
-     * comparisons will be messy at best. Currently `Quantity` converts to
-     * its `value_t` only via explicit conversion. If this is going to change,
-     * the `V` to `T` matching requirement must become stricter, e.g.
-     * `std::is_arithmetic_v<V>`.
-     */
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator== (Interval<Q, Cat> const iv, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv.quantity() == value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator== (T const value, Interval<Q, Cat> const iv) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv == value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator!= (Interval<Q, Cat> const iv, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv.quantity() != value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator!= (T const value, Interval<Q, Cat> const iv) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv != value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator<= (Interval<Q, Cat> const iv, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv.quantity() <= value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator<= (T const value, Interval<Q, Cat> const iv) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv >= value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator< (Interval<Q, Cat> const iv, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv.quantity() < value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator< (T const value, Interval<Q, Cat> const iv) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv > value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator>= (Interval<Q, Cat> const iv, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv.quantity() >= value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator>= (T const value, Interval<Q, Cat> const iv) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv <= value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator> (Interval<Q, Cat> const iv, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv.quantity() > value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename T>
-    constexpr std::enable_if_t
-      <std::is_convertible_v<T, typename Interval<Q, Cat>::value_t>, bool>
-    operator> (T const value, Interval<Q, Cat> const iv) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return iv < value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-
     /// @}
     // -- END Comparison operations --------------------------------------------
 
@@ -817,10 +656,7 @@ namespace util::quantities {
       using quantity_t::value;
 
       /// Conversion to the base quantity.
-#ifndef LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
-      explicit
-#endif // LARDATAALG_UTILITIES_INTERVALS_ENABLE_IMPLICIT_CONVERSION
-      constexpr operator value_t() const
+      explicit constexpr operator value_t() const
         { return value(); }
 
 
@@ -1073,155 +909,8 @@ namespace util::quantities {
       (Quantity<Args...> const a, Point<Q, Cat, IV> const b) noexcept
       { return b < a; }
 
-
-    /*
-     * To refrain the wild matching of every type with `V`, and still retain
-     * the ability to compare to e.g. an integer rather than a double, instead
-     * of forcing `V` and `T` to match, we ask `V` to be _implicitly_
-     * convertible into `T`.
-     * In particular, any requirement must exclude `Quantity` types from
-     * matching to `V`, or the interplay with the `Quantity` vs. `Quantity`
-     * comparisons will be messy at best. Currently `Quantity` converts to
-     * its `value_t` only via explicit conversion. If this is going to change,
-     * the `V` to `T` matching requirement must become stricter, e.g.
-     * `std::is_arithmetic_v<V>`.
-     */
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator== (Point<Q, Cat, IV> const p, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p.quantity() == value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator== (T const value, Point<Q, Cat, IV> const p) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p == value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator!= (Point<Q, Cat, IV> const p, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p.quantity() != value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator!= (T const value, Point<Q, Cat, IV> const p) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p != value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator<= (Point<Q, Cat, IV> const p, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p.quantity() <= value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator<= (T const value, Point<Q, Cat, IV> const p) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p >= value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator< (Point<Q, Cat, IV> const p, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p.quantity() < value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator< (T const value, Point<Q, Cat, IV> const p) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p > value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator>= (Point<Q, Cat, IV> const p, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p.quantity() >= value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator>= (T const value, Point<Q, Cat, IV> const p) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p <= value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator> (Point<Q, Cat, IV> const p, T const value) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p.quantity() > value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-    template <typename Q, typename Cat, typename IV, typename T>
-    constexpr
-    std::enable_if_t
-      <std::is_convertible_v<T, typename Point<Q, Cat, IV>::value_t>, bool>
-    operator> (T const value, Point<Q, Cat, IV> const p) noexcept
-#ifdef LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      { return p < value; }
-#else // LARDATAALG_UTILITIES_INTERVALS_ENABLE_VALUE_COMPARISONS
-      = delete; // comparison with unqualified value not allowed
-#endif
-
-
     /// @}
     // -- END Comparison operations --------------------------------------------
-
 
     // -- BEGIN Arithmetic operations ------------------------------------------
     /**

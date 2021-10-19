@@ -14,6 +14,7 @@
 // LArSoft libraries
 #include "lardataalg/Utilities/quantities/spacetime.h"
 #include "lardataalg/Utilities/intervals_fhicl.h"
+#include "test/Utilities/disable_boost_fpc_tolerance.hpp"
 
 // support libraries
 #include "fhiclcpp/types/Table.h"
@@ -26,9 +27,9 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 template <typename Config>
-fhicl::Table<Config> validateConfig(fhicl::ParameterSet const& pset) {
+Config validateConfig(fhicl::ParameterSet const& pset) {
   fhicl::Table<Config> validatedConfig { fhicl::Name("validatedConfig") };
-  
+
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "===> FHiCL configuration:";
   if (pset.is_empty()) std::cout << " <empty>";
@@ -37,18 +38,16 @@ fhicl::Table<Config> validateConfig(fhicl::ParameterSet const& pset) {
   validatedConfig.print_allowed_configuration
     (std::cout << "===> Expected configuration: ");
   std::cout << std::endl;
-  
+
   validatedConfig.validate_ParameterSet(pset);
-  return validatedConfig;
+  return validatedConfig();
 } // validateConfig()
 
 
 // -----------------------------------------------------------------------------
 template <typename Config>
-fhicl::Table<Config> validateConfig(std::string const& configStr) {
-  fhicl::ParameterSet pset;
-  pset = fhicl::ParameterSet::make(configStr);
-  return validateConfig<Config>(pset);
+Config validateConfig(std::string const& configStr) {
+  return validateConfig<Config>(fhicl::ParameterSet::make(configStr));
 } // validateConfig(Config)
 
 
@@ -63,15 +62,15 @@ void test_makeInterval() {
 
   auto t = util::quantities::makeInterval<microseconds>("-7e1 ms"sv);
   static_assert(std::is_same_v<decltype(t), microseconds>);
-  BOOST_TEST((t == -70000_us));
-  BOOST_TEST((t == -70_ms));
+  BOOST_TEST(t == -70000_us);
+  BOOST_TEST(t == -70_ms);
 
   t = util::quantities::makeInterval<microseconds>("7e1ms"sv);
-  BOOST_TEST((t == 70000_us));
-  BOOST_TEST((t == 70_ms));
+  BOOST_TEST(t == 70000_us);
+  BOOST_TEST(t == 70_ms);
 
   t = util::quantities::makeInterval<microseconds>("7e1"sv, true);
-  BOOST_TEST((t == 70_us));
+  BOOST_TEST(t == 70_us);
 
   BOOST_CHECK_THROW(
     util::quantities::makeInterval<microseconds>("7e1"sv),
@@ -110,15 +109,15 @@ void test_makePoint() {
 
   auto t = util::quantities::makePoint<microsecond>("-7e1 ms"sv);
   static_assert(std::is_same_v<decltype(t), microsecond>);
-  BOOST_TEST((t == -70000_us));
-  BOOST_TEST((t == -70_ms));
+  BOOST_TEST(t == -70000_us);
+  BOOST_TEST(t == -70_ms);
 
   t = util::quantities::makePoint<microsecond>("7e1ms"sv);
-  BOOST_TEST((t == 70000_us));
-  BOOST_TEST((t == 70_ms));
+  BOOST_TEST(t == 70000_us);
+  BOOST_TEST(t == 70_ms);
 
   t = util::quantities::makePoint<microsecond>("7e1"sv, true);
-  BOOST_TEST((t == 70_us));
+  BOOST_TEST(t == 70_us);
 
   BOOST_CHECK_THROW(
     util::quantities::makePoint<microsecond>("7e1"sv),
@@ -150,119 +149,85 @@ void test_makePoint() {
 
 // -----------------------------------------------------------------------------
 void test_read() {
-  
+
   using namespace util::quantities::time_literals;
-  
+
   struct Config {
-    
+
     fhicl::Atom<util::quantities::points::microsecond> start
       { fhicl::Name("start"), 0_us };
-    
+
     fhicl::Atom<util::quantities::points::microsecond> end
       { fhicl::Name("end"), 6_ms };
-    
+
     fhicl::Atom<util::quantities::intervals::microseconds> duration
       { fhicl::Name("duration"), 6_ms };
-    
+
   }; // struct Config
-  
+
   std::string const configStr { "start: 2ms duration: 16ms" };
   util::quantities::points::microsecond const expectedStart { 2_ms };
   util::quantities::points::microsecond const expectedEnd { 6_ms };
   util::quantities::intervals::microseconds const expectedDuration { 16_ms };
-  
-  auto validatedConfig = validateConfig<Config>(configStr)();
-  
-  auto start = validatedConfig.start();
-  static_assert
-    (std::is_same_v<decltype(start), util::quantities::points::microsecond>);
-  BOOST_TEST((start == expectedStart));
-  
-  auto end = validatedConfig.end();
-  static_assert
-    (std::is_same_v<decltype(end), util::quantities::points::microsecond>);
-  BOOST_TEST((end == expectedEnd));
-  
-  auto duration = validatedConfig.duration();
-  static_assert(std::is_same_v
-    <decltype(duration), util::quantities::intervals::microseconds>
-    );
-  BOOST_TEST((duration == expectedDuration));
-  
+
+  auto validatedConfig = validateConfig<Config>(configStr);
+  BOOST_TEST(validatedConfig.start() == expectedStart);
+  BOOST_TEST(validatedConfig.end() == expectedEnd);
+  BOOST_TEST(validatedConfig.duration() == expectedDuration);
+
 } // test_read()
 
 
 // -----------------------------------------------------------------------------
 void test_write() {
-  
+
   using namespace util::quantities::time_literals;
   struct Config {
-    
+
     fhicl::Atom<util::quantities::points::microsecond> start
       { fhicl::Name("start"), 0_us };
-    
+
     fhicl::Atom<util::quantities::points::microsecond> end
       { fhicl::Name("end"), 6_ms };
-    
+
     fhicl::Atom<util::quantities::intervals::microseconds> duration
       { fhicl::Name("duration"), 6_ms };
-    
+
   }; // struct Config
-  
+
   util::quantities::points::microsecond const expectedStart { 2_ms };
   util::quantities::points::microsecond const expectedEnd { 6_ms };
   util::quantities::intervals::microseconds const expectedDuration { 16_ms };
-  
+
   fhicl::ParameterSet pset;
-  pset.put<util::quantities::points::microsecond>("start", expectedStart);
-  pset.put<util::quantities::intervals::microseconds>
-    ("duration", expectedDuration);
-  
-  auto validatedConfig = validateConfig<Config>(pset)();
-  
-  auto start = validatedConfig.start();
-  static_assert
-    (std::is_same_v<decltype(start), util::quantities::points::microsecond>);
-  BOOST_TEST((start == expectedStart));
-  
-  auto end = validatedConfig.end();
-  static_assert
-    (std::is_same_v<decltype(end), util::quantities::points::microsecond>);
-  BOOST_TEST((end == expectedEnd));
-  
-  auto duration = validatedConfig.duration();
-  static_assert(std::is_same_v
-    <decltype(duration), util::quantities::intervals::microseconds>
-    );
-  BOOST_TEST((duration == expectedDuration));
-  
+  pset.put("start", expectedStart);
+  pset.put("duration", expectedDuration);
+
+  auto validatedConfig = validateConfig<Config>(pset);
+  BOOST_TEST(validatedConfig.start() == expectedStart);
+  BOOST_TEST(validatedConfig.end() == expectedEnd);
+  BOOST_TEST(validatedConfig.duration() == expectedDuration);
+
 } // test_write()
 
+// ----------------------------------------------------------------------------
 
-// -----------------------------------------------------------------------------
-// BEGIN Test cases  -----------------------------------------------------------
-// -----------------------------------------------------------------------------
-BOOST_AUTO_TEST_CASE(intervals_testcase) {
+BOOST_AUTO_TEST_SUITE(intervals_fhicl_test)
 
+BOOST_AUTO_TEST_CASE(intervals_testcase)
+{
   test_makeInterval();
+}
 
-} // BOOST_AUTO_TEST_CASE(intervals_testcase)
-
-// -----------------------------------------------------------------------------
-BOOST_AUTO_TEST_CASE(points_testcase) {
-
+BOOST_AUTO_TEST_CASE(points_testcase)
+{
   test_makePoint();
+}
 
-} // BOOST_AUTO_TEST_CASE(points_testcase)
-
-// -----------------------------------------------------------------------------
-BOOST_AUTO_TEST_CASE(quantities_fhicl_testcase) {
-
+BOOST_AUTO_TEST_CASE(quantities_fhicl_testcase)
+{
   test_read();
   test_write();
+}
 
-} // BOOST_AUTO_TEST_CASE(quantities_fhicl_testcase)
-
-// -----------------------------------------------------------------------------
-// END Test cases  -------------------------------------------------------------
-// -----------------------------------------------------------------------------
+BOOST_AUTO_TEST_SUITE_END()

@@ -51,29 +51,6 @@
 
 
 /**
- * @def LARDATAALG_UTILITIES_QUANTITIES_ENABLE_IMPLICIT_CONVERSION
- * @brief Enable implicit conversions of `Quantity` into `value_t`.
- *
- * This is likely going to break a number of features, and enabling it should
- * be followed by intense scrutiny of the tests.
- * If disabled, only the explicit conversion is supported.
- */
-#undef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_IMPLICIT_CONVERSION
-
-/**
- * @def LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
- * @brief Enable comparisons of `Quantity` with `value_t`.
- *
- * This is likely going to break some code, and it is dangerous in that a
- * statement like `t > 5` does not really make sure `5` is the right unit.
- * With this feature disabled (which is recommended), the same comparison would
- * be written `t > 5_ms`, thus ensuring the unit is known (this comes with the
- * hassle of `using namespace util::quantities::time_literals` or such).
- */
-#undef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-
-/**
  * @brief Types of variables with a unit.
  *
  * This library uses the following concepts, vaguely inspired by Boost Units
@@ -632,10 +609,7 @@ namespace util::quantities {
       constexpr value_t value() const { return fValue; }
 
       /// Explicit conversion to the base quantity.
-#ifndef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_IMPLICIT_CONVERSION
-      explicit
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_IMPLICIT_CONVERSION
-      constexpr operator value_t() const
+      explicit constexpr operator value_t() const
         { return value(); }
 
       // -- BEGIN Asymmetric arithmetic operations -----------------------------
@@ -934,168 +908,6 @@ namespace util::quantities {
 
     /// @}
     // -- END Arithmetic operations --------------------------------------------
-
-
-    // -- BEGIN Comparisons ----------------------------------------------------
-    /**
-     * @name Comparisons between a Quantity and its base value type.
-     *
-     * These operations, as well as the ones implemented as member functions,
-     * are provided for convenience.
-     *
-     * Here the symmetric operations are defined, where different operands can
-     * be swapped.
-     *
-     */
-    /// @{
-
-    /*
-     * To refrain the wild matching of every type with `V`, and still retain
-     * the ability to compare to e.g. an integer rather than a double, instead
-     * of forcing `V` and `T` to match, we ask `V` to be _implicitly_
-     * convertible into `T`.
-     * In particular, any requirement must exclude `Quantity` types from
-     * matching to `V`, or the interplay with the `Quantity` vs. `Quantity`
-     * comparisons will be messy at best. Currently `Quantity` converts to
-     * its `value_t` only via explicit conversion. If this is going to change,
-     * the `V` to `T` matching requirement must become stricter, e.g.
-     * `std::is_arithmetic_v<V>`.
-     */
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator== (Quantity<U, T> const q, V const value) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q.value() == value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator== (V const value, Quantity<U, T> const q) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q == value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator!= (Quantity<U, T> const q, V const value) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q.value() != value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator!= (V const value, Quantity<U, T> const q) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q != value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator<= (Quantity<U, T> const q, V const value) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q.value() <= value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator<= (V const value, Quantity<U, T> const q) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q >= value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator< (Quantity<U, T> const q, V const value) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q.value() < value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator< (V const value, Quantity<U, T> const q) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q > value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator>= (Quantity<U, T> const q, V const value) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q.value() >= value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator>= (V const value, Quantity<U, T> const q) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q <= value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator> (Quantity<U, T> const q, V const value) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q.value() > value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-    template <typename U, typename T, typename V>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<V>, bool>
-    operator> (V const value, Quantity<U, T> const q) noexcept
-#ifdef LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-      { return q < value; }
-#else
-      = delete; // forbidden
-#endif // LARDATAALG_UTILITIES_QUANTITIES_ENABLE_VALUE_COMPARISONS
-
-
-    /// @}
-    // -- END Comparisons ------------------------------------------------------
 
 
     // -------------------------------------------------------------------------
