@@ -18,7 +18,13 @@ standard_detproperties :
  DriftVelFudgeFactor: 1.
 
  UseIcarusMicrobooneDriftModel: false # if true, use alternative drift velocity formulation
- 
+
+ # Historically, ConvertTicksToX has allowed for the drift time between the
+ # wire planes. This is appropriate for recob::RawDigits, and recob::Wires from
+ # the 1D unfolding, but is not appropriate for recob::Wires from WireCell. The
+ # default value is 'true', retaining the 'classic' behaviour.
+ IncludeInterPlanePitchInXTickOffsets: true
+
  ElectronsToADC:    1.208041e-3  # in ADC/e; 6241.5 electrons = 1fC = 7.54 ADC counts for ArgoNeuT
  NumberTimeSamples: 2048         # ticks of the clock per readout frame
  TimeOffsetU:       -5.193

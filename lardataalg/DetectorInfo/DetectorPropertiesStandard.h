@@ -114,6 +114,15 @@ namespace detinfo {
                 "model for velocity calculation as in arXiv:2008.09765"),
         false};
 
+      fhicl::Atom<bool> IncludeInterPlanePitchInXTickOffsets{
+        Name("IncludeInterPlanePitchInXTickOffsets"),
+        Comment("Historically, ConvertTicksToX has allowed for the drift time "
+                "between the wire planes. This is appropriate for "
+                "recob::RawDigits, and recob::Wires from the 1D unfolding, "
+                "but is not appropriate for recob::Wires from WireCell. "
+                "The default value is 'true', retaining the 'classic' behaviour"),
+        true};
+
       fhicl::Atom<bool> SimpleBoundary{Name("SimpleBoundaryProcess"), Comment("")};
 
     }; // Configuration_t
@@ -291,6 +300,12 @@ namespace detinfo {
 
     bool fUseIcarusMicrobooneDriftModel; ///< if true, use alternative ICARUS-MicroBooNE drift
                                          ///< model instead of Walkowiak-based one
+
+    /// Historically, ConvertTicksToX has allowed for the drift time between
+    /// the wire planes. This is appropriate for recob::RawDigits, and
+    /// recob::Wires from the 1D unfolding, but is not appropriate for
+    /// recob::Wires from WireCell.
+    bool fIncludeInterPlanePitchInXTickOffsets;
 
     SternheimerParameters_t fSternheimerParameters; ///< Sternheimer parameters
 
