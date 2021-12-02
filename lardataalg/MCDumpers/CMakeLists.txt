@@ -1,5 +1,5 @@
 cet_make( LIBRARIES
-    nusimdata_SimulationBase
+    nusimdata::SimulationBase
     ROOT::EG
     ROOT::Core
   )
