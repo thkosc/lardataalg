@@ -4,7 +4,9 @@ cet_test(quantities_fhicl_test USE_BOOST_UNIT
   LIBRARIES PRIVATE
     fhiclcpp::fhiclcpp fhiclcpp::types cetlib_except::cetlib_except
   )
-cet_test(intervals_test USE_BOOST_UNIT)
+cet_test(intervals_test
+         LIBRARIES PRIVATE cetlib_except::cetlib_except
+         USE_BOOST_UNIT)
 cet_test(intervals_fhicl_test USE_BOOST_UNIT
   LIBRARIES PRIVATE
     fhiclcpp::fhiclcpp fhiclcpp::types cetlib_except::cetlib_except

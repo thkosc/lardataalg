@@ -1,5 +1,6 @@
 cet_make(LIBRARIES larcorealg_Geometry
                    larcorealg_CoreUtils
+                   canvas::canvas
                    messagefacility::MF_MessageLogger
                    cetlib_except::cetlib_except
                    fhiclcpp::fhiclcpp

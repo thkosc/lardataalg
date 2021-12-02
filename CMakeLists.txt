@@ -13,8 +13,6 @@ project(lardataalg VERSION 09.08.00 LANGUAGES CXX)
 # cetbuildtools contains our cmake modules
 find_package(cetbuildtools REQUIRED)
 
-list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules)
-
 include(CetCMakeEnv)
 cet_cmake_env()
 
@@ -26,16 +24,16 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
 
 cet_report_compiler_flags()
 
+find_package(cetlib_except REQUIRED PUBLIC)
+find_package(cetlib REQUIRED PUBLIC)
+find_package(canvas REQUIRED PUBLIC)
+find_package(canvas_root_io REQUIRED)
+find_package(nusimdata REQUIRED PUBLIC)
+find_package(ROOT COMPONENTS Core EG Hist REQUIRED)
 # these are minimum required versions, not the actual product versions
-find_ups_product( canvas )
 find_ups_product( larcoreobj )
 find_ups_product( larcorealg )
 find_ups_product( lardataobj )
-find_ups_product( nusimdata )
-find_ups_product( cetlib )
-find_ups_product( cetlib_except )
-find_ups_product(clhep)
-find_ups_root()
 
 # macros for artdaq_dictionary and simple_plugin
 include(ArtDictionary)
