@@ -1,11 +1,18 @@
-cet_make(LIBRARIES larcorealg_Geometry
-                   larcorealg_CoreUtils
+cet_make_library(
+         SOURCE DetectorClocksStandard.cxx
+                DetectorPropertiesData.cc
+                DetectorPropertiesStandard.cxx
+                ElecClock.cxx
+                LArPropertiesStandard.cxx
+                RunHistoryStandard.cxx
+         LIBRARIES larcorealg::Geometry
+                   larcorealg::CoreUtils
                    canvas::canvas
                    messagefacility::MF_MessageLogger
                    cetlib_except::cetlib_except
                    fhiclcpp::fhiclcpp
                    ROOT::Core
-                   ROOT::Hist) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.05.03) - deprecated: use cet_make_library(), build_dictonary(), cet_plugin() with explicit source lists and plugin base types
+                   ROOT::Hist)
 
 install_headers()
 install_fhicl()
