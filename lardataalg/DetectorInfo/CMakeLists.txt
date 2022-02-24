@@ -1,5 +1,12 @@
-cet_make(LIBRARIES larcorealg_Geometry
-                   larcorealg_CoreUtils
+cet_make_library(
+         SOURCE DetectorClocksStandard.cxx
+                DetectorPropertiesData.cc
+                DetectorPropertiesStandard.cxx
+                ElecClock.cxx
+                LArPropertiesStandard.cxx
+                RunHistoryStandard.cxx
+         LIBRARIES larcorealg::Geometry
+                   larcorealg::CoreUtils
                    canvas::canvas
                    messagefacility::MF_MessageLogger
                    cetlib_except::cetlib_except

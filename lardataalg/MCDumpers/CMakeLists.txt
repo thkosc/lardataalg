@@ -1,4 +1,6 @@
-cet_make( LIBRARIES
+cet_make_library(
+  SOURCE MCDumperUtils.cxx
+  LIBRARIES
     nusimdata::SimulationBase
     ROOT::EG
     ROOT::Core
