@@ -35,6 +35,7 @@ cet_test( DetectorClocksStandard_test
 
 cet_test( DetectorTimingTypes_test
           LIBRARIES cetlib::cetlib
+                    lardataalg::UtilitiesHeaders
           USE_BOOST_UNIT)
 
 cet_test( DetectorTimingsStandard_test

@@ -5,14 +5,17 @@ cet_make_library(
                 ElecClock.cxx
                 LArPropertiesStandard.cxx
                 RunHistoryStandard.cxx
-         LIBRARIES larcorealg::Geometry
-                   larcorealg::CoreUtils
+         LIBRARIES
                    canvas::canvas
                    messagefacility::MF_MessageLogger
                    cetlib_except::cetlib_except
                    fhiclcpp::fhiclcpp
                    ROOT::Core
-                   ROOT::Hist)
+                   ROOT::Hist
+         PUBLIC    larcorealg::Geometry
+                   larcorealg::CoreUtils
+                   lardataobj::RawData
+)
 
 install_headers()
 install_fhicl()
