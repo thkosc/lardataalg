@@ -38,20 +38,20 @@ namespace detinfo {
   /**
    * @brief Loads `DetectorClocksStandard` trigger times.
    * @tparam Event type of event where trigger data might be stored
-   * @param detClocks the instance of `detinfo::DetectorClocksStandard` to set
+   * @param triggerTag tag of the `raw::Trigger` collection data product to read
    * @param event the event the trigger objects are stored into
-   * @return whether the times were set from a trigger object
-   * @throws cet::exception if trigger data product has more than one trigger
+   * @return optional pair of trigger and beam gate time, empty if not found
+   * @throws cet::exception (category `"setDetectorClocksStandardTrigger"`)
+   *                        if trigger data product has more than one trigger
    *
-   * This function sets the trigger and beam gate times of `detClocks`.
-   * First, it attempts to read the settings from the event (see
-   * `setDetectorClocksStandardTriggersFromEvent()`).
-   * If that fails "nicely", then sets them with the default values from the
-   * configuration.
-   *
-   * A "nice" failure is where there is no trigger object in the event.
-   * Other types of failure include when there are more than one trigger objects
-   * in the event, in which case no choice is made, and an exception is thrown.
+   * This function returns the relative trigger and beam gate times read from an `event`.
+   * It attempts to read the information from a `raw::Trigger` collection data product
+   * with tag `triggerTag` in the `event`. Times are expected to be in microseconds
+   * on the electronics time scale.
+   * In case that data product does not exist, or it exists but empty,
+   * an empty result is quietly returned.
+   * If instead there are multiple trigger objects in the collection,
+   * no choice is made, and an exception is thrown.
    */
   template <typename Event>
   std::optional<std::pair<double, double>>
@@ -83,21 +83,23 @@ namespace detinfo {
   /**
    * @brief Loads `DetectorClocksStandard` G4Ref correction times.
    * @tparam Event type of event where trigger data might be stored
-   * @param detClocks the instance of `detinfo::DetectorClocksStandard` to set
+   * @param triggerTag tag of the `raw::Trigger` collection data product to read
    * @param event the event the trigger objects are stored into
-   * @return whether the g4 ref correction  was set from a trigger object
-   * @throws cet::exception if trigger data product has more than one trigger
+   * @return optional G4 reference time value, empty if not found
+   * @throws cet::exception (category `"setDetectorClocksStandardTrigger"`)
+   *                        if trigger data product has more than one trigger
    *
-   * This function sets the trigger and beam gate times of `detClocks`.
-   * First, it attempts to read the settings from the event (see
-   * `setDetectorClocksStandardG4RefTimeCorrectionFromEvent()`).
-   * If that fails "nicely", then sets them with the default values from the
-   * configuration.
-   *
-   * A "nice" failure is where there is no trigger object in the event.
-   * Other types of failure include when there are more than one trigger objects
-   * in the event, in which case no choice is made, and an exception is thrown.
-   */
+   * This function returns the simulation (G4) reference time from an `event`.
+   * It is assumed to match the trigger time (or, it is assumed that the trigger
+   * fired at the time the event was generated).
+   * The function attempts to read the information from a `raw::Trigger` collection
+   * data product with tag `triggerTag` in the `event`. The time is expected to be
+   * in microseconds on the electronics time scale.
+   * In case that data product does not exist, or it exists but empty,
+   * an empty result is quietly returned.
+   * If instead there are multiple trigger objects in the collection,
+   * no choice is made, and an exception is thrown.
+      */
   template <typename Event>
   std::optional<double>
   g4ref_time_for_event(art::InputTag const& triggerTag, Event const& event)
