@@ -69,8 +69,8 @@ cet_test( DetectorClocksCSU40L_test
   TEST_ARGS ./clockstest_csu40l.fcl
 )
 
-cet_make_exec( DetectorPropertiesStandard_test
-  LIBRARIES
+cet_make_exec( NAME DetectorPropertiesStandard_test
+  LIBRARIES PRIVATE
   lardataalg_DetectorInfo
   cetlib::cetlib
 )
