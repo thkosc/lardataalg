@@ -1,20 +1,36 @@
-cet_make_library(
-         SOURCE DetectorClocksStandard.cxx
-                DetectorPropertiesData.cc
-                DetectorPropertiesStandard.cxx
-                ElecClock.cxx
-                LArPropertiesStandard.cxx
-                RunHistoryStandard.cxx
-         LIBRARIES
-                   canvas::canvas
-                   messagefacility::MF_MessageLogger
-                   cetlib_except::cetlib_except
-                   fhiclcpp::fhiclcpp
-                   ROOT::Core
-                   ROOT::Hist
-         PUBLIC    larcorealg::Geometry
-                   larcorealg::CoreUtils
-                   lardataobj::RawData
+cet_make_library(SOURCE
+  DetectorClocksStandard.cxx
+  DetectorPropertiesData.cc
+  DetectorPropertiesStandard.cxx
+  ElecClock.cxx
+  LArPropertiesStandard.cxx
+  RunHistoryStandard.cxx
+  LIBRARIES
+  PUBLIC
+  lardataobj::RawData
+  larcorealg::Geometry
+  larcoreobj::SimpleTypesAndConstants
+  canvas::canvas
+  messagefacility::MF_MessageLogger
+  fhiclcpp::types
+  fhiclcpp::fhiclcpp
+  cetlib_except::cetlib_except
+  PRIVATE
+  cetlib::cetlib
+  ROOT::Core
+  ROOT::Hist
+)
+
+cet_make_library(LIBRARY_NAME DetectorInfo_TestHelpers INTERFACE
+  SOURCE
+  DetectorClocksStandardTestHelpers.h
+  DetectorPropertiesStandardTestHelpers.h
+  LArPropertiesStandardTestHelpers.h
+  LIBRARIES INTERFACE
+  lardataalg::DetectorInfo
+  larcorealg::TestUtils
+  messagefacility::MF_MessageLogger
+  fhiclcpp::fhiclcpp
 )
 
 install_headers()

@@ -1,4 +1,11 @@
-install_headers() 
-install_source() 
+cet_make_library(INTERFACE
+  SOURCE
+  DumperBase.h
+  RawData/OpDetWaveform.h
+  LIBRARIES INTERFACE
+  lardataalg::UtilitiesHeaders
+  lardataobj::headers
+)
 
-add_subdirectory(RawData)
+install_headers(SUBDIRS RawData)
+install_source(SUBDIRS RawData)

@@ -1,11 +1,12 @@
-cet_test( LArPropertiesStandard_test
-  LIBRARIES
-  lardataalg_DetectorInfo
-  cetlib::cetlib
+cet_test(LArPropertiesStandard_test
   DATAFILES lartest_standard.fcl
   TEST_ARGS ./lartest_standard.fcl
   INSTALL_BIN
   INSTALL_SOURCE
+  LIBRARIES PRIVATE
+  lardataalg::DetectorInfo_TestHelpers
+  lardataalg::DetectorInfo
+  larcorealg::unit_test_base
 )
 
 cet_test( LArPropertiesLArTPCdetector_test
@@ -22,30 +23,36 @@ cet_test( LArPropertiesBo_test
   TEST_ARGS ./lartest_bo.fcl
 )
 
-
-cet_test( DetectorClocksStandard_test
-  LIBRARIES
-  lardataalg_DetectorInfo
-  cetlib::cetlib
+cet_test(DetectorClocksStandard_test
   DATAFILES clockstest_standard.fcl
   TEST_ARGS ./clockstest_standard.fcl
   INSTALL_BIN
   INSTALL_SOURCE
+  LIBRARIES PRIVATE
+  lardataalg::DetectorInfo_TestHelpers
+  lardataalg::DetectorInfo
+  larcorealg::TestUtils
 )
 
-cet_test( DetectorTimingTypes_test
-          LIBRARIES cetlib::cetlib
-                    lardataalg::UtilitiesHeaders
-          USE_BOOST_UNIT)
+cet_test(DetectorTimingTypes_test USE_BOOST_UNIT
+  LIBRARIES PRIVATE
+  lardataalg::disable_boost_fpc_tolerance
+  lardataalg::DetectorInfo
+  lardataalg::UtilitiesHeaders
+  larcorealg::CoreUtils
+)
 
-cet_test( DetectorTimingsStandard_test
-  LIBRARIES
-  lardataalg_DetectorInfo
-  cetlib::cetlib
+cet_test(DetectorTimingsStandard_test
   DATAFILES clockstest_standard.fcl
   TEST_ARGS ./clockstest_standard.fcl
   INSTALL_BIN
   INSTALL_SOURCE
+  LIBRARIES PRIVATE
+  lardataalg::DetectorInfo_TestHelpers
+  lardataalg::DetectorInfo
+  lardataalg::UtilitiesHeaders
+  larcorealg::CoreUtils
+  messagefacility::MF_MessageLogger
 )
 
 cet_test( DetectorClocksLArTPCdetector_test
@@ -69,10 +76,12 @@ cet_test( DetectorClocksCSU40L_test
   TEST_ARGS ./clockstest_csu40l.fcl
 )
 
-cet_make_exec( NAME DetectorPropertiesStandard_test
+cet_make_exec(NAME DetectorPropertiesStandard_test
   LIBRARIES PRIVATE
-  lardataalg_DetectorInfo
-  cetlib::cetlib
+  lardataalg::DetectorInfo_TestHelpers
+  lardataalg::DetectorInfo
+  larcorealg::geometry_unit_test_base
+  larcorealg::Geometry
 )
 
 cet_test( DetectorPropertiesLArTPCdetector_test

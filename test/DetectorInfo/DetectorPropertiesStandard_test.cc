@@ -13,7 +13,7 @@
 #include "lardataalg/DetectorInfo/DetectorPropertiesStandard.h"
 #include "lardataalg/DetectorInfo/DetectorPropertiesStandardTestHelpers.h"
 #include "lardataalg/DetectorInfo/LArPropertiesStandardTestHelpers.h"
-#include "test/Geometry/geometry_unit_test_base.h"
+#include "larcorealg/TestUtils/geometry_unit_test_base.h"
 
 // C/C++ standard libraries
 #include <array>

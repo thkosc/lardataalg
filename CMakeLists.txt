@@ -22,16 +22,20 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
 
 cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
 
-find_package(cetlib_except REQUIRED EXPORT)
-find_package(cetlib REQUIRED EXPORT)
-find_package(canvas REQUIRED EXPORT)
-find_package(canvas_root_io REQUIRED)
 find_package(nusimdata REQUIRED EXPORT)
-find_package(ROOT COMPONENTS Core EG Hist REQUIRED EXPORT)
-find_package(Boost REQUIRED)
-find_package( larcoreobj REQUIRED EXPORT)
-find_package( larcorealg REQUIRED EXPORT)
-find_package( lardataobj REQUIRED EXPORT)
+
+find_package(canvas REQUIRED EXPORT)
+find_package(messagefacility REQUIRED EXPORT)
+find_package(fhiclcpp REQUIRED EXPORT)
+find_package(cetlib REQUIRED EXPORT)
+find_package(cetlib_except REQUIRED EXPORT)
+
+find_package(Boost COMPONENTS headers REQUIRED EXPORT)
+find_package(ROOT COMPONENTS Core EG Hist Physics REQUIRED EXPORT)
+
+find_package(lardataobj REQUIRED EXPORT)
+find_package(larcorealg REQUIRED EXPORT)
+find_package(larcoreobj REQUIRED EXPORT)
 
 # source
 add_subdirectory(lardataalg)
