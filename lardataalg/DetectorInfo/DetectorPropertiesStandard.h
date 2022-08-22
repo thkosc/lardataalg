@@ -128,13 +128,13 @@ namespace detinfo {
 
       fhicl::Atom<double> ModBoxAlpha {
         Name("ModBoxAlpha"),
-        Comment("alpha parameter in the Modified Box recombination moddel."),
+        Comment("alpha parameter in the Modified Box recombination model."),
         util::kModBoxA
       };
 
       fhicl::Atom<double> ModBoxBeta {
         Name("ModBoxBeta"),
-        Comment("beta parameter in the Modified Box recombination moddel."),
+        Comment("beta parameter in the Modified Box recombination model."),
         util::kModBoxB
       };
 
