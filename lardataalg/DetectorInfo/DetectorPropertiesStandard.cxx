@@ -13,7 +13,6 @@
 #include "larcorealg/Geometry/GeometryCore.h"
 #include "larcorealg/Geometry/PlaneGeo.h"
 #include "larcorealg/Geometry/TPCGeo.h"
-#include "larcoreobj/SimpleTypesAndConstants/PhysicalConstants.h"
 
 #include "cetlib/pow.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
@@ -88,6 +87,9 @@ namespace detinfo {
     fIncludeInterPlanePitchInXTickOffsets = config().IncludeInterPlanePitchInXTickOffsets();
 
     fSimpleBoundary = config().SimpleBoundary();
+
+    fModBoxA = config().ModBoxAlpha();
+    fModBoxB = config().ModBoxBeta();
   }
 
   //------------------------------------------------------------------------------------//
@@ -334,8 +336,8 @@ namespace detinfo {
     // correction at high values of dQ/dx.
     double const rho = Density();                          // LAr density in g/cm^3
     constexpr double Wion = 1000. / util::kGeVToElectrons; // 23.6 eV = 1e, Wion in MeV/e
-    double const Beta = util::kModBoxB / (rho * E_field);
-    constexpr double Alpha = util::kModBoxA;
+    double const Beta = fModBoxB / (rho * E_field);
+    double const Alpha = fModBoxA;
     double const dEdx = (exp(Beta * Wion * dQdx) - Alpha) / Beta;
 
     return dEdx;
