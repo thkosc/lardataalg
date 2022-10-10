@@ -374,7 +374,7 @@ namespace detinfo {
 
           // Calculate geometric time offset.
           // only works if xyz[0]<=0
-          const double* xyz = tpcgeom.PlaneLocation(0);
+          auto const xyz = tpcgeom.Plane(0).GetCenter();
 
           x_ticks_offsets[cstat][tpc][plane] =
             -xyz[0] / (dir * x_ticks_coefficient) + triggerOffset;
