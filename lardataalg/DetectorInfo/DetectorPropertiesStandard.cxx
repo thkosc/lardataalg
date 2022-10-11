@@ -36,9 +36,8 @@ namespace detinfo {
   }
 
   //--------------------------------------------------------------------
-  void
-  DetectorPropertiesStandard::ValidateAndConfigure(fhicl::ParameterSet const& p,
-                                                   std::set<std::string> const& ignore_params)
+  void DetectorPropertiesStandard::ValidateAndConfigure(fhicl::ParameterSet const& p,
+                                                        std::set<std::string> const& ignore_params)
   {
     {
       mf::LogInfo debug("setupProvider<DetectorPropertiesStandard>");
@@ -93,8 +92,7 @@ namespace detinfo {
   }
 
   //------------------------------------------------------------------------------------//
-  double
-  DetectorPropertiesStandard::Efield(unsigned int const planegap) const
+  double DetectorPropertiesStandard::Efield(unsigned int const planegap) const
   {
     if (planegap >= fEfield.size())
       throw cet::exception("DetectorPropertiesStandard")
@@ -104,8 +102,7 @@ namespace detinfo {
   }
 
   //------------------------------------------------
-  double
-  DetectorPropertiesStandard::Density(double temperature) const
+  double DetectorPropertiesStandard::Density(double temperature) const
   {
     // Default temperature use internal value.
     if (temperature == 0.) temperature = Temperature();
@@ -130,8 +127,7 @@ namespace detinfo {
   // Material parameters (stored in larproperties.fcl) are taken from
   // pdg web site http://pdg.lbl.gov/AtomicNuclearProperties/
   //
-  double
-  DetectorPropertiesStandard::Eloss(double mom, double mass, double tcut) const
+  double DetectorPropertiesStandard::Eloss(double mom, double mass, double tcut) const
   {
     // Some constants.
     constexpr double K = 0.307075;     // 4 pi N_A r_e^2 m_e c^2 (MeV cm^2/mol).
@@ -171,8 +167,7 @@ namespace detinfo {
   }
 
   //----------------------------------------------------------------------------------
-  double
-  DetectorPropertiesStandard::ElossVar(double const mom, double const mass) const
+  double DetectorPropertiesStandard::ElossVar(double const mom, double const mass) const
   {
     // Some constants.
     constexpr double K = 0.307075;     // 4 pi N_A r_e^2 m_e c^2 (MeV cm^2/mol).
@@ -187,8 +182,7 @@ namespace detinfo {
   }
 
   //------------------------------------------------------------------------------------//
-  double
-  DetectorPropertiesStandard::DriftVelocity(double efield, double temperature) const
+  double DetectorPropertiesStandard::DriftVelocity(double efield, double temperature) const
   {
     // Drift Velocity as a function of Electric Field and LAr Temperature
     // from : W. Walkowiak, NIM A 449 (2000) 288-294
@@ -301,13 +295,11 @@ namespace detinfo {
   //         effective pitch for a given 3D track.
   //  Electric Field in the drift region in KV/cm/
   // returns dEdX in MeV/cm
-  double
-  DetectorPropertiesStandard::BirksCorrection(double dQdx) const
+  double DetectorPropertiesStandard::BirksCorrection(double dQdx) const
   {
     return BirksCorrection(dQdx, Efield());
   }
-  double
-  DetectorPropertiesStandard::BirksCorrection(double dQdx, double E_field) const
+  double DetectorPropertiesStandard::BirksCorrection(double dQdx, double E_field) const
   {
     // Correction for charge quenching using parameterization from
     // S.Amoruso et al., NIM A 523 (2004) 275
@@ -324,13 +316,11 @@ namespace detinfo {
 
   //----------------------------------------------------------------------------------
   // Modified Box model correction
-  double
-  DetectorPropertiesStandard::ModBoxCorrection(double dQdx) const
+  double DetectorPropertiesStandard::ModBoxCorrection(double dQdx) const
   {
     return ModBoxCorrection(dQdx, Efield());
   }
-  double
-  DetectorPropertiesStandard::ModBoxCorrection(double dQdx, double E_field) const
+  double DetectorPropertiesStandard::ModBoxCorrection(double dQdx, double E_field) const
   {
     // Modified Box model correction has better behavior than the Birks
     // correction at high values of dQ/dx.
@@ -353,8 +343,8 @@ namespace detinfo {
   //--------------------------------------------------------------------
   // Recalculate x<-->ticks conversion parameters from detector constants
 
-  DetectorPropertiesData
-  DetectorPropertiesStandard::DataFor(detinfo::DetectorClocksData const& clock_data) const
+  DetectorPropertiesData DetectorPropertiesStandard::DataFor(
+    detinfo::DetectorClocksData const& clock_data) const
   {
     double const samplingRate = sampling_rate(clock_data);
     double const efield = Efield();
@@ -389,7 +379,7 @@ namespace detinfo {
           x_ticks_offsets[cstat][tpc][plane] =
             -xyz[0] / (dir * x_ticks_coefficient) + triggerOffset;
 
-          if(fIncludeInterPlanePitchInXTickOffsets){
+          if (fIncludeInterPlanePitchInXTickOffsets) {
             // Get field in gap between planes
             double efieldgap[3];
             double driftVelocitygap[3];
@@ -457,8 +447,8 @@ namespace detinfo {
       *this, x_ticks_coefficient, move(x_ticks_offsets), move(drift_direction)};
   }
 
-  std::string
-  DetectorPropertiesStandard::CheckTimeOffsets(std::set<geo::View_t> const& requested_views) const
+  std::string DetectorPropertiesStandard::CheckTimeOffsets(
+    std::set<geo::View_t> const& requested_views) const
   {
     auto const& present_views = fGeo->Views();
 

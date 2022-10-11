@@ -36,16 +36,14 @@ detinfo::DetectorClocksStandard::DetectorClocksStandard(fhicl::ParameterSet cons
   SetTriggerTime(fConfigValue[detinfo::kDefaultTrigTime], fConfigValue[detinfo::kDefaultBeamTime]);
 }
 
-void
-detinfo::DetectorClocksStandard::ApplyParams()
+void detinfo::DetectorClocksStandard::ApplyParams()
 {
   fFramePeriod = fConfigValue[kFramePeriod];
   fTriggerOffsetTPC = fConfigValue[kTriggerOffsetTPC];
   SetTriggerTime(fConfigValue[detinfo::kDefaultTrigTime], fConfigValue[detinfo::kDefaultBeamTime]);
 }
 
-bool
-detinfo::DetectorClocksStandard::IsRightConfig(const fhicl::ParameterSet& ps) const
+bool detinfo::DetectorClocksStandard::IsRightConfig(const fhicl::ParameterSet& ps) const
 {
   if (ps.has_key("module_label")) { return false; }
   return std::all_of(fConfigName.cbegin(), fConfigName.cend(), [&ps](auto const& config_name) {
@@ -53,13 +51,11 @@ detinfo::DetectorClocksStandard::IsRightConfig(const fhicl::ParameterSet& ps) co
   });
 }
 
-
-void
-detinfo::DetectorClocksStandard::debugReport() const
+void detinfo::DetectorClocksStandard::debugReport() const
 {
   std::cout << "fConfigValues contents: " << std::endl;
 
-  for(auto const& [ name, value ]: util::zip(fConfigName, fConfigValue))
+  for (auto const& [name, value] : util::zip(fConfigName, fConfigValue))
     std::cout << "\n    " << name << " ... " << value;
   std::cout << std::endl;
 
@@ -67,4 +63,3 @@ detinfo::DetectorClocksStandard::debugReport() const
   std::cout.flush();
 
 } // detinfo::DetectorClocksStandard::debugReport()
-

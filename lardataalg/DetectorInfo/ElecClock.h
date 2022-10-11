@@ -104,26 +104,22 @@ namespace detinfo {
         throw detinfo::DetectorClocksException("Only positive frequency allowed.");
     }
 
-    constexpr ElecClock
-    WithTime(double const time) const noexcept
+    constexpr ElecClock WithTime(double const time) const noexcept
     {
       return {time, fFramePeriod, fFrequency, std::nothrow};
     }
 
-    constexpr ElecClock
-    WithTick(int const tick, int const frame = 0) const noexcept
+    constexpr ElecClock WithTick(int const tick, int const frame = 0) const noexcept
     {
       return {Time(tick, frame), fFramePeriod, fFrequency, std::nothrow};
     }
 
-    constexpr ElecClock
-    AdvanceTimeBy(double const time) const noexcept
+    constexpr ElecClock AdvanceTimeBy(double const time) const noexcept
     {
       return {fTime + time, fFramePeriod, fFrequency, std::nothrow};
     }
 
-    constexpr ElecClock
-    AdvanceTicksBy(int const ticks) const noexcept
+    constexpr ElecClock AdvanceTicksBy(int const ticks) const noexcept
     {
       return {fTime + Time(ticks), fFramePeriod, fFrequency, std::nothrow};
     }
@@ -133,11 +129,7 @@ namespace detinfo {
      *
      * Note that this is different than `Time(Time())`, which is discretized.
      */
-    constexpr double
-    Time() const noexcept
-    {
-      return fTime;
-    }
+    constexpr double Time() const noexcept { return fTime; }
 
     /**
      * @brief Returns the absolute time of the start of the specified sample.
@@ -150,8 +142,7 @@ namespace detinfo {
      *
      * The returned time is not related to the current time of the clock.
      */
-    constexpr double
-    Time(int const sample, int const frame) const noexcept
+    constexpr double Time(int const sample, int const frame) const noexcept
     {
       return (sample / fFrequency + frame * fFramePeriod);
     }
@@ -165,8 +156,7 @@ namespace detinfo {
      *
      * It is not related to the current time of the clock.
      */
-    constexpr double
-    Time(double const time) const noexcept
+    constexpr double Time(double const time) const noexcept
     {
       return Time(Sample(time), Frame(time));
     }
@@ -180,32 +170,16 @@ namespace detinfo {
      *
      * It is not related to the current time of the clock.
      */
-    constexpr double
-    Time(int const ticks) const noexcept
-    {
-      return ticks / fFrequency;
-    }
+    constexpr double Time(int const ticks) const noexcept { return ticks / fFrequency; }
 
     /// Frequency in MHz.
-    constexpr double
-    Frequency() const
-    {
-      return fFrequency;
-    }
+    constexpr double Frequency() const { return fFrequency; }
 
     /// A single frame period in microseconds.
-    constexpr double
-    FramePeriod() const noexcept
-    {
-      return fFramePeriod;
-    }
+    constexpr double FramePeriod() const noexcept { return fFramePeriod; }
 
     /// Current clock tick (that is, the number of tick `Time()` falls in).
-    constexpr int
-    Ticks() const noexcept
-    {
-      return Ticks(fTime);
-    }
+    constexpr int Ticks() const noexcept { return Ticks(fTime); }
 
     /**
      * @brief Returns the number of tick the specified time falls in.
@@ -217,8 +191,7 @@ namespace detinfo {
      * @note The returned value (number of tick) can wrap if the real number of
      *       the tick is beyond the range of the returned data type (`int`).
      */
-    constexpr int
-    Ticks(double const time) const noexcept
+    constexpr int Ticks(double const time) const noexcept
     {
       return static_cast<int>(time * fFrequency);
     }
@@ -234,8 +207,7 @@ namespace detinfo {
      * @note The returned value (number of tick) can wrap if the real number of
      *       the tick is beyond the range of the returned data type (`int`).
      */
-    constexpr int
-    Ticks(int const sample, int const frame) const noexcept
+    constexpr int Ticks(int const sample, int const frame) const noexcept
     {
       return sample + frame * FrameTicks();
     }
@@ -249,11 +221,7 @@ namespace detinfo {
      * To univocally define the sample, the number of the frame must also be
      * obtained, e.g. via `Frame()`.
      */
-    constexpr int
-    Sample() const noexcept
-    {
-      return Sample(fTime);
-    }
+    constexpr int Sample() const noexcept { return Sample(fTime); }
 
     /**
      * @brief Returns the number of the sample containing the specified time.
@@ -268,8 +236,7 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    constexpr int
-    Sample(double const time) const noexcept
+    constexpr int Sample(double const time) const noexcept
     {
       return static_cast<int>((time - Frame(time) * fFramePeriod) * fFrequency);
     }
@@ -287,8 +254,7 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    constexpr int
-    Sample(int const tick) const noexcept
+    constexpr int Sample(int const tick) const noexcept
     {
       return (tick % static_cast<int>(FrameTicks()));
     }
@@ -300,11 +266,7 @@ namespace detinfo {
      * The returned value is the number of the frame which the current clock
      * time falls in.
      */
-    constexpr int
-    Frame() const noexcept
-    {
-      return Frame(fTime);
-    }
+    constexpr int Frame() const noexcept { return Frame(fTime); }
 
     /**
      * @brief Returns the number of the frame containing the specified time.
@@ -317,8 +279,7 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    constexpr int
-    Frame(double const time) const noexcept
+    constexpr int Frame(double const time) const noexcept
     {
       return static_cast<int>(time / fFramePeriod);
     }
@@ -334,48 +295,26 @@ namespace detinfo {
      *
      * The result is not related to the current time of the clock.
      */
-    constexpr int
-    Frame(int const tick) const noexcept
+    constexpr int Frame(int const tick) const noexcept
     {
       return (tick / static_cast<int>(FrameTicks()));
     }
 
     /// Number ticks in a frame.
-    constexpr unsigned int
-    FrameTicks() const noexcept
+    constexpr unsigned int FrameTicks() const noexcept
     {
       return static_cast<unsigned int>(fFramePeriod * fFrequency);
     }
 
     /// A single tick period in microseconds.
-    constexpr double
-    TickPeriod() const noexcept
-    {
-      return 1. / fFrequency;
-    }
+    constexpr double TickPeriod() const noexcept { return 1. / fFrequency; }
 
     //-- comparators --//
 
-    constexpr bool
-    operator<(const ElecClock& rhs) const noexcept
-    {
-      return fTime < rhs.Time();
-    }
-    constexpr bool
-    operator>(const ElecClock& rhs) const noexcept
-    {
-      return fTime > rhs.Time();
-    }
-    constexpr bool
-    operator<=(const ElecClock& rhs) const noexcept
-    {
-      return fTime <= rhs.Time();
-    }
-    constexpr bool
-    operator>=(const ElecClock& rhs) const noexcept
-    {
-      return fTime >= rhs.Time();
-    }
+    constexpr bool operator<(const ElecClock& rhs) const noexcept { return fTime < rhs.Time(); }
+    constexpr bool operator>(const ElecClock& rhs) const noexcept { return fTime > rhs.Time(); }
+    constexpr bool operator<=(const ElecClock& rhs) const noexcept { return fTime <= rhs.Time(); }
+    constexpr bool operator>=(const ElecClock& rhs) const noexcept { return fTime >= rhs.Time(); }
 
   private:
     constexpr ElecClock(double const time,

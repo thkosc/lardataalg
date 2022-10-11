@@ -12,27 +12,28 @@
 
 // LArSoft libraries
 #include "larcorealg/CoreUtils/ContainerMeta.h" // util::collection_value_access_t
-#include "larcorealg/CoreUtils/MetaUtils.h" // util::with_const_as_t
+#include "larcorealg/CoreUtils/MetaUtils.h"     // util::with_const_as_t
 
 // C/C++ standard libraries
-#include <string> // std::to_string()
-#include <iterator> // std::iterator_category, std::size(), ...
-#include <memory> // std::unique_ptr<>
 #include <algorithm> // std::reference_wrapper<>
+#include <cstddef>   // std::size_t
+#include <iterator>  // std::iterator_category, std::size(), ...
+#include <limits>    // std::numeric_limits<>
+#include <memory>    // std::unique_ptr<>
 #include <stdexcept> // std::out_of_range
-#include <limits> // std::numeric_limits<>
-#include <cstddef> // std::size_t
-
+#include <string>    // std::to_string()
 
 namespace util {
 
   namespace details {
 
     // ---------------------------------------------------------------------------
-    template <typename Cont> struct ContainerTraits;
+    template <typename Cont>
+    struct ContainerTraits;
 
     // ---------------------------------------------------------------------------
-    template <typename Cont, typename = void> class ContainerStorage;
+    template <typename Cont, typename = void>
+    class ContainerStorage;
 
     // ---------------------------------------------------------------------------
 
@@ -43,10 +44,12 @@ namespace util {
   struct MappedContainerBase {
 
     template <typename T = std::size_t>
-    static constexpr T invalidIndex() { return std::numeric_limits<T>::max(); }
+    static constexpr T invalidIndex()
+    {
+      return std::numeric_limits<T>::max();
+    }
 
   }; // struct MappedContainerBase
-
 
   // ---------------------------------------------------------------------------
   /**
@@ -120,7 +123,7 @@ namespace util {
    *
    */
   template <typename Cont, typename Mapping>
-  class MappedContainer: private MappedContainerBase {
+  class MappedContainer : private MappedContainerBase {
 
     /// Type of object used for storage.
     using Storage_t = details::ContainerStorage<Cont>;
@@ -141,17 +144,14 @@ namespace util {
 
     // constantness needs to be removed in order for this object to be copiable
     ///< Value returned for elements not mapped.
-    std::remove_cv_t<Value_t> fDefValue {};
-
+    std::remove_cv_t<Value_t> fDefValue{};
 
     template <typename Container, typename Reference>
     class IteratorBase;
 
-
-      public:
-
+  public:
     using DataContainer_t = Cont; ///< Type of the original container.
-    using Mapping_t = Mapping; ///< Type of the mapping object.
+    using Mapping_t = Mapping;    ///< Type of the mapping object.
 
     /// Type of this class.
     using MappedContainer_t = MappedContainer<DataContainer_t, Mapping_t>;
@@ -162,7 +162,6 @@ namespace util {
     /// Type of the index passed to the mapping.
     using MappingIndex_t = std::size_t;
 
-
     // --- BEGIN -- C++ standard container definitions -------------------------
     /// @name C++ standard container definitions
     /// @{
@@ -172,25 +171,20 @@ namespace util {
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
-    using reference = util::with_const_as_t<
-      typename Storage_t::reference,
-      util::collection_value_access_t<DataContainer_t>
-      >;
+    using reference = util::with_const_as_t<typename Storage_t::reference,
+                                            util::collection_value_access_t<DataContainer_t>>;
     using const_reference = typename Storage_t::const_reference;
 
     using iterator = IteratorBase<MappedContainer_t, reference>;
-    using const_iterator
-      = IteratorBase<MappedContainer_t const, const_reference>;
+    using const_iterator = IteratorBase<MappedContainer_t const, const_reference>;
 
     /// @}
     // --- END -- C++ standard container definitions ---------------------------
-
 
     /// Invalid index to be returned by the mapping when the required index is
     /// not mapped back to the original container; in that case, a
     /// `defaultValue()` is mapped instead.
     static constexpr DataIndex_t InvalidIndex = invalidIndex<DataIndex_t>();
-
 
     // --- BEGIN Constructors --------------------------------------------------
     /// @name Constructors
@@ -209,14 +203,12 @@ namespace util {
      * The `defValue` value is returned for the requested elements which are not
      * mapped to the original container (`InvalidIndex`).
      */
-    MappedContainer(
-      DataContainer_t const& cont,
-      Mapping_t const& mapping,
-      size_type size,
-      value_type defValue
-      )
+    MappedContainer(DataContainer_t const& cont,
+                    Mapping_t const& mapping,
+                    size_type size,
+                    value_type defValue)
       : fData(cont), fMapping(mapping), fSize(size), fDefValue(defValue)
-      {}
+    {}
 
     /**
      * @brief Constructor: acquires data and mapping.
@@ -227,10 +219,9 @@ namespace util {
      * The default value is a default-constructed `value_type` (`0` for numeric
      * types, `nullptr` for pointers).
      */
-    MappedContainer
-      (DataContainer_t const& cont, Mapping_t const& mapping, size_type size)
+    MappedContainer(DataContainer_t const& cont, Mapping_t const& mapping, size_type size)
       : MappedContainer(cont, mapping, size, {})
-      {}
+    {}
 
     /**
      * @brief Constructor: acquires data and mapping.
@@ -244,11 +235,10 @@ namespace util {
      */
     MappedContainer(DataContainer_t const& cont, Mapping_t const& mapping)
       : MappedContainer(cont, mapping, minimal_size(cont, mapping))
-      {}
+    {}
 
     /// @}
     // --- END Constructors ----------------------------------------------------
-
 
     // --- BEGIN Container information -----------------------------------------
     /**
@@ -294,7 +284,6 @@ namespace util {
     /// Returns whether the container has no elements.
     bool empty() const { return size() == 0U; }
 
-
     // @{
     /**
      * @brief Returns the default value for elements with no original content.
@@ -302,19 +291,16 @@ namespace util {
      * Note that changing it will change at the same time the value returned
      * for all unmapped elements afterwards.
      */
-    reference       defaultValue()       { return fDefValue; }
+    reference defaultValue() { return fDefValue; }
     const_reference defaultValue() const { return fDefValue; }
     // @}
-
 
     /// Changes the default value.
     /// The new value will be used for all following mappings.
     void setDefaultValue(value_type defValue) { fDefValue = defValue; }
 
-
     /// @}
     // --- END Container information -------------------------------------------
-
 
     // --- BEGIN Random access to elements -------------------------------------
     /// @name Random access to elements
@@ -329,10 +315,8 @@ namespace util {
      * The content requested for `index` is fetched from the original data, at
      * the element resulting from the mapping of the `index` argument.
      */
-    decltype(auto) operator[] (MappingIndex_t index) const
-      { return map_element(index); }
-    decltype(auto) operator[] (MappingIndex_t index)
-      { return map_element(index); }
+    decltype(auto) operator[](MappingIndex_t index) const { return map_element(index); }
+    decltype(auto) operator[](MappingIndex_t index) { return map_element(index); }
     // @}
 
     // @{
@@ -346,14 +330,13 @@ namespace util {
     decltype(auto) at(MappingIndex_t index);
     // @}
 
-
     // @{
     /**
      * @brief Returns the first element in the container.
      * @return the first element in the container, undefined if `empty()`
      */
     decltype(auto) front() const { return map_element(0U); }
-    decltype(auto) front()       { return map_element(0U); }
+    decltype(auto) front() { return map_element(0U); }
     // @}
 
     // @{
@@ -362,9 +345,8 @@ namespace util {
      * @return the last element in the container, undefined if `empty()`
      */
     decltype(auto) back() const { return map_element(size() - 1); }
-    decltype(auto) back()       { return map_element(size() - 1); }
+    decltype(auto) back() { return map_element(size() - 1); }
     // @}
-
 
     // @{
     /**
@@ -376,54 +358,46 @@ namespace util {
     decltype(auto) map_index(MappingIndex_t index);
     // @}
 
-
     /// @}
     // --- END Random access to elements ---------------------------------------
-
 
     // --- BEGIN Iteration -----------------------------------------------------
     /// @name Iteration
     /// @{
 
     /// Returns a constant iterator to the first mapped element.
-    const_iterator cbegin() const { return { *this, 0U }; }
+    const_iterator cbegin() const { return {*this, 0U}; }
 
     /// Returns a constant iterator to the first mapped element.
     const_iterator begin() const { return cbegin(); }
 
     /// Returns an iterator to the first mapped element.
-    iterator begin() { return { *this, 0U }; }
+    iterator begin() { return {*this, 0U}; }
 
     /// Returns a constant iterator past the last mapped element.
-    const_iterator cend() const { return { *this, size() }; }
+    const_iterator cend() const { return {*this, size()}; }
 
     /// Returns a constant iterator past the last mapped element.
     const_iterator end() const { return cend(); }
 
     /// Returns an iterator past the last mapped element.
-    iterator end() { return { *this, size() }; }
+    iterator end() { return {*this, size()}; }
 
     /// @}
     // --- END Iteration -------------------------------------------------------
 
-      protected:
-
+  protected:
     /// Returns the minimum size to include all mapped values.
-    static size_type minimal_size
-      (DataContainer_t const& cont, Mapping_t const& mapping);
+    static size_type minimal_size(DataContainer_t const& cont, Mapping_t const& mapping);
 
-
-      private:
-
+  private:
     /// Returns the value mapped to the specified `index`.
     decltype(auto) map_element(MappingIndex_t index);
 
     /// Returns the value mapped to the specified `index`.
     decltype(auto) map_element(MappingIndex_t index) const;
 
-
   }; // class MappedContainer<>
-
 
   //----------------------------------------------------------------------------
   /**
@@ -439,14 +413,13 @@ namespace util {
    */
   template <typename Cont, typename Mapping>
   auto mapContainer(Cont cont, Mapping mapping)
-    { return MappedContainer<Cont, Mapping>(cont, mapping); }
-
+  {
+    return MappedContainer<Cont, Mapping>(cont, mapping);
+  }
 
   //----------------------------------------------------------------------------
 
-
 } // namespace util
-
 
 //------------------------------------------------------------------------------
 //---  template implementation
@@ -457,8 +430,11 @@ namespace util {
 
     //--------------------------------------------------------------------------
     template <typename T>
-    T& NullRef() { T* nullTptr = nullptr; return *nullTptr; }
-
+    T& NullRef()
+    {
+      T* nullTptr = nullptr;
+      return *nullTptr;
+    }
 
     //--------------------------------------------------------------------------
     //---  ContainerStorage
@@ -469,39 +445,37 @@ namespace util {
       using Container_t = Cont;
       using Traits_t = details::ContainerTraits<Container_t>;
 
-      using index_type      = typename Traits_t::size_type;
+      using index_type = typename Traits_t::size_type;
 
-      using value_type      = typename Traits_t::value_type;
-      using size_type       = typename Traits_t::size_type;
+      using value_type = typename Traits_t::value_type;
+      using size_type = typename Traits_t::size_type;
       using difference_type = typename Traits_t::difference_type;
-      using reference       = typename Traits_t::reference;
+      using reference = typename Traits_t::reference;
       using const_reference = typename Traits_t::const_reference;
 
       Container_t fCont;
 
       ContainerStorageBase() = default;
-      explicit ContainerStorageBase(Container_t const& cont): fCont(cont) {}
-      explicit ContainerStorageBase(Container_t&& cont)
-        : fCont(std::move(cont)) {}
+      explicit ContainerStorageBase(Container_t const& cont) : fCont(cont) {}
+      explicit ContainerStorageBase(Container_t&& cont) : fCont(std::move(cont)) {}
 
-      decltype(auto) container() const
-        { return util::collection_from_reference(fCont); }
-      decltype(auto) container()
-        { return util::collection_from_reference(fCont); }
+      decltype(auto) container() const { return util::collection_from_reference(fCont); }
+      decltype(auto) container() { return util::collection_from_reference(fCont); }
 
-      auto size() const { using std::size; return size(container()); }
+      auto size() const
+      {
+        using std::size;
+        return size(container());
+      }
 
-      decltype(auto) operator[] (index_type index)
-        { return container()[index]; }
-      decltype(auto) operator[] (index_type index) const
-        { return container()[index]; }
+      decltype(auto) operator[](index_type index) { return container()[index]; }
+      decltype(auto) operator[](index_type index) const { return container()[index]; }
 
     }; // struct ContainerStorageBase
 
-
     //--------------------------------------------------------------------------
     template <typename Cont, typename /* = void */>
-    class ContainerStorage: public ContainerStorageBase<Cont> {
+    class ContainerStorage : public ContainerStorageBase<Cont> {
 
       using Base_t = ContainerStorageBase<Cont>;
 
@@ -510,16 +484,13 @@ namespace util {
 
     }; // struct ContainerStorage
 
-
     template <typename Cont>
-    class ContainerStorage
-      <Cont, std::enable_if_t<util::is_reference_wrapper_v<Cont>>>
-      : public ContainerStorageBase<Cont>
-    {
+    class ContainerStorage<Cont, std::enable_if_t<util::is_reference_wrapper_v<Cont>>>
+      : public ContainerStorageBase<Cont> {
       using Base_t = ContainerStorageBase<Cont>;
       using DataContainer_t = typename Cont::type;
 
-        public:
+    public:
       // inherit all constructors
       using Base_t::Base_t;
 
@@ -527,18 +498,13 @@ namespace util {
       // calling the inherited constructor with a `reference_wrapper`
       // (`Base_t::Container_t`) referencing an invalid reference to
       // the wrapped data type (which is `DataContainer_t`).
-      ContainerStorage()
-        : Base_t(typename Base_t::Container_t{NullRef<DataContainer_t>()})
-        {}
+      ContainerStorage() : Base_t(typename Base_t::Container_t{NullRef<DataContainer_t>()}) {}
 
     }; // struct ContainerStorage
 
-
     //--------------------------------------------------------------------------
 
-
   } // namespace details
-
 
   //----------------------------------------------------------------------------
   //--- MappedContainer::IteratorBase
@@ -553,51 +519,49 @@ namespace util {
     /// This type.
     using Iterator_t = IteratorBase<Container_t, Reference_t>;
 
-    Container_t* fCont = nullptr; ///< Pointer to the container.
+    Container_t* fCont = nullptr;         ///< Pointer to the container.
     MappingIndex_t fIndex = InvalidIndex; ///< Current index in container.
 
-      public:
-
+  public:
     // --- BEGIN Traits --------------------------------------------------------
     /// @name Traits
     /// @{
 
-    using value_type        = std::remove_cv_t<typename Container_t::value_type>;
-    using difference_type   = typename Container_t::difference_type;
-    using size_type         = typename Container_t::size_type;
-    using reference         = Reference_t;
-    using pointer           = decltype(&std::declval<reference>());
+    using value_type = std::remove_cv_t<typename Container_t::value_type>;
+    using difference_type = typename Container_t::difference_type;
+    using size_type = typename Container_t::size_type;
+    using reference = Reference_t;
+    using pointer = decltype(&std::declval<reference>());
     using iterator_category = std::input_iterator_tag;
 
     /// @}
     // --- END Traits ----------------------------------------------------------
 
-
     /// Constructor: an invalid iterator.
     IteratorBase() = default;
 
     /// Constructor: iterator pointing to element `index` of `cont`.
-    IteratorBase(Container_t& cont, MappingIndex_t index)
-      : fCont(&cont), fIndex(index)
-      {}
+    IteratorBase(Container_t& cont, MappingIndex_t index) : fCont(&cont), fIndex(index) {}
 
     /// Copy constructor.
     IteratorBase(Iterator_t const&) = default;
 
     /// Copy constructor: from a different container type.
     template <typename OC, typename OR>
-    IteratorBase(IteratorBase<OC, OR> const& from)
-      : fCont(from.cont), fIndex(from.index)
-      {}
+    IteratorBase(IteratorBase<OC, OR> const& from) : fCont(from.cont), fIndex(from.index)
+    {}
 
     /// Copy assignment.
-    Iterator_t& operator= (Iterator_t const&) = default;
+    Iterator_t& operator=(Iterator_t const&) = default;
 
     /// Assignment from a different container type.
     template <typename OC, typename OR>
-    Iterator_t& operator= (IteratorBase<OC, OR> const& from)
-      { fCont = from.fCont; fIndex = from.fIndex; return *this; }
-
+    Iterator_t& operator=(IteratorBase<OC, OR> const& from)
+    {
+      fCont = from.fCont;
+      fIndex = from.fIndex;
+      return *this;
+    }
 
     // --- BEGIN Dereferencing -------------------------------------------------
     /// @name Dereferencing
@@ -610,214 +574,229 @@ namespace util {
 
     /// Returns the mapped item `n` steps ahead of what the iterator currentlt
     /// points to.
-    reference operator[] (difference_type n) const
-      { return (*fCont)[fIndex + n]; }
+    reference operator[](difference_type n) const { return (*fCont)[fIndex + n]; }
 
     /// @}
     // --- END Dereferencing ---------------------------------------------------
-
 
     // --- BEGIN Transformation ------------------------------------------------
     /// @name Transformation
     /// @{
     /// Increments this iterator and returns it incremented.
-    Iterator_t& operator++() { ++fIndex; return *this; }
+    Iterator_t& operator++()
+    {
+      ++fIndex;
+      return *this;
+    }
 
     /// Increments this iterator and returns its old value.
-    Iterator_t operator++(int) { auto it = *this; this->operator++(); return it; }
+    Iterator_t operator++(int)
+    {
+      auto it = *this;
+      this->operator++();
+      return it;
+    }
 
     /// Decrements this iterator and returns it decremented.
-    Iterator_t& operator--() { --fIndex; return *this; }
+    Iterator_t& operator--()
+    {
+      --fIndex;
+      return *this;
+    }
 
     /// Decrements this iterator and returns its old value.
-    Iterator_t operator--(int) { auto it = *this; this->operator--(); return it; }
+    Iterator_t operator--(int)
+    {
+      auto it = *this;
+      this->operator--();
+      return it;
+    }
 
     /// Increments this iterator by `n` steps and returns it incremented.
-    Iterator_t& operator+= (difference_type n) { fIndex += n; return *this; }
+    Iterator_t& operator+=(difference_type n)
+    {
+      fIndex += n;
+      return *this;
+    }
 
     /// Decrements this iterator by `n` steps and returns it decremented.
-    Iterator_t& operator-= (difference_type n) { fIndex -= n; return *this; }
+    Iterator_t& operator-=(difference_type n)
+    {
+      fIndex -= n;
+      return *this;
+    }
 
     /// Returns an iterator pointing `n` steps ahead of this one.
-    Iterator_t operator+ (difference_type n) const
-      { auto it = *this; it += n; return it; }
+    Iterator_t operator+(difference_type n) const
+    {
+      auto it = *this;
+      it += n;
+      return it;
+    }
 
     /// Returns an iterator pointing `n` steps behind this one.
-    Iterator_t operator- (difference_type n) const
-      { auto it = *this; it -= n; return it; }
+    Iterator_t operator-(difference_type n) const
+    {
+      auto it = *this;
+      it -= n;
+      return it;
+    }
 
     /// Returns the number of steps this iterator is ahead of `other`.
-    difference_type operator- (Iterator_t& other) const
-      { return fIndex - other.fIndex; }
+    difference_type operator-(Iterator_t& other) const { return fIndex - other.fIndex; }
 
     /// @}
     // --- END Transformation --------------------------------------------------
-
 
     // --- BEGIN Comparisons ---------------------------------------------------
     /// @name Comparisons
     /// @{
     /// Returns whether this iterator is equal to `other`.
     template <typename OC, typename OR>
-    bool operator== (IteratorBase<OC, OR> const& other) const
-      { return (fCont == other.fCont) && (fIndex == other.fIndex); }
+    bool operator==(IteratorBase<OC, OR> const& other) const
+    {
+      return (fCont == other.fCont) && (fIndex == other.fIndex);
+    }
 
     /// Returns whether this iterator is not equal to `other`.
     template <typename OC, typename OR>
-    bool operator!= (IteratorBase<OC, OR> const& other) const
-      { return (fCont != other.fCont) || (fIndex != other.fIndex); }
+    bool operator!=(IteratorBase<OC, OR> const& other) const
+    {
+      return (fCont != other.fCont) || (fIndex != other.fIndex);
+    }
 
     /// Returns whether this iterator is behind of or equal to `other`.
     template <typename OC, typename OR>
-    bool operator<= (IteratorBase<OC, OR> const& other) const
-      { return (fCont == other.fCont) && (fIndex <= other.fIndex); }
+    bool operator<=(IteratorBase<OC, OR> const& other) const
+    {
+      return (fCont == other.fCont) && (fIndex <= other.fIndex);
+    }
 
     /// Returns whether this iterator is strictly behind of `other`.
     template <typename OC, typename OR>
-    bool operator< (IteratorBase<OC, OR> const& other) const
-      { return (fCont == other.fCont) && (fIndex < other.fIndex); }
+    bool operator<(IteratorBase<OC, OR> const& other) const
+    {
+      return (fCont == other.fCont) && (fIndex < other.fIndex);
+    }
 
     /// Returns whether this iterator is ahead of or equal to `other`.
     template <typename OC, typename OR>
-    bool operator>= (IteratorBase<OC, OR> const& other) const
-      { return (fCont == other.fCont) && (fIndex >= other.fIndex); }
+    bool operator>=(IteratorBase<OC, OR> const& other) const
+    {
+      return (fCont == other.fCont) && (fIndex >= other.fIndex);
+    }
 
     /// Returns whether this iterator is strictly ahead of `other`.
     template <typename OC, typename OR>
-    bool operator> (IteratorBase<OC, OR> const& other) const
-      { return (fCont == other.fCont) && (fIndex > other.fIndex); }
+    bool operator>(IteratorBase<OC, OR> const& other) const
+    {
+      return (fCont == other.fCont) && (fIndex > other.fIndex);
+    }
 
     /// @}
     // --- END Comparisons -----------------------------------------------------
 
   }; // IteratorBase
 
-
   // it hurts the eye
-  template <
-    typename Cont, typename Mapping,
-    typename Container, typename Reference
-    >
-  typename MappedContainer<Cont, Mapping>::template IteratorBase<Container, Reference>
-  operator+
-    (
-    typename MappedContainer<Cont, Mapping>::template IteratorBase<Container, Reference>::difference_type n,
-    typename MappedContainer<Cont, Mapping>::template IteratorBase<Container, Reference> const& it
-    )
-    { return it + n; }
-
+  template <typename Cont, typename Mapping, typename Container, typename Reference>
+  typename MappedContainer<Cont, Mapping>::template IteratorBase<Container, Reference> operator+(
+    typename MappedContainer<Cont, Mapping>::template IteratorBase<Container,
+                                                                   Reference>::difference_type n,
+    typename MappedContainer<Cont, Mapping>::template IteratorBase<Container, Reference> const& it)
+  {
+    return it + n;
+  }
 
 } // namespace util
 
-
-
 namespace util::details {
-
 
   //----------------------------------------------------------------------------
   template <typename Cont>
   struct ContainerTraitsImpl {
-    using value_type      = typename Cont::value_type;
+    using value_type = typename Cont::value_type;
     using difference_type = typename Cont::difference_type;
-    using size_type       = typename Cont::size_type;
+    using size_type = typename Cont::size_type;
     using const_reference = typename Cont::const_reference;
-    using reference       = typename Cont::reference;
-    using const_iterator  = typename Cont::const_iterator;
-    using iterator        = typename Cont::iterator;
+    using reference = typename Cont::reference;
+    using const_iterator = typename Cont::const_iterator;
+    using iterator = typename Cont::iterator;
   }; // ContainerTraitsImpl<>
 
   template <typename T>
   struct ContainerTraitsImpl<T*> {
-    using value_type      = T; // should it be devoid of const/mutable?
+    using value_type = T; // should it be devoid of const/mutable?
     using difference_type = std::ptrdiff_t;
-    using size_type       = std::size_t;
+    using size_type = std::size_t;
     using const_reference = T const&;
-    using reference       = T&;
-    using const_iterator  = T const*;
-    using iterator        = T*;
+    using reference = T&;
+    using const_iterator = T const*;
+    using iterator = T*;
   }; // ContainerTraitsImpl<T*>
 
   // this is not as powerful as it should... hoping users do not nest
   // crazily `unique_ptr`, `reference_wrapper` and such
   template <typename Cont>
   struct ContainerTraits
-    : ContainerTraitsImpl<
-        std::remove_reference_t<
-          util::collection_from_reference_t<
-            util::strip_referenceness_t<Cont>
-          >
-        >
-      >
-    {};
-
+    : ContainerTraitsImpl<std::remove_reference_t<
+        util::collection_from_reference_t<util::strip_referenceness_t<Cont>>>> {};
 
   //----------------------------------------------------------------------------
 
 } // namespace util::details
-
 
 //------------------------------------------------------------------------------
 //--- util::MappedContainer
 //------------------------------------------------------------------------------
 template <typename Cont, typename Mapping>
 auto util::MappedContainer<Cont, Mapping>::minimal_size() const -> size_type
-  { return minimal_size(fData.container(), fMapping.container()); }
-
+{
+  return minimal_size(fData.container(), fMapping.container());
+}
 
 //------------------------------------------------------------------------------
 template <typename Cont, typename Mapping>
-decltype(auto) util::MappedContainer<Cont, Mapping>::map_element
-  (MappingIndex_t index) const
+decltype(auto) util::MappedContainer<Cont, Mapping>::map_element(MappingIndex_t index) const
 {
   auto const dataIndex = map_index(index);
-  return (dataIndex == InvalidIndex)? defaultValue(): fData[dataIndex];
+  return (dataIndex == InvalidIndex) ? defaultValue() : fData[dataIndex];
 } // util::MappedContainer<>::map_element() const
 
-
 //------------------------------------------------------------------------------
 template <typename Cont, typename Mapping>
-decltype(auto) util::MappedContainer<Cont, Mapping>::map_element
-  (MappingIndex_t index)
+decltype(auto) util::MappedContainer<Cont, Mapping>::map_element(MappingIndex_t index)
 {
   auto const dataIndex = map_index(index);
-  return (dataIndex == InvalidIndex)? defaultValue(): fData[dataIndex];
+  return (dataIndex == InvalidIndex) ? defaultValue() : fData[dataIndex];
 } // util::MappedContainer<>::map_element()
-
 
 //------------------------------------------------------------------------------
 template <typename Cont, typename Mapping>
-decltype(auto) util::MappedContainer<Cont, Mapping>::at
-  (MappingIndex_t index) const
+decltype(auto) util::MappedContainer<Cont, Mapping>::at(MappingIndex_t index) const
 {
   if (index >= size()) {
-    throw std::out_of_range(
-      "MappedContainer::at(" + std::to_string(index) + "): out of range (size: "
-      + std::to_string(size()) + ")"
-      );
+    throw std::out_of_range("MappedContainer::at(" + std::to_string(index) +
+                            "): out of range (size: " + std::to_string(size()) + ")");
   }
   return map_element(index);
 } // util::MappedContainer<>::at() const
 
-
 //------------------------------------------------------------------------------
 template <typename Cont, typename Mapping>
-decltype(auto) util::MappedContainer<Cont, Mapping>::at
-  (MappingIndex_t index)
+decltype(auto) util::MappedContainer<Cont, Mapping>::at(MappingIndex_t index)
 {
   if (index >= size()) {
-    throw std::out_of_range(
-      "MappedContainer::at(" + std::to_string(index) + "): out of range (size: "
-      + std::to_string(size()) + ")"
-      );
+    throw std::out_of_range("MappedContainer::at(" + std::to_string(index) +
+                            "): out of range (size: " + std::to_string(size()) + ")");
   }
   return map_element(index);
 } // util::MappedContainer<>::at()
 
-
 //------------------------------------------------------------------------------
 template <typename Cont, typename Mapping>
-auto util::MappedContainer<Cont, Mapping>::minimal_size
-  (DataContainer_t const&, Mapping_t const& mapping) -> size_type
+auto util::MappedContainer<Cont, Mapping>::minimal_size(DataContainer_t const&,
+                                                        Mapping_t const& mapping) -> size_type
 {
   /*
    * Obscure compiler errors are expected if the `Mapping_t` type does not
@@ -829,22 +808,20 @@ auto util::MappedContainer<Cont, Mapping>::minimal_size
   return size(util::collection_from_reference(mapping));
 } // util::MappedContainer<>::minimal_size(DataContainer_t, Mapping_t)
 
+//------------------------------------------------------------------------------
+template <typename Cont, typename Mapping>
+decltype(auto) util::MappedContainer<Cont, Mapping>::map_index(MappingIndex_t index) const
+{
+  return fMapping[index];
+}
 
 //------------------------------------------------------------------------------
 template <typename Cont, typename Mapping>
-decltype(auto) util::MappedContainer<Cont, Mapping>::map_index
-  (MappingIndex_t index) const
-  { return fMapping[index]; }
-
-
-//------------------------------------------------------------------------------
-template <typename Cont, typename Mapping>
-decltype(auto) util::MappedContainer<Cont, Mapping>::map_index
-  (MappingIndex_t index)
-  { return fMapping[index]; }
-
+decltype(auto) util::MappedContainer<Cont, Mapping>::map_index(MappingIndex_t index)
+{
+  return fMapping[index];
+}
 
 //------------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_UTILITIES_MAPPEDCONTAINER_H

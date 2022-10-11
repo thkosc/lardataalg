@@ -13,7 +13,7 @@
 namespace detinfo {
 
   enum RunType_t {
-    kUnknownRunType=0,
+    kUnknownRunType = 0,
     kProductionRun,
     kCommissioningRun,
     kTestRun,
@@ -40,7 +40,7 @@ namespace detinfo {
     virtual int RunType() const = 0;
     virtual std::string RunTypeAsString() const = 0;
     virtual uint64_t TStart() const = 0;
-    virtual uint64_t TStop()  const = 0;
+    virtual uint64_t TStop() const = 0;
     virtual uint64_t Duration() const = 0;
 
   }; // class RunHistory

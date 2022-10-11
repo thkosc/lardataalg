@@ -10,18 +10,17 @@
 #define LARDATAALG_UTILITIES_INTERVALS_FHICL_H
 
 // LArSoft libraries
-#include "lardataalg/Utilities/quantities_fhicl.h"
-#include "lardataalg/Utilities/intervals.h"
 #include "larcorealg/CoreUtils/StdUtils.h" // util::to_string()
+#include "lardataalg/Utilities/intervals.h"
+#include "lardataalg/Utilities/quantities_fhicl.h"
 
 // support libraries
 #include "fhiclcpp/coding.h"
 
 // C++ libraries
-#include <string_view>
-#include <string>
 #include <any>
-
+#include <string>
+#include <string_view>
 
 namespace util::quantities::concepts {
 
@@ -61,7 +60,6 @@ namespace util::quantities::concepts {
   template <typename... Args>
   void decode(std::any const& src, Point<Args...>& p);
 
-
   /**
    * @brief Encodes a quantity interval into a FHiCL parameter set atom.
    * @tparam Args types defining the quantity interval type
@@ -95,58 +93,48 @@ namespace util::quantities::concepts {
 
 } // namespace util::quantities::concepts
 
-
 // -----------------------------------------------------------------------------
 // ---  template implementation
 // -----------------------------------------------------------------------------
 template <typename... Args>
-void util::quantities::concepts::decode
-  (std::any const& src, Interval<Args...>& iv)
+void util::quantities::concepts::decode(std::any const& src, Interval<Args...>& iv)
 {
   using interval_t = Interval<Args...>;
   using quantity_t = typename interval_t::quantity_t;
 
   quantity_t q;
   util::quantities::concepts::decode(src, q);
-  iv = interval_t{ q };
+  iv = interval_t{q};
 
 } // util::quantities::concepts::decode(Interval)
 
-
 // -----------------------------------------------------------------------------
 template <typename... Args>
-void util::quantities::concepts::decode
-  (std::any const& src, Point<Args...>& pt)
+void util::quantities::concepts::decode(std::any const& src, Point<Args...>& pt)
 {
   using point_t = Point<Args...>;
   using quantity_t = typename point_t::quantity_t;
 
   quantity_t q;
   util::quantities::concepts::decode(src, q);
-  pt = point_t{ q };
+  pt = point_t{q};
 
 } // util::quantities::concepts::decode(Point)
 
-
 // -----------------------------------------------------------------------------
 template <typename... Args>
-::fhicl::detail::ps_atom_t util::quantities::concepts::encode
-  (Interval<Args...> const& iv)
+::fhicl::detail::ps_atom_t util::quantities::concepts::encode(Interval<Args...> const& iv)
 {
   return ::fhicl::detail::encode(util::to_string(iv));
 } // util::quantities::concepts::encode(Interval)
 
-
 // -----------------------------------------------------------------------------
 template <typename... Args>
-::fhicl::detail::ps_atom_t util::quantities::concepts::encode
-  (Point<Args...> const& p)
+::fhicl::detail::ps_atom_t util::quantities::concepts::encode(Point<Args...> const& p)
 {
   return ::fhicl::detail::encode(util::to_string(p));
 } // util::quantities::concepts::encode(Point)
 
-
 // -----------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_UTILITIES_INTERVALS_FHICL_H

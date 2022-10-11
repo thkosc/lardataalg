@@ -21,9 +21,8 @@
 #include "lardataalg/Utilities/quantities.h"
 
 // C/C++ standard libraries
-#include <string_view>
 #include <ratio>
-
+#include <string_view>
 
 //------------------------------------------------------------------------------
 namespace util::quantities {
@@ -32,18 +31,17 @@ namespace util::quantities {
 
     using namespace std::string_view_literals; // for operator""sv()
 
-    struct Second: public concepts::UnitBase {
+    struct Second : public concepts::UnitBase {
       static constexpr auto symbol = "s"sv;
-      static constexpr auto name   = "second"sv;
+      static constexpr auto name = "second"sv;
     };
 
-    struct Meter: public concepts::UnitBase {
+    struct Meter : public concepts::UnitBase {
       static constexpr auto symbol = "m"sv;
-      static constexpr auto name   = "meter"sv;
+      static constexpr auto name = "meter"sv;
     };
 
   } // namespace units
-
 
   // -- BEGIN Time -------------------------------------------------------------
   /**
@@ -64,7 +62,6 @@ namespace util::quantities {
    * are exactly equivalent to the singular-named counterparts.
    */
   /// @{
-
 
   /// The most generic `units::Second`-based quantity.
   template <typename R, typename T = double>
@@ -176,46 +173,56 @@ namespace util::quantities {
 
     // @{
     /// Literal second value.
-    constexpr second operator""_s (long double v)
-      { return second{ static_cast<double>(v) }; }
-    constexpr second operator""_s (unsigned long long int v)
-      { return second{ static_cast<double>(v) }; }
+    constexpr second operator""_s(long double v) { return second{static_cast<double>(v)}; }
+    constexpr second operator""_s(unsigned long long int v)
+    {
+      return second{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal millisecond value.
-    constexpr millisecond operator""_ms (long double v)
-      { return millisecond{ static_cast<double>(v) }; }
-    constexpr millisecond operator""_ms (unsigned long long int v)
-      { return millisecond{ static_cast<double>(v) }; }
+    constexpr millisecond operator""_ms(long double v)
+    {
+      return millisecond{static_cast<double>(v)};
+    }
+    constexpr millisecond operator""_ms(unsigned long long int v)
+    {
+      return millisecond{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal microsecond value.
-    constexpr microsecond operator""_us (long double v)
-      { return microsecond{ static_cast<double>(v) }; }
-    constexpr microsecond operator""_us (unsigned long long int v)
-      { return microsecond{ static_cast<double>(v) }; }
+    constexpr microsecond operator""_us(long double v)
+    {
+      return microsecond{static_cast<double>(v)};
+    }
+    constexpr microsecond operator""_us(unsigned long long int v)
+    {
+      return microsecond{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal nanosecond value.
-    constexpr nanosecond operator""_ns (long double v)
-      { return nanosecond{ static_cast<double>(v) }; }
-    constexpr nanosecond operator""_ns (unsigned long long int v)
-      { return nanosecond{ static_cast<double>(v) }; }
+    constexpr nanosecond operator""_ns(long double v) { return nanosecond{static_cast<double>(v)}; }
+    constexpr nanosecond operator""_ns(unsigned long long int v)
+    {
+      return nanosecond{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal picosecond value.
-    constexpr picosecond operator""_ps (long double v)
-      { return picosecond{ static_cast<double>(v) }; }
-    constexpr picosecond operator""_ps (unsigned long long int v)
-      { return picosecond{ static_cast<double>(v) }; }
+    constexpr picosecond operator""_ps(long double v) { return picosecond{static_cast<double>(v)}; }
+    constexpr picosecond operator""_ps(unsigned long long int v)
+    {
+      return picosecond{static_cast<double>(v)};
+    }
     // @}
 
   } // time_literals
-
 
   // --- BEGIN Time intervals --------------------------------------------------
 
@@ -223,8 +230,7 @@ namespace util::quantities {
 
     /// The most generic `units::Second`-based interval.
     template <typename R, typename T = double>
-    using scaled_seconds
-      = concepts::Interval<util::quantities::scaled_second<R, T>>;
+    using scaled_seconds = concepts::Interval<util::quantities::scaled_second<R, T>>;
 
     //
     // seconds
@@ -280,11 +286,9 @@ namespace util::quantities {
     /// Type of time interval stored in picoseconds, in double precision.
     using picoseconds = picoseconds_as<>;
 
-
   } // namespace intervals
 
   // --- END Time intervals ----------------------------------------------------
-
 
   // --- BEGIN Time points -----------------------------------------------------
 
@@ -292,8 +296,7 @@ namespace util::quantities {
 
     /// The most generic `units::Second`-based point.
     template <typename R, typename T = double, typename Cat = NoCategory>
-    using scaled_second
-      = concepts::Point<util::quantities::scaled_second<R, T>, Cat>;
+    using scaled_second = concepts::Point<util::quantities::scaled_second<R, T>, Cat>;
 
     //
     // second
@@ -349,16 +352,12 @@ namespace util::quantities {
     /// Type of time point stored in picoseconds, in double precision.
     using picosecond = picosecond_as<>;
 
-
   } // namespace points
 
   // --- END Time points -------------------------------------------------------
 
-
   /// @}
   // -- END Time ---------------------------------------------------------------
-
-
 
   // -- BEGIN Space ------------------------------------------------------------
   /**
@@ -379,7 +378,6 @@ namespace util::quantities {
    * are exactly equivalent to the singular-named counterparts.
    */
   /// @{
-
 
   /// The most generic `units::Meter`-based quantity.
   template <typename R, typename T = double>
@@ -544,70 +542,74 @@ namespace util::quantities {
 
     // @{
     /// Literal meter value.
-    constexpr meter operator""_m (long double v)
-      { return meter{ static_cast<double>(v) }; }
-    constexpr meter operator""_m (unsigned long long int v)
-      { return meter{ static_cast<double>(v) }; }
+    constexpr meter operator""_m(long double v) { return meter{static_cast<double>(v)}; }
+    constexpr meter operator""_m(unsigned long long int v) { return meter{static_cast<double>(v)}; }
     // @}
 
     // @{
     /// Literal kilometer value.
-    constexpr kilometer operator""_km (long double v)
-      { return kilometer{ static_cast<double>(v) }; }
-    constexpr kilometer operator""_km (unsigned long long int v)
-      { return kilometer{ static_cast<double>(v) }; }
+    constexpr kilometer operator""_km(long double v) { return kilometer{static_cast<double>(v)}; }
+    constexpr kilometer operator""_km(unsigned long long int v)
+    {
+      return kilometer{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal centimeter value.
-    constexpr centimeter operator""_cm (long double v)
-      { return centimeter{ static_cast<double>(v) }; }
-    constexpr centimeter operator""_cm (unsigned long long int v)
-      { return centimeter{ static_cast<double>(v) }; }
+    constexpr centimeter operator""_cm(long double v) { return centimeter{static_cast<double>(v)}; }
+    constexpr centimeter operator""_cm(unsigned long long int v)
+    {
+      return centimeter{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal millimeter value.
-    constexpr millimeter operator""_mm (long double v)
-      { return millimeter{ static_cast<double>(v) }; }
-    constexpr millimeter operator""_mm (unsigned long long int v)
-      { return millimeter{ static_cast<double>(v) }; }
+    constexpr millimeter operator""_mm(long double v) { return millimeter{static_cast<double>(v)}; }
+    constexpr millimeter operator""_mm(unsigned long long int v)
+    {
+      return millimeter{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal micrometer value.
-    constexpr micrometer operator""_um (long double v)
-      { return micrometer{ static_cast<double>(v) }; }
-    constexpr micrometer operator""_um (unsigned long long int v)
-      { return micrometer{ static_cast<double>(v) }; }
+    constexpr micrometer operator""_um(long double v) { return micrometer{static_cast<double>(v)}; }
+    constexpr micrometer operator""_um(unsigned long long int v)
+    {
+      return micrometer{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal nanometer value.
-    constexpr nanometer operator""_nm (long double v)
-      { return nanometer{ static_cast<double>(v) }; }
-    constexpr nanometer operator""_nm (unsigned long long int v)
-      { return nanometer{ static_cast<double>(v) }; }
+    constexpr nanometer operator""_nm(long double v) { return nanometer{static_cast<double>(v)}; }
+    constexpr nanometer operator""_nm(unsigned long long int v)
+    {
+      return nanometer{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal picometer value.
-    constexpr picometer operator""_pm (long double v)
-      { return picometer{ static_cast<double>(v) }; }
-    constexpr picometer operator""_pm (unsigned long long int v)
-      { return picometer{ static_cast<double>(v) }; }
+    constexpr picometer operator""_pm(long double v) { return picometer{static_cast<double>(v)}; }
+    constexpr picometer operator""_pm(unsigned long long int v)
+    {
+      return picometer{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal femtometer value.
-    constexpr femtometer operator""_fm (long double v)
-      { return femtometer{ static_cast<double>(v) }; }
-    constexpr femtometer operator""_fm (unsigned long long int v)
-      { return femtometer{ static_cast<double>(v) }; }
+    constexpr femtometer operator""_fm(long double v) { return femtometer{static_cast<double>(v)}; }
+    constexpr femtometer operator""_fm(unsigned long long int v)
+    {
+      return femtometer{static_cast<double>(v)};
+    }
     // @}
 
   } // space_literals
-
 
   // --- BEGIN Space intervals -------------------------------------------------
 
@@ -615,8 +617,7 @@ namespace util::quantities {
 
     /// The most generic `units::Meter`-based interval.
     template <typename R, typename T = double>
-    using scaled_meters
-      = concepts::Interval<util::quantities::scaled_meter<R, T>>;
+    using scaled_meters = concepts::Interval<util::quantities::scaled_meter<R, T>>;
 
     //
     // meters
@@ -705,11 +706,9 @@ namespace util::quantities {
     /// Type of space interval stored in femtometers, in double precision.
     using femtometers = femtometers_as<>;
 
-
   } // namespace intervals
 
   // --- END Space intervals ---------------------------------------------------
-
 
   // --- BEGIN Space points ----------------------------------------------------
 
@@ -717,8 +716,7 @@ namespace util::quantities {
 
     /// The most generic `units::Meter`-based point.
     template <typename R, typename T = double, typename Cat = NoCategory>
-    using scaled_meter
-      = concepts::Point<util::quantities::scaled_meter<R, T>, Cat>;
+    using scaled_meter = concepts::Point<util::quantities::scaled_meter<R, T>, Cat>;
 
     //
     // meter
@@ -807,20 +805,15 @@ namespace util::quantities {
     /// Type of space point stored in femtometers, in double precision.
     using femtometer = femtometer_as<>;
 
-
   } // namespace points
 
   // --- END Space points -------------------------------------------------------
 
-
   /// @}
   // -- END Space --------------------------------------------------------------
-
-
 
 } // namespace util::quantities
 
 //------------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_UTILITIES_QUANTITIES_SPACETIME_H

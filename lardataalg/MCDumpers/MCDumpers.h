@@ -12,14 +12,14 @@
 #define LARDATAALG_MCDUMPERS_MCDUMPERS_H
 
 // LArSoft libraries
-#include "lardataalg/MCDumpers/MCDumperUtils.h"
-#include "larcorealg/CoreUtils/DumpUtils.h" // lar::dump namespace
+#include "larcorealg/CoreUtils/DumpUtils.h"                // lar::dump namespace
 #include "larcorealg/Geometry/geo_vectors_utils_TVector.h" // geo::vect::dump
+#include "lardataalg/MCDumpers/MCDumperUtils.h"
 
 // nusimdata libraries
-#include "nusimdata/SimulationBase/MCTrajectory.h"
-#include "nusimdata/SimulationBase/MCParticle.h"
 #include "nusimdata/SimulationBase/GTruth.h"
+#include "nusimdata/SimulationBase/MCParticle.h"
+#include "nusimdata/SimulationBase/MCTrajectory.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 
 // ROOT libraries
@@ -28,7 +28,6 @@
 // C/C++ standard libraries
 #include <string>
 #include <utility> // std::forward()
-
 
 namespace sim {
 
@@ -51,18 +50,18 @@ namespace sim {
      * The output starts on the current line, and the last line is NOT broken.
      */
     template <typename Stream>
-    void DumpMCParticle(
-      Stream&& out, simb::MCParticle const& particle,
-      std::string indent, std::string firstIndent
-      );
+    void DumpMCParticle(Stream&& out,
+                        simb::MCParticle const& particle,
+                        std::string indent,
+                        std::string firstIndent);
 
     template <typename Stream>
-    void DumpMCParticle
-      (Stream&& out, simb::MCParticle const& particle, std::string indent = "")
-      { DumpMCParticle(std::forward<Stream>(out), particle, indent, indent); }
+    void DumpMCParticle(Stream&& out, simb::MCParticle const& particle, std::string indent = "")
+    {
+      DumpMCParticle(std::forward<Stream>(out), particle, indent, indent);
+    }
 
     //@}
-
 
     //--------------------------------------------------------------------------
     //@{
@@ -84,20 +83,18 @@ namespace sim {
      * The last line of the output is NOT broken.
      */
     template <typename Stream>
-    void DumpMCParticleTrajectory(
-      Stream&& out, simb::MCTrajectory const& trajectory,
-      unsigned int pointsPerLine, std::string indent
-      );
+    void DumpMCParticleTrajectory(Stream&& out,
+                                  simb::MCTrajectory const& trajectory,
+                                  unsigned int pointsPerLine,
+                                  std::string indent);
 
     template <typename Stream>
-    void DumpMCParticleTrajectory
-      (Stream&& out, simb::MCTrajectory const& trajectory)
-      {
-        DumpMCParticleTrajectory(std::forward<Stream>(out), trajectory, 0U, "");
-      }
+    void DumpMCParticleTrajectory(Stream&& out, simb::MCTrajectory const& trajectory)
+    {
+      DumpMCParticleTrajectory(std::forward<Stream>(out), trajectory, 0U, "");
+    }
 
     // @}
-
 
     //--------------------------------------------------------------------------
     // @{
@@ -116,18 +113,18 @@ namespace sim {
      * The output starts on the current line, and the last line is NOT broken.
      */
     template <typename Stream>
-    void DumpMCNeutrino(
-      Stream&& out, simb::MCNeutrino const& neutrino,
-      std::string indent, std::string firstIndent
-      );
+    void DumpMCNeutrino(Stream&& out,
+                        simb::MCNeutrino const& neutrino,
+                        std::string indent,
+                        std::string firstIndent);
 
     template <typename Stream>
-    void DumpMCNeutrino
-      (Stream&& out, simb::MCNeutrino const& neutrino, std::string indent = "")
-      { DumpMCNeutrino(std::forward<Stream>(out), neutrino, indent, indent); }
+    void DumpMCNeutrino(Stream&& out, simb::MCNeutrino const& neutrino, std::string indent = "")
+    {
+      DumpMCNeutrino(std::forward<Stream>(out), neutrino, indent, indent);
+    }
 
     // @}
-
 
     //--------------------------------------------------------------------------
     // @{
@@ -154,36 +151,37 @@ namespace sim {
      * The output starts on the current line, and the last line is NOT broken.
      */
     template <typename Stream>
-    void DumpMCTruth(
-      Stream&& out, simb::MCTruth const& truth, unsigned int pointsPerLine,
-      std::string indent, std::string firstIndent
-      );
+    void DumpMCTruth(Stream&& out,
+                     simb::MCTruth const& truth,
+                     unsigned int pointsPerLine,
+                     std::string indent,
+                     std::string firstIndent);
 
     template <typename Stream>
-    void DumpMCTruth(
-      Stream&& out, simb::MCTruth const& truth, unsigned int pointsPerLine,
-      std::string indent = ""
-      )
-      {
-        DumpMCTruth
-          (std::forward<Stream>(out), truth, pointsPerLine, indent, indent);
-      }
+    void DumpMCTruth(Stream&& out,
+                     simb::MCTruth const& truth,
+                     unsigned int pointsPerLine,
+                     std::string indent = "")
+    {
+      DumpMCTruth(std::forward<Stream>(out), truth, pointsPerLine, indent, indent);
+    }
 
     template <typename Stream>
-    void DumpMCTruth(
-      Stream&& out, simb::MCTruth const& truth,
-      std::string indent, std::string firstIndent
-      )
-      { DumpMCTruth(std::forward<Stream>(out), truth, 0, indent, firstIndent); }
+    void DumpMCTruth(Stream&& out,
+                     simb::MCTruth const& truth,
+                     std::string indent,
+                     std::string firstIndent)
+    {
+      DumpMCTruth(std::forward<Stream>(out), truth, 0, indent, firstIndent);
+    }
 
     template <typename Stream>
-    void DumpMCTruth(
-      Stream&& out, simb::MCTruth const& truth, std::string indent = ""
-      )
-      { DumpMCTruth(std::forward<Stream>(out), truth, indent, indent); }
+    void DumpMCTruth(Stream&& out, simb::MCTruth const& truth, std::string indent = "")
+    {
+      DumpMCTruth(std::forward<Stream>(out), truth, indent, indent);
+    }
 
     // @}
-
 
     //--------------------------------------------------------------------------
     // @{
@@ -202,15 +200,16 @@ namespace sim {
      * The output starts on the current line, and the last line is NOT broken.
      */
     template <typename Stream>
-    void DumpGTruth(
-      Stream&& out, simb::GTruth const& truth,
-      std::string indent, std::string firstIndent
-      );
+    void DumpGTruth(Stream&& out,
+                    simb::GTruth const& truth,
+                    std::string indent,
+                    std::string firstIndent);
 
     template <typename Stream>
-    void DumpGTruth
-      (Stream&& out, simb::GTruth const& truth, std::string indent = "")
-      { DumpGTruth(std::forward<Stream>(out), truth, indent, indent); }
+    void DumpGTruth(Stream&& out, simb::GTruth const& truth, std::string indent = "")
+    {
+      DumpGTruth(std::forward<Stream>(out), truth, indent, indent);
+    }
 
     // @}
 
@@ -220,30 +219,30 @@ namespace sim {
 
 } // namespace sim
 
-
 //------------------------------------------------------------------------------
 //---  template implementation
 //------------------------------------------------------------------------------
 template <typename Stream>
-void sim::dump::DumpMCParticle(
-  Stream&& out, simb::MCParticle const& particle,
-  std::string indent, std::string firstIndent
-) {
-  out << firstIndent
-    << "ID=" << particle.TrackId() << ": " << ParticleName(particle.PdgCode())
-    << " mass=" << particle.Mass() << " GeV/c2 "
-    << " status=" << particle.StatusCode()
-      << " (" << ParticleStatusName(particle.StatusCode()) << ")"
-    ;
+void sim::dump::DumpMCParticle(Stream&& out,
+                               simb::MCParticle const& particle,
+                               std::string indent,
+                               std::string firstIndent)
+{
+  out << firstIndent << "ID=" << particle.TrackId() << ": " << ParticleName(particle.PdgCode())
+      << " mass=" << particle.Mass() << " GeV/c2 "
+      << " status=" << particle.StatusCode() << " (" << ParticleStatusName(particle.StatusCode())
+      << ")";
   if (particle.Weight() != 1.0) out << " weight=" << particle.Weight();
   if (particle.Rescatter() != simb::MCParticle::s_uninitialized) {
     out << " rescattered (" << particle.Rescatter() << ")";
   }
   out << "; generator vertex " << particle.GetGvtx();
-  out << "\n" << indent << "created via "
-    << (particle.Process().empty()? "magics": particle.Process());
-  if (particle.Mother() == 0) out << " by the gods";
-  else                        out << " from ID=" << particle.Mother();
+  out << "\n"
+      << indent << "created via " << (particle.Process().empty() ? "magics" : particle.Process());
+  if (particle.Mother() == 0)
+    out << " by the gods";
+  else
+    out << " from ID=" << particle.Mother();
 
   const unsigned int nDaughters = particle.NumberDaughters();
   const unsigned int nPoints = particle.NumberTrajectoryPoints();
@@ -253,13 +252,13 @@ void sim::dump::DumpMCParticle(
     out << " at " << start << " cm with momentum " << start_mom << " GeV/c";
   }
   if (particle.Polarization().Mag2() != 0.) {
-    out
-      << " with polarization " << lar::dump::vector3D(particle.Polarization());
+    out << " with polarization " << lar::dump::vector3D(particle.Polarization());
   }
   // does this particle seem to stop? (by decay, or because of extended traj.)
   if ((nPoints > 1) || (nDaughters > 0)) {
-    out << "\n" << indent << ((nDaughters > 0)? "ends": "stops") << " by "
-      << (particle.EndProcess().empty()? "magics": particle.EndProcess());
+    out << "\n"
+        << indent << ((nDaughters > 0) ? "ends" : "stops") << " by "
+        << (particle.EndProcess().empty() ? "magics" : particle.EndProcess());
     if (nPoints > 1) {
       TLorentzVector const& stop = particle.EndPosition();
       TLorentzVector const& stop_mom = particle.EndMomentum();
@@ -271,32 +270,34 @@ void sim::dump::DumpMCParticle(
         out << "particle ID=" << particle.FirstDaughter();
       else {
         out << nDaughters << " particles from ID=" << particle.FirstDaughter()
-          << " to ID=" << particle.LastDaughter();
+            << " to ID=" << particle.LastDaughter();
       }
     } // if daughters
-  } // if it stops
+  }   // if it stops
   if (nPoints > 1) {
     simb::MCTrajectory const& traj = particle.Trajectory();
-    out << "\n" << indent << "comes with a trajectory " << traj.TotalLength()
-      << " cm long in " << nPoints << " points";
+    out << "\n"
+        << indent << "comes with a trajectory " << traj.TotalLength() << " cm long in " << nPoints
+        << " points";
   } // if has points
 
 } // sim::dump::DumpMCParticle()
 
-
 //------------------------------------------------------------------------------
 template <typename Stream>
-void sim::dump::DumpMCParticleTrajectory(
-  Stream&& out, simb::MCTrajectory const& trajectory,
-  unsigned int pointsPerLine, std::string indent
-) {
+void sim::dump::DumpMCParticleTrajectory(Stream&& out,
+                                         simb::MCTrajectory const& trajectory,
+                                         unsigned int pointsPerLine,
+                                         std::string indent)
+{
   unsigned int page = 0;
-  for (auto const& pair: trajectory) {
+  for (auto const& pair : trajectory) {
     if ((pointsPerLine > 0) && (page-- == 0)) {
       out << "\n" << indent << "  ";
       page = pointsPerLine - 1;
     }
-    else out << " -- ";
+    else
+      out << " -- ";
 
     TLorentzVector const& pos = pair.first;
     out << pos;
@@ -304,35 +305,27 @@ void sim::dump::DumpMCParticleTrajectory(
 
 } // sim::dump::DumpMCParticleTrajectory()
 
-
 //------------------------------------------------------------------------------
 template <typename Stream>
-void sim::dump::DumpMCNeutrino(
-  Stream&& out, simb::MCNeutrino const& nu,
-  std::string indent, std::string firstIndent
-) {
+void sim::dump::DumpMCNeutrino(Stream&& out,
+                               simb::MCNeutrino const& nu,
+                               std::string indent,
+                               std::string firstIndent)
+{
 
-  out << firstIndent
-    << "from " << TruthCCNCname(nu.CCNC())
-      << ", " << TruthInteractionTypeName(nu.InteractionType())
-      << ", mode: " << nu.Mode() << " (" << TruthReactionMode(nu.Mode()) << ")"
-    << '\n' << indent
-      << "target: " << nu.Target() << " (" << ParticleName(nu.Target()) << ")"
-    ;
+  out << firstIndent << "from " << TruthCCNCname(nu.CCNC()) << ", "
+      << TruthInteractionTypeName(nu.InteractionType()) << ", mode: " << nu.Mode() << " ("
+      << TruthReactionMode(nu.Mode()) << ")" << '\n'
+      << indent << "target: " << nu.Target() << " (" << ParticleName(nu.Target()) << ")";
   if (nu.HitNuc() != 0) {
-    out << ", hit nucleon: " << nu.HitNuc()
-      << " (" << ParticleName(nu.HitNuc()) << ")";
+    out << ", hit nucleon: " << nu.HitNuc() << " (" << ParticleName(nu.HitNuc()) << ")";
   }
   if (nu.HitQuark() != 0) {
-    out << ", hit quark: " << nu.HitQuark()
-      << " (" << ParticleName(nu.HitQuark()) << ")";
+    out << ", hit quark: " << nu.HitQuark() << " (" << ParticleName(nu.HitQuark()) << ")";
   }
-  out
-    << '\n' << indent
-      << "x=" << nu.X() << " y=" << nu.Y() << " w=" << nu.W()
-      << " Q^2=" << nu.QSqr() << " GeV^2; theta=" << nu.Theta()
-      << " rad pT=" << nu.Pt() << " GeV/c"
-    ;
+  out << '\n'
+      << indent << "x=" << nu.X() << " y=" << nu.Y() << " w=" << nu.W() << " Q^2=" << nu.QSqr()
+      << " GeV^2; theta=" << nu.Theta() << " rad pT=" << nu.Pt() << " GeV/c";
   out << '\n' << indent << "neutrino: ";
   DumpMCParticle(std::forward<Stream>(out), nu.Nu(), indent + "  ", "");
   out << '\n' << indent << "outgoing lepton: ";
@@ -340,21 +333,19 @@ void sim::dump::DumpMCNeutrino(
 
 } // sim::dump::DumpMCNeutrino()
 
-
 //------------------------------------------------------------------------------
 template <typename Stream>
-void sim::dump::DumpMCTruth(
-  Stream&& out, simb::MCTruth const& truth, unsigned int pointsPerLine,
-  std::string indent, std::string firstIndent
-) {
+void sim::dump::DumpMCTruth(Stream&& out,
+                            simb::MCTruth const& truth,
+                            unsigned int pointsPerLine,
+                            std::string indent,
+                            std::string firstIndent)
+{
   unsigned int const nParticles = truth.NParticles();
-  out << firstIndent
-    << nParticles << " particles from "
-    << TruthOriginName(truth.Origin());
+  out << firstIndent << nParticles << " particles from " << TruthOriginName(truth.Origin());
   if (truth.NeutrinoSet()) {
     out << '\n' << indent << "neutrino information: ";
-    DumpMCNeutrino
-      (std::forward<Stream>(out), truth.GetNeutrino(), indent + "  ", "");
+    DumpMCNeutrino(std::forward<Stream>(out), truth.GetNeutrino(), indent + "  ", "");
   }
   for (unsigned int i = 0; i < nParticles; ++i) {
     out << '\n' << indent << "[#" << i << "] ";
@@ -365,77 +356,66 @@ void sim::dump::DumpMCTruth(
     if ((nPoints > 0) && (pointsPerLine > 0)) {
       out << ":";
       DumpMCParticleTrajectory(
-        std::forward<Stream>(out), particle.Trajectory(),
-        pointsPerLine, indent + "    "
-        );
+        std::forward<Stream>(out), particle.Trajectory(), pointsPerLine, indent + "    ");
     } // if has points
-  } // for all particles
+  }   // for all particles
 
 } // sim::dump::DumpMCTruth()
 
-
 //------------------------------------------------------------------------------
 template <typename Stream>
-void sim::dump::DumpGTruth(
-  Stream&& out, simb::GTruth const& truth,
-  std::string indent, std::string firstIndent
-) {
+void sim::dump::DumpGTruth(Stream&& out,
+                           simb::GTruth const& truth,
+                           std::string indent,
+                           std::string firstIndent)
+{
 
-  unsigned int const nCharged
-    = truth.fNumPiPlus + truth.fNumPiMinus + truth.fNumProton;
+  unsigned int const nCharged = truth.fNumPiPlus + truth.fNumPiMinus + truth.fNumProton;
   unsigned int const nNeutral = truth.fNumPi0 + truth.fNumNeutron;
-  unsigned int const nPions
-    = truth.fNumPiPlus + truth.fNumPiMinus + truth.fNumPi0;
+  unsigned int const nPions = truth.fNumPiPlus + truth.fNumPiMinus + truth.fNumPi0;
   unsigned int const nNucleons = truth.fNumProton + truth.fNumNeutron;
   unsigned int const nTotalParticles = nCharged + nNeutral;
 
-  out << firstIndent
-      << "interaction code: " << truth.fGint
-      << ", neutrino scattering code: " << truth.fGscatter
-      << " at " << truth.fVertex
-    << "\n" << indent
-      << "probe: " << ParticleName(truth.fProbePDG)
-      << " with cp=" << truth.fProbeP4
+  out << firstIndent << "interaction code: " << truth.fGint
+      << ", neutrino scattering code: " << truth.fGscatter << " at " << truth.fVertex << "\n"
+      << indent << "probe: " << ParticleName(truth.fProbePDG) << " with cp=" << truth.fProbeP4
       << " hit nucleon with cp=" << truth.fHitNucP4 << " GeV"
-      << " (" << (truth.fIsSeaQuark? "": "not a ") << "sea quark)"
-      << " in target: " << ParticleName(truth.ftgtPDG)
-      << " (Z: " << truth.ftgtZ << ", A: " << truth.ftgtA << ")"
-    << "\n" << indent
-      << "event interaction weight (genie internal): " << truth.fweight
-      << ", interaction probability: " << truth.fprobability
-      << ", cross section: " << truth.fXsec
-      << ", differential cross section: " << truth.fDiffXsec
-    << "\n" << indent
-      << "particles after reaction, before FSI: "
-              << truth.fNumPiPlus  << " pi+"
+      << " (" << (truth.fIsSeaQuark ? "" : "not a ") << "sea quark)"
+      << " in target: " << ParticleName(truth.ftgtPDG) << " (Z: " << truth.ftgtZ
+      << ", A: " << truth.ftgtA << ")"
+      << "\n"
+      << indent << "event interaction weight (genie internal): " << truth.fweight
+      << ", interaction probability: " << truth.fprobability << ", cross section: " << truth.fXsec
+      << ", differential cross section: " << truth.fDiffXsec << "\n"
+      << indent << "particles after reaction, before FSI: " << truth.fNumPiPlus << " pi+"
       << ", " << truth.fNumPiMinus << " pi-"
-      << ", " << truth.fNumPi0     << " pi0"
-      << ", " << truth.fNumProton  << " p/pbar"
+      << ", " << truth.fNumPi0 << " pi0"
+      << ", " << truth.fNumProton << " p/pbar"
       << ", " << truth.fNumNeutron << " n/nbar"
-    << "\n" << indent
-      << "  total " << nTotalParticles << " particles after reaction before FSI"
-        ": " << nCharged << "/" << nNeutral << " charged/neutral"
-        ", " << nPions << " pions, " << nNucleons << " nucleons"
-    << "\n" << indent << "process "
-      << (truth.fIsCharm? "with": "without") << " charmed hadron";
-  if (truth.fResNum == -1) out << ", no resonance";
-  else                     out << ", resonance: #" << truth.fResNum;
-  out
-    << "\n" << indent
-      << "internal (on shell) genie kinematics: Q^2: " << truth.fgQ2 << " GeV^2"
+      << "\n"
+      << indent << "  total " << nTotalParticles
+      << " particles after reaction before FSI"
+         ": "
+      << nCharged << "/" << nNeutral
+      << " charged/neutral"
+         ", "
+      << nPions << " pions, " << nNucleons << " nucleons"
+      << "\n"
+      << indent << "process " << (truth.fIsCharm ? "with" : "without") << " charmed hadron";
+  if (truth.fResNum == -1)
+    out << ", no resonance";
+  else
+    out << ", resonance: #" << truth.fResNum;
+  out << "\n"
+      << indent << "internal (on shell) genie kinematics: Q^2: " << truth.fgQ2 << " GeV^2"
       << " q^2: " << truth.fgq2 << " GeV^2"
       << ", w: " << truth.fgW << " GeV^2"
       << ", t: " << truth.fgT << " GeV^2"
-      << ", x: " << truth.fgX
-      << ", y: " << truth.fgY
-    << "\n" << indent
-      << "FShadSyst: " << truth.fFShadSystP4
-    ;
+      << ", x: " << truth.fgX << ", y: " << truth.fgY << "\n"
+      << indent << "FShadSyst: " << truth.fFShadSystP4;
 
 } // sim::DumpGTruth::DumpTruth()
 
-
 //------------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_MCDUMPERS_MCDUMPERS_H

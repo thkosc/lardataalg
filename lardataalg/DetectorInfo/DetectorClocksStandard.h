@@ -124,11 +124,7 @@ namespace detinfo {
     DetectorClocksStandard(fhicl::ParameterSet const& pset);
     DetectorClocksStandard(DetectorClocksStandard const&) = delete;
 
-    void
-    SetConfigValue(size_t i, double val)
-    {
-      fConfigValue[i] = val;
-    }
+    void SetConfigValue(size_t i, double val) { fConfigValue[i] = val; }
 
     /**
      * @brief Returns the input tag of the trigger data product.
@@ -137,11 +133,7 @@ namespace detinfo {
      * The trigger module name is set directly in the configuration as
      * `TrigModuleName`.
      */
-    std::string const&
-    TrigModuleName() const
-    {
-      return fTrigModuleName;
-    }
+    std::string const& TrigModuleName() const { return fTrigModuleName; }
 
     /**
      * @brief Returns the input tag of the trigger data product for G4Ref correctons.
@@ -150,25 +142,12 @@ namespace detinfo {
      * The trigger module name is set directly in the configuration as
      * `G4RefCorrTrigModuleName`.
      */
-    std::string
-    G4RefCorrTrigModuleName() const
-    {
-      return fG4RefCorrTrigModuleName;
-    }
+    std::string G4RefCorrTrigModuleName() const { return fG4RefCorrTrigModuleName; }
 
-    std::vector<std::string> const&
-    ConfigNames() const override
-    {
-      return fConfigName;
-    }
-    std::vector<double> const&
-    ConfigValues() const override
-    {
-      return fConfigValue;
-    }
+    std::vector<std::string> const& ConfigNames() const override { return fConfigName; }
+    std::vector<double> const& ConfigValues() const override { return fConfigValue; }
 
-    DetectorClocksData
-    DataForJob() const override
+    DetectorClocksData DataForJob() const override
     {
       return DetectorClocksData{
         fConfigValue[kG4RefTime], // FIXME: Should be run-dependent?
@@ -181,10 +160,9 @@ namespace detinfo {
         ElecClock{0, kDEFAULT_FRAME_PERIOD, kDEFAULT_FREQUENCY_EXTERNAL}};
     }
 
-    DetectorClocksData
-    DataFor(double const g4_ref_time,
-            double const trigger_time,
-            double const beam_time) const override
+    DetectorClocksData DataFor(double const g4_ref_time,
+                               double const trigger_time,
+                               double const beam_time) const override
     {
       return DetectorClocksData{
         g4_ref_time,
@@ -219,16 +197,14 @@ namespace detinfo {
      * @ref DetectorClocksBeamGateOpening "beam gate opening" times are set, and
      * the electronic clocks are updated to store the new trigger time.
      */
-    void
-    SetTriggerTime(double const trig_time, double const beam_time)
+    void SetTriggerTime(double const trig_time, double const beam_time)
     {
       fTriggerTime = trig_time;
       fBeamGateTime = beam_time;
       fTPCClock = ElecClock{fTriggerTime, fFramePeriod, fConfigValue[kClockSpeedTPC]};
     }
 
-    double
-    TriggerOffsetTPC() const
+    double TriggerOffsetTPC() const
     {
       if (fTriggerOffsetTPC < 0)
         return fTriggerOffsetTPC;

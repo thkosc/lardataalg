@@ -18,17 +18,16 @@
 #define LARDATA_DETECTORINFO_LARPROPERTIESSTANDARDTESTHELPERS_H 1
 
 // LArSoft libraries
-#include "lardataalg/DetectorInfo/LArPropertiesStandard.h"
 #include "larcorealg/TestUtils/ProviderTestHelpers.h"
+#include "lardataalg/DetectorInfo/LArPropertiesStandard.h"
 
 // framework and utility libraries
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // C/C++ standard libraries
-#include <string>
 #include <memory> // std::unique_ptr<>
-
+#include <string>
 
 namespace testing {
 
@@ -42,37 +41,35 @@ namespace testing {
   template <>
   struct ProviderSetupClass<detinfo::LArPropertiesStandard> {
 
-    static std::unique_ptr<detinfo::LArPropertiesStandard> setup
-      (fhicl::ParameterSet const& pset)
-      {
-        // some feedback about whether we are using the right configuration
-        std::string ServiceProviderPath;
-        if (pset.get_if_present("service_provider", ServiceProviderPath)) {
-          std::string ServiceProviderName = ServiceProviderPath;
-          size_t iSlash = ServiceProviderPath.rfind('/');
-          if (iSlash != std::string::npos)
-            ServiceProviderName.erase(0, iSlash + 1);
+    static std::unique_ptr<detinfo::LArPropertiesStandard> setup(fhicl::ParameterSet const& pset)
+    {
+      // some feedback about whether we are using the right configuration
+      std::string ServiceProviderPath;
+      if (pset.get_if_present("service_provider", ServiceProviderPath)) {
+        std::string ServiceProviderName = ServiceProviderPath;
+        size_t iSlash = ServiceProviderPath.rfind('/');
+        if (iSlash != std::string::npos) ServiceProviderName.erase(0, iSlash + 1);
 
-          if (ServiceProviderName == "LArPropertiesServiceStandard") {
-            MF_LOG_TRACE("setupProvider")
-              << "Verified service implementation for LArPropertiesService: '"
-              << ServiceProviderPath << "'";
-          }
-          else {
-            mf::LogWarning("setupProvider")
-              << "This set up is for a LArPropertiesStandard provider.\n"
-              "Your configuration specifies a '" << ServiceProviderPath
-              << "' service implementation that is not known to use that provider.";
-          }
+        if (ServiceProviderName == "LArPropertiesServiceStandard") {
+          MF_LOG_TRACE("setupProvider")
+            << "Verified service implementation for LArPropertiesService: '" << ServiceProviderPath
+            << "'";
         }
+        else {
+          mf::LogWarning("setupProvider")
+            << "This set up is for a LArPropertiesStandard provider.\n"
+               "Your configuration specifies a '"
+            << ServiceProviderPath
+            << "' service implementation that is not known to use that provider.";
+        }
+      }
 
-        //
-        // create the new LArPropertiesStandard service provider
-        //
-        return std::make_unique<detinfo::LArPropertiesStandard>(pset);
-      } // setup()
-  }; // ProviderSetup<LArPropertiesStandard>
-
+      //
+      // create the new LArPropertiesStandard service provider
+      //
+      return std::make_unique<detinfo::LArPropertiesStandard>(pset);
+    } // setup()
+  };  // ProviderSetup<LArPropertiesStandard>
 
   /**
    * @brief Environment setup helper for LArPropertiesStandard
@@ -102,15 +99,13 @@ namespace testing {
   template <typename TestEnv>
   struct SimpleEnvironmentSetupClass<detinfo::LArPropertiesStandard, TestEnv> {
     static detinfo::LArPropertiesStandard* setup(TestEnv& env)
-      {
-        return SimpleEnvironmentStandardSetupByName
-          <detinfo::LArPropertiesStandard, detinfo::LArProperties, TestEnv>
-          (env, "LArPropertiesService");
-      }
+    {
+      return SimpleEnvironmentStandardSetupByName<detinfo::LArPropertiesStandard,
+                                                  detinfo::LArProperties,
+                                                  TestEnv>(env, "LArPropertiesService");
+    }
   }; // SimpleEnvironmentSetupClass<detinfo::LArPropertiesStandard>
 
-
 } // namespace testing
-
 
 #endif // LARDATA_DETECTORINFO_LARPROPERTIESSTANDARDTESTHELPERS_H

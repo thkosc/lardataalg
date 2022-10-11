@@ -65,73 +65,45 @@ namespace detinfo {
     // @}
 
     /// Returns the detector clocks data object
-    detinfo::DetectorClocksData const&
-    clockData() const
-    {
-      return fClockData;
-    }
+    detinfo::DetectorClocksData const& clockData() const { return fClockData; }
 
     /// Equivalent to `detinfo::DetectorClocksData::TriggerTime()`.
-    microsecond
-    TriggerTime() const
-    {
-      return microsecond{clockData().TriggerTime()};
-    }
+    microsecond TriggerTime() const { return microsecond{clockData().TriggerTime()}; }
 
     /// Equivalent to `detinfo::DetectorClocksData::BeamGateTime()`.
-    microsecond
-    BeamGateTime() const
-    {
-      return microsecond{clockData().BeamGateTime()};
-    }
+    microsecond BeamGateTime() const { return microsecond{clockData().BeamGateTime()}; }
 
     /// Equivalent to `detinfo::DetectorClocksData::TPCTime()`.
-    microsecond
-    TPCTime() const
-    {
-      return microsecond{clockData().TPCTime()};
-    }
+    microsecond TPCTime() const { return microsecond{clockData().TPCTime()}; }
 
     // @{
     /// Equivalent to `detinfo::DetectorClocksData::G4ToElecTime()`.
-    microsecond
-    G4ToElecTime(nanosecond simTime) const
+    microsecond G4ToElecTime(nanosecond simTime) const
     {
       return microsecond{clockData().G4ToElecTime(simTime.value())};
     }
-    microsecond
-    G4ToElecTime(double simTime) const
-    {
-      return G4ToElecTime(nanosecond{simTime});
-    }
+    microsecond G4ToElecTime(double simTime) const { return G4ToElecTime(nanosecond{simTime}); }
     // @}
 
     // @{
     /// Equivalent to `detinfo::DetectorClocksData::G4ToElecTime()`.
-    ticks_d
-    TPCTick2TDC(ticks_d tpcticks) const
+    ticks_d TPCTick2TDC(ticks_d tpcticks) const
     {
       return ticks_d{clockData().TPCTick2TDC(tpcticks.value())};
     }
-    ticks_d
-    TPCTick2TDC(double tpcticks) const
-    {
-      return TPCTick2TDC(ticks_d{tpcticks});
-    }
+    ticks_d TPCTick2TDC(double tpcticks) const { return TPCTick2TDC(ticks_d{tpcticks}); }
     // @}
 
     /// Equivalent to
     /// `detinfo::DetectorClocksData::OpticalClock().TickPeriod()`.
-    microsecond
-    OpticalClockPeriod() const
+    microsecond OpticalClockPeriod() const
     {
       return microsecond{clockData().OpticalClock().TickPeriod()};
     }
 
     /// Equivalent to
     /// `detinfo::DetectorClocksData::OpticalClock().TickPeriod()`.
-    megahertz
-    OpticalClockFrequency() const
+    megahertz OpticalClockFrequency() const
     {
       return megahertz{clockData().OpticalClock().Frequency()};
     }
@@ -140,8 +112,8 @@ namespace detinfo {
 
   /// Transforms a `detinfo::DetectorClocksData` into a
   /// `detinfo::DetectorClocksWithUnits`.
-  inline detinfo::DetectorClocksWithUnits
-  makeDetectorClocksWithUnits(detinfo::DetectorClocksData const& clockData)
+  inline detinfo::DetectorClocksWithUnits makeDetectorClocksWithUnits(
+    detinfo::DetectorClocksData const& clockData)
   {
     return detinfo::DetectorClocksWithUnits{clockData};
   }
@@ -307,18 +279,13 @@ namespace detinfo {
     /// @{
 
     /// Returns a DetectorClocksWithUnits object.
-    detinfo::DetectorClocksWithUnits const&
-    detClocksUnits() const
+    detinfo::DetectorClocksWithUnits const& detClocksUnits() const
     {
       return static_cast<detinfo::DetectorClocksWithUnits const&>(*this);
     }
 
     /// Returns the detector clocks data.
-    detinfo::DetectorClocksData const&
-    clockData() const
-    {
-      return detClocksUnits().clockData();
-    }
+    detinfo::DetectorClocksData const& clockData() const { return detClocksUnits().clockData(); }
 
     /// @}
     // --- END -- Access to underlying service providers -----------------------
@@ -327,16 +294,14 @@ namespace detinfo {
 
     /// Returns the trigger time as a point in electronics time.
     /// @see `detinfo::DetectorClocksData::TriggerTime()`
-    electronics_time
-    TriggerTime() const
+    electronics_time TriggerTime() const
     {
       return electronics_time{detClocksUnits().TriggerTime()};
     }
 
     /// Returns the beam gate time as a point in electronics time.
     /// @see `detinfo::DetectorClocksData::BeamGateTime()`
-    electronics_time
-    BeamGateTime() const
+    electronics_time BeamGateTime() const
     {
       return electronics_time{detClocksUnits().BeamGateTime()};
     }
@@ -393,8 +358,7 @@ namespace detinfo {
      * usually truncated.
      */
     template <typename Ticks>
-    Ticks
-    toTicks(time_interval time) const
+    Ticks toTicks(time_interval time) const
     {
       return Ticks::castFrom(time / ClockPeriodFor<Ticks>());
     }
@@ -413,8 +377,7 @@ namespace detinfo {
      * is equivalent to use `detinfo::DetectorClocksData::G4ToElecTime(47.5)`.
      */
     template <typename FromTime>
-    electronics_time
-    toElectronicsTime(FromTime time) const
+    electronics_time toElectronicsTime(FromTime time) const
     {
       return toTimeScale<electronics_time>(time);
     }
@@ -433,8 +396,7 @@ namespace detinfo {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     template <typename FromTime>
-    electronics_tick_d
-    toElectronicsTickD(FromTime time) const
+    electronics_tick_d toElectronicsTickD(FromTime time) const
     {
       return toTick<electronics_tick_d>(time);
     }
@@ -453,8 +415,7 @@ namespace detinfo {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     template <typename FromTime>
-    electronics_tick
-    toElectronicsTick(FromTime time) const
+    electronics_tick toElectronicsTick(FromTime time) const
     {
       return toTick<electronics_tick>(time);
     }
@@ -472,8 +433,7 @@ namespace detinfo {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     template <typename FromTime>
-    trigger_time
-    toTriggerTime(FromTime time) const
+    trigger_time toTriggerTime(FromTime time) const
     {
       return toTimeScale<trigger_time>(time);
     }
@@ -491,8 +451,7 @@ namespace detinfo {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     template <typename FromTime>
-    simulation_time
-    toSimulationTime(FromTime time) const
+    simulation_time toSimulationTime(FromTime time) const
     {
       return toTimeScale<simulation_time>(time);
     }
@@ -510,16 +469,14 @@ namespace detinfo {
 
     /// Returns the period of the clock for the specified time scale.
     template <typename TimeScale>
-    time_interval_for<TimeScale>
-    ClockPeriodFor() const
+    time_interval_for<TimeScale> ClockPeriodFor() const
     {
       return time_interval_for<TimeScale>{microsecond{ClockFor<TimeScale>().TickPeriod()}};
     }
 
     /// Returns the frequency of the clock for the specified time scale.
     template <typename TimeScale>
-    frequency_for<TimeScale>
-    ClockFrequencyFor() const
+    frequency_for<TimeScale> ClockFrequencyFor() const
     {
       return frequency_for<TimeScale>{megahertz{ClockFor<TimeScale>().Frequency()}};
     }
@@ -529,18 +486,10 @@ namespace detinfo {
     // --- BEGIN -- Optical clock ----------------------------------------------
 
     /// Returns the duration of the optical clock period and tick.
-    auto
-    OpticalClockPeriod() const
-    {
-      return ClockPeriodFor<optical_time>();
-    }
+    auto OpticalClockPeriod() const { return ClockPeriodFor<optical_time>(); }
 
     /// Returns the frequency of the optical clock tick.
-    megahertz
-    OpticalClockFrequency() const
-    {
-      return ClockFrequencyFor<optical_time>();
-    }
+    megahertz OpticalClockFrequency() const { return ClockFrequencyFor<optical_time>(); }
 
     /**
      * @brief Returns the optical ticks corresponding to a `time` interval.
@@ -553,8 +502,7 @@ namespace detinfo {
      * the resulting number of ticks is usually truncated.
      */
     template <typename Ticks = optical_time_ticks>
-    Ticks
-    toOpticalTicks(time_interval time) const
+    Ticks toOpticalTicks(time_interval time) const
     {
       static_assert(traits_of<Ticks>::template same_category_as<optical_tick>,
                     "Specified ticks are not for optical time scale!");
@@ -574,8 +522,7 @@ namespace detinfo {
      * The number of ticks is *truncated*.
      */
     template <typename TimePoint>
-    optical_tick
-    toOpticalTick(TimePoint time) const
+    optical_tick toOpticalTick(TimePoint time) const
     {
       return toTick<optical_tick>(time);
     }
@@ -593,8 +540,7 @@ namespace detinfo {
      * The number of ticks may be fractional.
      */
     template <typename TimePoint>
-    optical_tick_d
-    toOpticalTickD(TimePoint time) const
+    optical_tick_d toOpticalTickD(TimePoint time) const
     {
       return toTick<optical_tick_d>(time);
     }
@@ -687,31 +633,28 @@ namespace detinfo {
     // --- END -- Reference times ----------------------------------------------
 
   private:
-    friend detinfo::DetectorTimings makeDetectorTimings
-      (detinfo::DetectorClocksWithUnits const&);
+    friend detinfo::DetectorTimings makeDetectorTimings(detinfo::DetectorClocksWithUnits const&);
 
   }; // class DetectorTimings
 
   /// Returns `DetectorTimings` object from specified
   /// `detinfo::DetectorClocksData`.
-  inline detinfo::DetectorTimings
-  makeDetectorTimings(detinfo::DetectorClocksData const& detClocks)
+  inline detinfo::DetectorTimings makeDetectorTimings(detinfo::DetectorClocksData const& detClocks)
   {
     return detinfo::DetectorTimings{detClocks};
   }
 
   /// Returns `DetectorTimings` object from specified
   /// `detinfo::DetectorClocksData`.
-  inline detinfo::DetectorTimings
-  makeDetectorTimings(detinfo::DetectorClocksData const* detClocks)
+  inline detinfo::DetectorTimings makeDetectorTimings(detinfo::DetectorClocksData const* detClocks)
   {
     return makeDetectorTimings(*detClocks);
   }
 
   /// Returns `DetectorTimings` object from specified
   /// `detinfo::DetectorClocksWithUnits`.
-  inline detinfo::DetectorTimings
-  makeDetectorTimings(detinfo::DetectorClocksWithUnits const& detClocksWU)
+  inline detinfo::DetectorTimings makeDetectorTimings(
+    detinfo::DetectorClocksWithUnits const& detClocksWU)
   {
     return static_cast<detinfo::DetectorTimings const&>(detClocksWU);
   }
@@ -750,11 +693,7 @@ namespace detinfo {
     template <typename TimePoint>
     struct StartTimeImpl<TimePoint, TimePoint> {
 
-      static constexpr TimePoint
-      startTime(DetectorTimings const*)
-      {
-        return TimePoint{0_us};
-      }
+      static constexpr TimePoint startTime(DetectorTimings const*) { return TimePoint{0_us}; }
 
     }; // StartTimeImpl<>
 
@@ -765,8 +704,7 @@ namespace detinfo {
     struct StartTimeImpl<detinfo::timescales::TPCelectronics_time, // source
                          detinfo::timescales::electronics_time     // destination
                          > {
-      static detinfo::timescales::electronics_time
-      startTime(DetectorTimings const* detTiming)
+      static detinfo::timescales::electronics_time startTime(DetectorTimings const* detTiming)
       {
         return detinfo::timescales::electronics_time(detTiming->detClocksUnits().TPCTime());
       }
@@ -778,8 +716,7 @@ namespace detinfo {
     struct StartTimeImpl<detinfo::timescales::optical_time,    // source
                          detinfo::timescales::electronics_time // destination
                          > {
-      static constexpr detinfo::timescales::electronics_time
-      startTime(DetectorTimings const*)
+      static constexpr detinfo::timescales::electronics_time startTime(DetectorTimings const*)
       {
         return detinfo::timescales::electronics_time(0_us);
       }
@@ -791,8 +728,7 @@ namespace detinfo {
     struct StartTimeImpl<detinfo::timescales::simulation_time, // source
                          detinfo::timescales::electronics_time // destination
                          > {
-      static detinfo::timescales::electronics_time
-      startTime(DetectorTimings const* detTiming)
+      static detinfo::timescales::electronics_time startTime(DetectorTimings const* detTiming)
       {
         return detinfo::timescales::electronics_time{
           detTiming->detClocksUnits().G4ToElecTime(0.0_ns)};
@@ -805,8 +741,7 @@ namespace detinfo {
     struct StartTimeImpl<detinfo::timescales::trigger_time,    // scale to convert the start of
                          detinfo::timescales::electronics_time // destination scale
                          > {
-      static detinfo::timescales::electronics_time
-      startTime(DetectorTimings const* detTiming)
+      static detinfo::timescales::electronics_time startTime(DetectorTimings const* detTiming)
       {
         return detTiming->TriggerTime();
       }
@@ -821,8 +756,7 @@ namespace detinfo {
       detinfo::timescales::electronics_time, // source
       TimeScale,                             // destination
       std::enable_if_t<!std::is_same_v<TimeScale, detinfo::timescales::electronics_time>>> {
-      static TimeScale
-      startTime(DetectorTimings const* detTiming)
+      static TimeScale startTime(DetectorTimings const* detTiming)
       {
         return TimeScale{
           -(detTiming->startTime<TimeScale, detinfo::timescales::electronics_time>().quantity())};
@@ -849,8 +783,7 @@ namespace detinfo {
       std::enable_if_t<!std::is_same_v<TimePoint, detinfo::timescales::electronics_time> &&
                        !std::is_same_v<TimeScale, detinfo::timescales::electronics_time> &&
                        !std::is_same_v<TimeScale, TimePoint>>> {
-      static TimeScale
-      startTime(DetectorTimings const* detTiming)
+      static TimeScale startTime(DetectorTimings const* detTiming)
       {
         return detTiming->toTimeScale<TimeScale>(detTiming->startTime<TimePoint>());
       }
@@ -866,8 +799,7 @@ namespace detinfo {
     template <typename TickPoint>
     struct StartTickImpl<TickPoint, TickPoint> {
 
-      static constexpr TickPoint
-      startTick(DetectorTimings const*)
+      static constexpr TickPoint startTick(DetectorTimings const*)
       {
         return TickPoint::castFrom(0.0);
       }
@@ -879,8 +811,7 @@ namespace detinfo {
     struct StartTickImpl<detinfo::timescales::TPCelectronics_tick_d, // source
                          detinfo::timescales::electronics_tick_d     // destination
                          > {
-      static detinfo::timescales::electronics_tick_d
-      startTick(DetectorTimings const* detTiming)
+      static detinfo::timescales::electronics_tick_d startTick(DetectorTimings const* detTiming)
       {
         return detinfo::timescales::electronics_tick_d(
           detTiming->detClocksUnits().TPCTick2TDC(0_tickd));
@@ -893,8 +824,7 @@ namespace detinfo {
     struct StartTickImpl<detinfo::timescales::optical_tick,      // source
                          detinfo::timescales::electronics_tick_d // destination
                          > {
-      static constexpr detinfo::timescales::electronics_tick_d
-      startTick(DetectorTimings const*)
+      static constexpr detinfo::timescales::electronics_tick_d startTick(DetectorTimings const*)
       {
         return 0_tickd;
       }
@@ -907,8 +837,7 @@ namespace detinfo {
     template <typename FromTime, typename TargetTime, typename = void>
     struct TimeScaleConverter {
 
-      static TargetTime
-      convert(FromTime time, DetectorTimings const* timings)
+      static TargetTime convert(FromTime time, DetectorTimings const* timings)
       {
         return timings->startTime<FromTime, TargetTime>() + time.quantity();
       }
@@ -918,11 +847,7 @@ namespace detinfo {
     template <typename TargetTime>
     struct TimeScaleConverter<TargetTime, TargetTime> {
 
-      static TargetTime
-      convert(TargetTime time, DetectorTimings const*)
-      {
-        return time;
-      }
+      static TargetTime convert(TargetTime time, DetectorTimings const*) { return time; }
 
     }; // TimeScaleConverter<TargetTime, TargetTime>
 
@@ -932,8 +857,7 @@ namespace detinfo {
                               TargetTime,
                               std::enable_if_t<detinfo::timescales::is_tick_v<FromTick>>> {
 
-      static TargetTime
-      convert(FromTick tick, DetectorTimings const* timings)
+      static TargetTime convert(FromTick tick, DetectorTimings const* timings)
       {
         using FromTime = typename detinfo::timescales::timescale_traits<
           typename FromTick::category_t>::time_point_t;
@@ -948,20 +872,16 @@ namespace detinfo {
     template <typename FromTime, typename TargetTick, typename = void>
     struct TickConverter {
 
-
-      static TargetTick convert
-      (FromTime time, DetectorTimings const* timings)
+      static TargetTick convert(FromTime time, DetectorTimings const* timings)
       {
         // dispatcher
-        if constexpr(detinfo::timescales::is_tick_v<FromTime>)
+        if constexpr (detinfo::timescales::is_tick_v<FromTime>)
           return convertTick(time, timings);
         else
           return convertTime(time, timings);
       } // convert()
 
-
-      static TargetTick
-      convertTime(FromTime time, DetectorTimings const* timings)
+      static TargetTick convertTime(FromTime time, DetectorTimings const* timings)
       {
         static_assert(!detinfo::timescales::is_tick_v<FromTime>);
         using TargetTime = typename detinfo::timescales::timescale_traits<
@@ -971,8 +891,7 @@ namespace detinfo {
         return TargetTick::castFrom(timeFromStart / clockPeriod);
       } // convertTime()
 
-      static TargetTick
-      convertTick(FromTime tick, DetectorTimings const* timings)
+      static TargetTick convertTick(FromTime tick, DetectorTimings const* timings)
       {
         static_assert(detinfo::timescales::is_tick_v<FromTime>);
         // effectively we must go very close to the times from the tick;
@@ -1006,8 +925,7 @@ namespace detinfo {
 
     template <>
     struct ClockForImpl<detinfo::timescales::TPCelectronicsTimeCategory> {
-      static detinfo::ElecClock const&
-      get(DetectorTimings const* timings)
+      static detinfo::ElecClock const& get(DetectorTimings const* timings)
       {
         return timings->clockData().TPCClock();
       }
@@ -1015,8 +933,7 @@ namespace detinfo {
 
     template <>
     struct ClockForImpl<detinfo::timescales::OpticalTimeCategory> {
-      static detinfo::ElecClock const&
-      get(DetectorTimings const* timings)
+      static detinfo::ElecClock const& get(DetectorTimings const* timings)
       {
         return timings->clockData().OpticalClock();
       }
@@ -1024,8 +941,7 @@ namespace detinfo {
 
     template <>
     struct ClockForImpl<detinfo::timescales::TriggerTimeCategory> {
-      static detinfo::ElecClock const&
-      get(DetectorTimings const* timings)
+      static detinfo::ElecClock const& get(DetectorTimings const* timings)
       {
         return timings->clockData().TriggerClock();
       }
@@ -1041,47 +957,41 @@ namespace detinfo {
 
   // ---------------------------------------------------------------------------
   template <typename TimePoint, typename TimeScale /* = electronics_time */>
-  constexpr TimeScale
-  DetectorTimings::startTime() const
+  constexpr TimeScale DetectorTimings::startTime() const
   {
     return details::StartTimeImpl<TimePoint, TimeScale>::startTime(this);
   }
 
   // ---------------------------------------------------------------------------
   template <typename TickPoint, typename TimeTickScale /* = electronics_tick */>
-  constexpr TimeTickScale
-  DetectorTimings::startTick() const
+  constexpr TimeTickScale DetectorTimings::startTick() const
   {
     return details::StartTickImpl<TickPoint, TimeTickScale>::startTick(this);
   }
 
   // ---------------------------------------------------------------------------
   template <typename TargetTime, typename FromTime>
-  TargetTime
-  DetectorTimings::toTimeScale(FromTime time) const
+  TargetTime DetectorTimings::toTimeScale(FromTime time) const
   {
     return details::TimeScaleConverter<FromTime, TargetTime>::convert(time, this);
   } // DetectorTimings::toTimeScale()
 
   // ---------------------------------------------------------------------------
   template <typename TargetTick, typename FromTime>
-  TargetTick
-  DetectorTimings::toTick(FromTime time) const
+  TargetTick DetectorTimings::toTick(FromTime time) const
   {
     return details::TickConverter<FromTime, TargetTick>::convert(time, this);
   } // DetectorTimings::toTick()
 
   // ---------------------------------------------------------------------------
   template <typename TimeScale>
-  detinfo::ElecClock const&
-  DetectorTimings::ClockFor() const
+  detinfo::ElecClock const& DetectorTimings::ClockFor() const
   {
     return details::ClockForImpl<TimeScale>::get(this);
   }
 
   // ---------------------------------------------------------------------------
-  inline auto
-  DetectorTimings::fromStart(electronics_time time) const -> time_interval
+  inline auto DetectorTimings::fromStart(electronics_time time) const -> time_interval
   {
     return time - startTime<electronics_time, electronics_time>();
   }

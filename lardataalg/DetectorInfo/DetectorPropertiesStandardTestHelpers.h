@@ -54,9 +54,9 @@ namespace testing {
   template <>
   struct ProviderSetupClass<detinfo::DetectorPropertiesStandard> {
 
-    static std::unique_ptr<detinfo::DetectorPropertiesStandard>
-    setup(fhicl::ParameterSet const& pset,
-          detinfo::DetectorPropertiesStandard::providers_type const& providers)
+    static std::unique_ptr<detinfo::DetectorPropertiesStandard> setup(
+      fhicl::ParameterSet const& pset,
+      detinfo::DetectorPropertiesStandard::providers_type const& providers)
     {
       // some feedback about whether we are using the right configuration
       std::string ServiceProviderPath;
@@ -129,8 +129,7 @@ namespace testing {
    */
   template <typename TestEnv>
   struct SimpleEnvironmentSetupClass<detinfo::DetectorPropertiesStandard, TestEnv> {
-    static detinfo::DetectorPropertiesStandard*
-    setup(TestEnv& env)
+    static detinfo::DetectorPropertiesStandard* setup(TestEnv& env)
     {
       auto* detp = env.template SetupProviderFor<detinfo::DetectorProperties,
                                                  detinfo::DetectorPropertiesStandard>(

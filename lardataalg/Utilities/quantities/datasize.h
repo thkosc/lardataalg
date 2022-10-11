@@ -19,9 +19,8 @@
 #include "lardataalg/Utilities/quantities.h"
 
 // C/C++ standard libraries
-#include <string_view>
 #include <ratio>
-
+#include <string_view>
 
 //------------------------------------------------------------------------------
 namespace util::quantities {
@@ -30,13 +29,12 @@ namespace util::quantities {
 
     using namespace std::string_view_literals; // for operator""sv()
 
-    struct Byte: public concepts::UnitBase {
+    struct Byte : public concepts::UnitBase {
       static constexpr auto symbol = "B"sv;
-      static constexpr auto name   = "byte"sv;
+      static constexpr auto name = "byte"sv;
     };
 
   } // namespace units
-
 
   namespace prefixes {
 
@@ -60,7 +58,6 @@ namespace util::quantities {
 
   } // namespace prefixes
 
-
   // -- BEGIN Data size --------------------------------------------------------
   /**
    * @name Data size
@@ -77,7 +74,6 @@ namespace util::quantities {
    *
    */
   /// @{
-
 
   /// The most generic `units::Byte`-based quantity.
   template <typename R, typename T = unsigned long long int>
@@ -202,7 +198,6 @@ namespace util::quantities {
   /// Alias for common language habits.
   using exbibytes = exbibyte;
 
-
   /**
    * @brief Literal constants for data size quantities.
    *
@@ -225,63 +220,68 @@ namespace util::quantities {
 
     // @{
     /// Literal second value.
-    constexpr byte operator""_B (long double v)
-      { return byte{ static_cast<unsigned long long int>(v) }; }
-    constexpr byte operator""_B (unsigned long long int v)
-      { return byte{ v }; }
+    constexpr byte operator""_B(long double v)
+    {
+      return byte{static_cast<unsigned long long int>(v)};
+    }
+    constexpr byte operator""_B(unsigned long long int v) { return byte{v}; }
     // @}
 
     // @{
     /// Literal kibibyte value.
-    constexpr kibibyte operator""_kiB (long double v)
-      { return kibibyte{ static_cast<unsigned long long int>(v) }; }
-    constexpr kibibyte operator""_kiB (unsigned long long int v)
-      { return kibibyte{ v }; }
+    constexpr kibibyte operator""_kiB(long double v)
+    {
+      return kibibyte{static_cast<unsigned long long int>(v)};
+    }
+    constexpr kibibyte operator""_kiB(unsigned long long int v) { return kibibyte{v}; }
     // @}
 
     // @{
     /// Literal mebibyte value.
-    constexpr mebibyte operator""_MiB (long double v)
-      { return mebibyte{ static_cast<unsigned long long int>(v) }; }
-    constexpr mebibyte operator""_MiB (unsigned long long int v)
-      { return mebibyte{ v }; }
+    constexpr mebibyte operator""_MiB(long double v)
+    {
+      return mebibyte{static_cast<unsigned long long int>(v)};
+    }
+    constexpr mebibyte operator""_MiB(unsigned long long int v) { return mebibyte{v}; }
     // @}
 
     // @{
     /// Literal gibibyte value.
-    constexpr gibibyte operator""_GiB (long double v)
-      { return gibibyte{ static_cast<unsigned long long int>(v) }; }
-    constexpr gibibyte operator""_GiB (unsigned long long int v)
-      { return gibibyte{ v }; }
+    constexpr gibibyte operator""_GiB(long double v)
+    {
+      return gibibyte{static_cast<unsigned long long int>(v)};
+    }
+    constexpr gibibyte operator""_GiB(unsigned long long int v) { return gibibyte{v}; }
     // @}
 
     // @{
     /// Literal tebibyte value.
-    constexpr tebibyte operator""_TiB (long double v)
-      { return tebibyte{ static_cast<unsigned long long int>(v) }; }
-    constexpr tebibyte operator""_TiB (unsigned long long int v)
-      { return tebibyte{ v }; }
+    constexpr tebibyte operator""_TiB(long double v)
+    {
+      return tebibyte{static_cast<unsigned long long int>(v)};
+    }
+    constexpr tebibyte operator""_TiB(unsigned long long int v) { return tebibyte{v}; }
     // @}
 
     // @{
     /// Literal pebibyte value.
-    constexpr pebibyte operator""_PiB (long double v)
-      { return pebibyte{ static_cast<unsigned long long int>(v) }; }
-    constexpr pebibyte operator""_PiB (unsigned long long int v)
-      { return pebibyte{ v }; }
+    constexpr pebibyte operator""_PiB(long double v)
+    {
+      return pebibyte{static_cast<unsigned long long int>(v)};
+    }
+    constexpr pebibyte operator""_PiB(unsigned long long int v) { return pebibyte{v}; }
     // @}
 
     // @{
     /// Literal exbibyte value.
-    constexpr exbibyte operator""_EiB (long double v)
-      { return exbibyte{ static_cast<unsigned long long int>(v) }; }
-    constexpr exbibyte operator""_EiB (unsigned long long int v)
-      { return exbibyte{ v }; }
+    constexpr exbibyte operator""_EiB(long double v)
+    {
+      return exbibyte{static_cast<unsigned long long int>(v)};
+    }
+    constexpr exbibyte operator""_EiB(unsigned long long int v) { return exbibyte{v}; }
     // @}
 
-
   } // datasize_literals
-
 
   /// @}
   // -- END Data size ----------------------------------------------------------
@@ -297,84 +297,76 @@ namespace util::quantities::concepts {
   template <>
   struct Prefix<prefixes::kibi> {
 
-      /// Returns the symbol of the prefix.
-      static constexpr auto symbol() { return "ki"sv; }
+    /// Returns the symbol of the prefix.
+    static constexpr auto symbol() { return "ki"sv; }
 
-      /// Returns the full name of the prefix.
-      static constexpr auto name() { return "kibi"sv; }
+    /// Returns the full name of the prefix.
+    static constexpr auto name() { return "kibi"sv; }
 
   }; // struct Prefix<prefixes::kibi>
-
 
   /// Prefix for 1048576 (2^20).
   template <>
   struct Prefix<prefixes::mebi> {
 
-      /// Returns the symbol of the prefix.
-      static constexpr auto symbol() { return "Mi"sv; }
+    /// Returns the symbol of the prefix.
+    static constexpr auto symbol() { return "Mi"sv; }
 
-      /// Returns the full name of the prefix.
-      static constexpr auto name() { return "mebi"sv; }
+    /// Returns the full name of the prefix.
+    static constexpr auto name() { return "mebi"sv; }
 
   }; // struct Prefix<prefixes::mebi>
-
 
   /// Prefix for 1073741824 (2^30).
   template <>
   struct Prefix<prefixes::gibi> {
 
-      /// Returns the symbol of the prefix.
-      static constexpr auto symbol() { return "Gi"sv; }
+    /// Returns the symbol of the prefix.
+    static constexpr auto symbol() { return "Gi"sv; }
 
-      /// Returns the full name of the prefix.
-      static constexpr auto name() { return "gibi"sv; }
+    /// Returns the full name of the prefix.
+    static constexpr auto name() { return "gibi"sv; }
 
   }; // struct Prefix<prefixes::gibi>
-
 
   /// Prefix for 2^40.
   template <>
   struct Prefix<prefixes::tebi> {
 
-      /// Returns the symbol of the prefix.
-      static constexpr auto symbol() { return "Ti"sv; }
+    /// Returns the symbol of the prefix.
+    static constexpr auto symbol() { return "Ti"sv; }
 
-      /// Returns the full name of the prefix.
-      static constexpr auto name() { return "tebi"sv; }
+    /// Returns the full name of the prefix.
+    static constexpr auto name() { return "tebi"sv; }
 
   }; // struct Prefix<prefixes::tebi>
-
 
   /// Prefix for 2^50.
   template <>
   struct Prefix<prefixes::pebi> {
 
-      /// Returns the symbol of the prefix.
-      static constexpr auto symbol() { return "Pi"sv; }
+    /// Returns the symbol of the prefix.
+    static constexpr auto symbol() { return "Pi"sv; }
 
-      /// Returns the full name of the prefix.
-      static constexpr auto name() { return "pebi"sv; }
+    /// Returns the full name of the prefix.
+    static constexpr auto name() { return "pebi"sv; }
 
   }; // struct Prefix<prefixes::pebi>
-
 
   /// Prefix for 2^60.
   template <>
   struct Prefix<prefixes::exbi> {
 
-      /// Returns the symbol of the prefix.
-      static constexpr auto symbol() { return "Ei"sv; }
+    /// Returns the symbol of the prefix.
+    static constexpr auto symbol() { return "Ei"sv; }
 
-      /// Returns the full name of the prefix.
-      static constexpr auto name() { return "exbi"sv; }
+    /// Returns the full name of the prefix.
+    static constexpr auto name() { return "exbi"sv; }
 
   }; // struct Prefix<prefixes::exbi>
 
-
 } // namespace util::quantities::concepts
 
-
 //------------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_UTILITIES_QUANTITIES_DATASIZE_H

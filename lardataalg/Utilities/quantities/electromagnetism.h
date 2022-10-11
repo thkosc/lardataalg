@@ -23,9 +23,8 @@
 #include "lardataalg/Utilities/quantities.h"
 
 // C/C++ standard libraries
-#include <string_view>
 #include <ratio>
-
+#include <string_view>
 
 //------------------------------------------------------------------------------
 namespace util::quantities {
@@ -34,18 +33,17 @@ namespace util::quantities {
 
     using namespace std::string_view_literals; // for operator""sv()
 
-    struct Coulomb: public concepts::UnitBase {
+    struct Coulomb : public concepts::UnitBase {
       static constexpr auto symbol = "C"sv;
-      static constexpr auto name   = "coulomb"sv;
+      static constexpr auto name = "coulomb"sv;
     };
 
-    struct Volt: public concepts::UnitBase {
+    struct Volt : public concepts::UnitBase {
       static constexpr auto symbol = "V"sv;
-      static constexpr auto name   = "volt"sv;
+      static constexpr auto name = "volt"sv;
     };
 
   } // namespace units
-
 
   // -- BEGIN Charge -----------------------------------------------------------
   /**
@@ -63,7 +61,6 @@ namespace util::quantities {
    *
    */
   /// @{
-
 
   /// The most generic `units::Coulomb`-based quantity.
   template <typename R, typename T = double>
@@ -129,9 +126,7 @@ namespace util::quantities {
   /// Type of charge stored in femtocoulomb, in double precision.
   using femtocoulomb = femtocoulomb_as<>;
 
-
   // -- END Charge -------------------------------------------------------------
-
 
   // -- BEGIN Electric potential -----------------------------------------------
   /**
@@ -149,7 +144,6 @@ namespace util::quantities {
    *
    */
   /// @{
-
 
   /// The most generic `units::Volt`-based quantity.
   template <typename R, typename T = double>
@@ -218,7 +212,6 @@ namespace util::quantities {
   /// @}
   // -- END Electric potential -------------------------------------------------
 
-
   /**
    * @brief Literal constants for quantities.
    *
@@ -241,107 +234,128 @@ namespace util::quantities {
 
     // @{
     /// Literal coulomb value.
-    constexpr coulomb operator""_C (long double v)
-      { return coulomb{ static_cast<double>(v) }; }
-    constexpr coulomb operator""_C (unsigned long long int v)
-      { return coulomb{ static_cast<double>(v) }; }
+    constexpr coulomb operator""_C(long double v) { return coulomb{static_cast<double>(v)}; }
+    constexpr coulomb operator""_C(unsigned long long int v)
+    {
+      return coulomb{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal millicoulomb value.
-    constexpr millicoulomb operator""_mC (long double v)
-      { return millicoulomb{ static_cast<double>(v) }; }
-    constexpr millicoulomb operator""_mC (unsigned long long int v)
-      { return millicoulomb{ static_cast<double>(v) }; }
+    constexpr millicoulomb operator""_mC(long double v)
+    {
+      return millicoulomb{static_cast<double>(v)};
+    }
+    constexpr millicoulomb operator""_mC(unsigned long long int v)
+    {
+      return millicoulomb{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal microcoulomb value.
-    constexpr microcoulomb operator""_uC (long double v)
-      { return microcoulomb{ static_cast<double>(v) }; }
-    constexpr microcoulomb operator""_uC (unsigned long long int v)
-      { return microcoulomb{ static_cast<double>(v) }; }
+    constexpr microcoulomb operator""_uC(long double v)
+    {
+      return microcoulomb{static_cast<double>(v)};
+    }
+    constexpr microcoulomb operator""_uC(unsigned long long int v)
+    {
+      return microcoulomb{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal nanocoulomb value.
-    constexpr nanocoulomb operator""_nC (long double v)
-      { return nanocoulomb{ static_cast<double>(v) }; }
-    constexpr nanocoulomb operator""_nC (unsigned long long int v)
-      { return nanocoulomb{ static_cast<double>(v) }; }
+    constexpr nanocoulomb operator""_nC(long double v)
+    {
+      return nanocoulomb{static_cast<double>(v)};
+    }
+    constexpr nanocoulomb operator""_nC(unsigned long long int v)
+    {
+      return nanocoulomb{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal picocoulomb value.
-    constexpr picocoulomb operator""_pC (long double v)
-      { return picocoulomb{ static_cast<double>(v) }; }
-    constexpr picocoulomb operator""_pC (unsigned long long int v)
-      { return picocoulomb{ static_cast<double>(v) }; }
+    constexpr picocoulomb operator""_pC(long double v)
+    {
+      return picocoulomb{static_cast<double>(v)};
+    }
+    constexpr picocoulomb operator""_pC(unsigned long long int v)
+    {
+      return picocoulomb{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal femtocoulomb value.
-    constexpr femtocoulomb operator""_fC (long double v)
-      { return femtocoulomb{ static_cast<double>(v) }; }
-    constexpr femtocoulomb operator""_fC (unsigned long long int v)
-      { return femtocoulomb{ static_cast<double>(v) }; }
+    constexpr femtocoulomb operator""_fC(long double v)
+    {
+      return femtocoulomb{static_cast<double>(v)};
+    }
+    constexpr femtocoulomb operator""_fC(unsigned long long int v)
+    {
+      return femtocoulomb{static_cast<double>(v)};
+    }
     // @}
-
 
     // @{
     /// Literal volt value.
-    constexpr volt operator""_V (long double v)
-      { return volt{ static_cast<double>(v) }; }
-    constexpr volt operator""_V (unsigned long long int v)
-      { return volt{ static_cast<double>(v) }; }
+    constexpr volt operator""_V(long double v) { return volt{static_cast<double>(v)}; }
+    constexpr volt operator""_V(unsigned long long int v) { return volt{static_cast<double>(v)}; }
     // @}
 
     // @{
     /// Literal millivolt value.
-    constexpr millivolt operator""_mV (long double v)
-      { return millivolt{ static_cast<double>(v) }; }
-    constexpr millivolt operator""_mV (unsigned long long int v)
-      { return millivolt{ static_cast<double>(v) }; }
+    constexpr millivolt operator""_mV(long double v) { return millivolt{static_cast<double>(v)}; }
+    constexpr millivolt operator""_mV(unsigned long long int v)
+    {
+      return millivolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal microvolt value.
-    constexpr microvolt operator""_uV (long double v)
-      { return microvolt{ static_cast<double>(v) }; }
-    constexpr microvolt operator""_uV (unsigned long long int v)
-      { return microvolt{ static_cast<double>(v) }; }
+    constexpr microvolt operator""_uV(long double v) { return microvolt{static_cast<double>(v)}; }
+    constexpr microvolt operator""_uV(unsigned long long int v)
+    {
+      return microvolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal kilovolt value.
-    constexpr kilovolt operator""_kV (long double v)
-      { return kilovolt{ static_cast<double>(v) }; }
-    constexpr kilovolt operator""_kV (unsigned long long int v)
-      { return kilovolt{ static_cast<double>(v) }; }
+    constexpr kilovolt operator""_kV(long double v) { return kilovolt{static_cast<double>(v)}; }
+    constexpr kilovolt operator""_kV(unsigned long long int v)
+    {
+      return kilovolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal megavolt value.
-    constexpr megavolt operator""_MV (long double v)
-      { return megavolt{ static_cast<double>(v) }; }
-    constexpr megavolt operator""_MV (unsigned long long int v)
-      { return megavolt{ static_cast<double>(v) }; }
+    constexpr megavolt operator""_MV(long double v) { return megavolt{static_cast<double>(v)}; }
+    constexpr megavolt operator""_MV(unsigned long long int v)
+    {
+      return megavolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal gigavolt value.
-    constexpr gigavolt operator""_GV (long double v)
-      { return gigavolt{ static_cast<double>(v) }; }
-    constexpr gigavolt operator""_GV (unsigned long long int v)
-      { return gigavolt{ static_cast<double>(v) }; }
+    constexpr gigavolt operator""_GV(long double v) { return gigavolt{static_cast<double>(v)}; }
+    constexpr gigavolt operator""_GV(unsigned long long int v)
+    {
+      return gigavolt{static_cast<double>(v)};
+    }
     // @}
 
   } // electromagnetism_literals
 
-
 } // namespace util::quantities
 
 //------------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ELECTROMAGNETISM_H

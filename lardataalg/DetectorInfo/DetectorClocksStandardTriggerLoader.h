@@ -54,8 +54,8 @@ namespace detinfo {
    * no choice is made, and an exception is thrown.
    */
   template <typename Event>
-  std::optional<std::pair<double, double>>
-  trigger_times_for_event(art::InputTag const& triggerTag, Event const& event)
+  std::optional<std::pair<double, double>> trigger_times_for_event(art::InputTag const& triggerTag,
+                                                                   Event const& event)
   {
     // try to read the trigger from the event
     // fetch the trigger data product
@@ -101,8 +101,7 @@ namespace detinfo {
    * no choice is made, and an exception is thrown.
       */
   template <typename Event>
-  std::optional<double>
-  g4ref_time_for_event(art::InputTag const& triggerTag, Event const& event)
+  std::optional<double> g4ref_time_for_event(art::InputTag const& triggerTag, Event const& event)
   {
     // fetch the trigger data product
     using TriggerHandle_t = typename Event::template HandleT<std::vector<raw::Trigger>>;

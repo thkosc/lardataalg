@@ -11,19 +11,17 @@
 #ifndef LARDATAALG_DUMPERS_RAWDATA_OPDETWAVEFORM_H
 #define LARDATAALG_DUMPERS_RAWDATA_OPDETWAVEFORM_H
 
-
 // LArSoft includes
 #include "lardataalg/Dumpers/DumperBase.h"
 #include "lardataalg/Utilities/StatCollector.h" // lar::util::MinMaxCollector
 #include "lardataobj/RawData/OpDetWaveform.h"
 
 // C//C++ standard libraries
-#include <vector>
 #include <algorithm> // std::min()
-#include <ios> // std::fixed
-#include <iomanip> // std::setprecision(), std::setw()
-#include <utility> // std::forward(), std::swap()
-
+#include <iomanip>   // std::setprecision(), std::setw()
+#include <ios>       // std::fixed
+#include <utility>   // std::forward(), std::swap()
+#include <vector>
 
 namespace dump::raw {
 
@@ -42,42 +40,42 @@ namespace dump::raw {
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    *
    */
-  class OpDetWaveformDumper: public DumperBase {
-      public:
-    
+  class OpDetWaveformDumper : public DumperBase {
+  public:
     /// Base functor for printing time according to tick number.
     struct TimeLabelMaker {
-      
+
       virtual ~TimeLabelMaker() = default;
-      
+
       /// Returns the label to be written for the specified `tick` number.
-      virtual std::string label
-        (raw::OpDetWaveform const& waveform, unsigned int tick) const = 0;
-      
+      virtual std::string label(raw::OpDetWaveform const& waveform, unsigned int tick) const = 0;
+
       /// Length of padded label. For best results, it should be a constant.
-      virtual unsigned int labelWidth
-        (raw::OpDetWaveform const& waveform, unsigned int tick) const
-        { return 10U; }
-      
+      virtual unsigned int labelWidth(raw::OpDetWaveform const& waveform, unsigned int tick) const
+      {
+        return 10U;
+      }
+
     }; // struct TimeLabelMaker
-    
-    
+
     /// Time label: tick number relative to the waveform.
-    struct TickLabelMaker: public TimeLabelMaker {
-      
+    struct TickLabelMaker : public TimeLabelMaker {
+
       /// Returns the label to be written for the specified `tick` number.
-      virtual std::string label
-        (raw::OpDetWaveform const&, unsigned int tick) const override
-        { return std::to_string(tick); }
-      
+      virtual std::string label(raw::OpDetWaveform const&, unsigned int tick) const override
+      {
+        return std::to_string(tick);
+      }
+
       /// Length of padded label. For best results, it should be a constant.
-      virtual unsigned int labelWidth
-        (raw::OpDetWaveform const& waveform, unsigned int) const override
-        { return digitsOf(waveform.size()); }
-      
+      virtual unsigned int labelWidth(raw::OpDetWaveform const& waveform,
+                                      unsigned int) const override
+      {
+        return digitsOf(waveform.size());
+      }
+
     }; // struct TickLabelMaker
-    
-    
+
     /**
      * @brief Constructor: sets waveform dump parameters.
      * @param pedestal (default: `0`) the pedestal to be automatically added to
@@ -88,11 +86,10 @@ namespace dump::raw {
      * Note that no indentation is set. If some is desired, set it with
      * `setIndent()` after construction.
      */
-    OpDetWaveformDumper
-      (raw::ADC_Count_t pedestal = 0, unsigned int digitsPerLine = 0U)
+    OpDetWaveformDumper(raw::ADC_Count_t pedestal = 0, unsigned int digitsPerLine = 0U)
       : fPedestal(pedestal), fDigitsPerLine(digitsPerLine)
-      {}
-    
+    {}
+
     /**
      * @brief Chooses which time label maker to use.
      * @param timeLabelMaker a pointer to the external time label maker
@@ -103,8 +100,9 @@ namespace dump::raw {
      * printed at all.
      */
     void setTimeLabelMaker(TimeLabelMaker const* timeLabelMaker)
-      { fTimeLabelMaker = timeLabelMaker; }
-    
+    {
+      fTimeLabelMaker = timeLabelMaker;
+    }
 
     /**
      * @brief Dumps the content of a waveform into the specified output stream.
@@ -120,87 +118,78 @@ namespace dump::raw {
     /// An alias of `dump()`.
     template <typename Stream>
     void operator()(Stream&& stream, raw::OpDetWaveform const& waveform)
-      { dump(stream, waveform); }
-
+    {
+      dump(stream, waveform);
+    }
 
     /// Pads the specified string to the right, truncating its right if needed.
-    static std::string padRight
-      (std::string const& s, unsigned int width, std::string padding = " ");
-    
+    static std::string padRight(std::string const& s,
+                                unsigned int width,
+                                std::string padding = " ");
+
     /// Pads the specified string to the right, truncating its right if needed.
     static unsigned int digitsOf(unsigned int n);
-    
-      private:
-    
-    raw::ADC_Count_t fPedestal; ///< ADC pedestal (subtracted from readings).
-    unsigned int fDigitsPerLine;  ///< ADC readings per line in the output.
-    
+
+  private:
+    raw::ADC_Count_t fPedestal;  ///< ADC pedestal (subtracted from readings).
+    unsigned int fDigitsPerLine; ///< ADC readings per line in the output.
+
     /// The functor to be used to extract the time label.
     TimeLabelMaker const* fTimeLabelMaker = nullptr;
-    
+
   }; // class OpDetWaveformDumper
 
 } // namespace dump::raw
-
 
 // -----------------------------------------------------------------------------
 // ---  Template implementation
 // -----------------------------------------------------------------------------
 template <typename Stream>
-void dump::raw::OpDetWaveformDumper::dump
-  (Stream&& stream, raw::OpDetWaveform const& waveform)
+void dump::raw::OpDetWaveformDumper::dump(Stream&& stream, raw::OpDetWaveform const& waveform)
 {
   static std::string const headerSep = " | ";
-  
+
   auto const& data = waveform;
   using Count_t = raw::ADC_Count_t;
 
   auto out = indenter(std::forward<Stream>(stream));
-  
+
   // print a header for the raw digits
-  out.start()
-    << "on channel #" << waveform.ChannelNumber() << " (time stamp: "
-    << waveform.TimeStamp() << "): " << data.size() << " time ticks";
-  
+  out.start() << "on channel #" << waveform.ChannelNumber()
+              << " (time stamp: " << waveform.TimeStamp() << "): " << data.size() << " time ticks";
+
   // print the content of the channel
   if (fDigitsPerLine == 0) return;
 
   // save and change indentation
   saveIndentSettings().set(indent() + "  ");
-  
+
   unsigned int repeat_count = 0U; // additional lines like the last one
   unsigned int index = 0U;
   unsigned int firstLineTick = 0U;
-  
+
   // local function for printing and resetting the repeat count
-  auto flushRepeatCount
-    = [this, &out, &waveform, &firstLineTick](unsigned int& count)
-    -> decltype(auto)
-    {
-      if (count > 0) {
-        out.newline();
-        if (fTimeLabelMaker) {
-          out
-            << padRight("", fTimeLabelMaker->labelWidth(waveform, firstLineTick))
-            << headerSep
-            ;
-        }
-        out << " [ ... repeated " << count << " more times ]";
-        count = 0;
+  auto flushRepeatCount =
+    [this, &out, &waveform, &firstLineTick](unsigned int& count) -> decltype(auto) {
+    if (count > 0) {
+      out.newline();
+      if (fTimeLabelMaker) {
+        out << padRight("", fTimeLabelMaker->labelWidth(waveform, firstLineTick)) << headerSep;
       }
-      return out;
-    };
+      out << " [ ... repeated " << count << " more times ]";
+      count = 0;
+    }
+    return out;
+  };
 
   std::vector<Count_t> DigitBuffer(fDigitsPerLine), LastBuffer;
 
   lar::util::MinMaxCollector<Count_t> Extrema;
-  out.newline()
-    << "content of the channel (" << fDigitsPerLine << " ticks per line):";
+  out.newline() << "content of the channel (" << fDigitsPerLine << " ticks per line):";
   auto iTick = data.cbegin(), tend = data.cend(); // const iterators
   while (iTick != tend) {
     // the next line will show at most fDigitsPerLine ticks
-    unsigned int line_size
-      = std::min(fDigitsPerLine, (unsigned int) data.size() - index);
+    unsigned int line_size = std::min(fDigitsPerLine, (unsigned int)data.size() - index);
     if (line_size == 0) break; // no more ticks
 
     // fill the new buffer (iTick will move forward)
@@ -216,7 +205,7 @@ void dump::raw::OpDetWaveformDumper::dump
       repeat_count += 1;
       continue;
     }
-    
+
     // if there are previous repeats, write that on screen
     // before the new, different line
     flushRepeatCount(repeat_count);
@@ -224,79 +213,70 @@ void dump::raw::OpDetWaveformDumper::dump
     // dump the new line of ticks
     out.newline();
     if (fTimeLabelMaker) {
-      out << padRight(
-          fTimeLabelMaker->label(waveform, firstLineTick),
-          fTimeLabelMaker->labelWidth(waveform, firstLineTick)
-        )
-        << headerSep
-        ;
+      out << padRight(fTimeLabelMaker->label(waveform, firstLineTick),
+                      fTimeLabelMaker->labelWidth(waveform, firstLineTick))
+          << headerSep;
     }
-    for (auto digit: DigitBuffer)
+    for (auto digit : DigitBuffer)
       out << " " << std::setw(4) << digit;
-    
-    
+
     // quick way to assign DigitBuffer to LastBuffer
     // (we don't care we lose the former)
     std::swap(LastBuffer, DigitBuffer);
-    
+
   } // while
   flushRepeatCount(repeat_count);
   if (Extrema.min() != Extrema.max()) {
-    out.newline()
-      << "  range of " << data.size()
-      << " samples: [" << Extrema.min() << ";" << Extrema.max() << "] (span: "
-      << (Extrema.max() - Extrema.min());
+    out.newline() << "  range of " << data.size() << " samples: [" << Extrema.min() << ";"
+                  << Extrema.max() << "] (span: " << (Extrema.max() - Extrema.min());
     if (fPedestal != 0) {
-      out << ", absolute: ["
-        << (Extrema.min() + fPedestal) << ";"
-        << (Extrema.max() + fPedestal) << "]";
+      out << ", absolute: [" << (Extrema.min() + fPedestal) << ";" << (Extrema.max() + fPedestal)
+          << "]";
     }
     out << ")";
   }
-  
+
   restoreIndentSettings();
-  
+
 } // dump::raw::OpDetWaveformDumper::dump()
 
-
 //----------------------------------------------------------------------------
-std::string dump::raw::OpDetWaveformDumper::padRight
-  (std::string const& s, unsigned int width, std::string padding /* = " " */)
+std::string dump::raw::OpDetWaveformDumper::padRight(std::string const& s,
+                                                     unsigned int width,
+                                                     std::string padding /* = " " */)
 {
 
   if (s.length() > width) { // too long already?
     // truncate on the right
-    return { s, 0U, width }; // { string, start index, character count }
+    return {s, 0U, width}; // { string, start index, character count }
   }
 
   std::string padded;
   padded.reserve(width);
-  
+
   // this is how many full padding strings we need to prepend
-  unsigned int nPadding
-    = (s.length() >= width)? 0U: (width - s.length()) / padding.length();
-  
+  unsigned int nPadding = (s.length() >= width) ? 0U : (width - s.length()) / padding.length();
+
   // if there is need for some more partial padding beyond that:
   if (nPadding * padding.length() + s.length() < width) {
     // immediately prepend from the rightmost part of the padding string
-    padded.append(
-      padding.end() - (width - (nPadding * padding.length() + s.length())),
-      padding.end()
-      );
+    padded.append(padding.end() - (width - (nPadding * padding.length() + s.length())),
+                  padding.end());
   }
-  
+
   // add the rest of the padding and the string, and then we are done
-  while (nPadding-- > 0) padded += padding;
+  while (nPadding-- > 0)
+    padded += padding;
   padded += s;
-  
+
   assert(padded.length() == width);
-  
+
   return padded;
 } // dump::raw::OpDetWaveformDumper::padRight()
 
-
 //----------------------------------------------------------------------------
-unsigned int dump::raw::OpDetWaveformDumper::digitsOf(unsigned int n) {
+unsigned int dump::raw::OpDetWaveformDumper::digitsOf(unsigned int n)
+{
   unsigned int digits = 1U;
   while (n >= 10) {
     ++digits;
@@ -305,8 +285,6 @@ unsigned int dump::raw::OpDetWaveformDumper::digitsOf(unsigned int n) {
   return digits;
 } // dump::raw::OpDetWaveformDumper::digitsOf()
 
-
 //----------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_DUMPERS_RAWDATA_OPDETWAVEFORM_H

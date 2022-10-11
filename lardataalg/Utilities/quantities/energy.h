@@ -22,9 +22,8 @@
 #include "lardataalg/Utilities/quantities.h"
 
 // C/C++ standard libraries
-#include <string_view>
 #include <ratio>
-
+#include <string_view>
 
 //------------------------------------------------------------------------------
 namespace util::quantities {
@@ -33,14 +32,12 @@ namespace util::quantities {
 
     using namespace std::string_view_literals; // for operator""sv()
 
-    struct ElectronVolt: public concepts::UnitBase {
+    struct ElectronVolt : public concepts::UnitBase {
       static constexpr auto symbol = "eV"sv;
-      static constexpr auto name   = "electronvolt"sv;
+      static constexpr auto name = "electronvolt"sv;
     };
 
-
   } // namespace units
-
 
   // -- BEGIN Particle energy --------------------------------------------------
   /**
@@ -60,11 +57,9 @@ namespace util::quantities {
    */
   /// @{
 
-
   /// The most generic `units::ElectronVolt`-based quantity.
   template <typename R, typename T = double>
-  using scaled_electronvolt
-    = concepts::scaled_quantity<units::ElectronVolt, R, T>;
+  using scaled_electronvolt = concepts::scaled_quantity<units::ElectronVolt, R, T>;
 
   //
   // electronvolt
@@ -81,8 +76,7 @@ namespace util::quantities {
   //
   /// Type of energy stored in microelectronvolt.
   template <typename T = double>
-  using microelectronvolt_as
-    = concepts::rescale<electronvolt_as<T>, std::micro>;
+  using microelectronvolt_as = concepts::rescale<electronvolt_as<T>, std::micro>;
 
   /// Type of energy stored in microelectronvolt, in double precision.
   using microelectronvolt = microelectronvolt_as<>;
@@ -92,8 +86,7 @@ namespace util::quantities {
   //
   /// Type of energy stored in millielectronvolt.
   template <typename T = double>
-  using millielectronvolt_as
-    = concepts::rescale<electronvolt_as<T>, std::milli>;
+  using millielectronvolt_as = concepts::rescale<electronvolt_as<T>, std::milli>;
 
   /// Type of energy stored in millielectronvolt, in double precision.
   using millielectronvolt = millielectronvolt_as<>;
@@ -141,7 +134,6 @@ namespace util::quantities {
   /// @}
   // -- END Particle energy ----------------------------------------------------
 
-
   /**
    * @brief Literal constants for energy quantities.
    *
@@ -163,66 +155,92 @@ namespace util::quantities {
 
     // @{
     /// Literal electronvolt value.
-    constexpr electronvolt operator""_eV (long double v)
-      { return electronvolt{ static_cast<double>(v) }; }
-    constexpr electronvolt operator""_eV (unsigned long long int v)
-      { return electronvolt{ static_cast<double>(v) }; }
+    constexpr electronvolt operator""_eV(long double v)
+    {
+      return electronvolt{static_cast<double>(v)};
+    }
+    constexpr electronvolt operator""_eV(unsigned long long int v)
+    {
+      return electronvolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal microelectronvolt value.
-    constexpr microelectronvolt operator""_ueV (long double v)
-      { return microelectronvolt{ static_cast<double>(v) }; }
-    constexpr microelectronvolt operator""_ueV (unsigned long long int v)
-      { return microelectronvolt{ static_cast<double>(v) }; }
+    constexpr microelectronvolt operator""_ueV(long double v)
+    {
+      return microelectronvolt{static_cast<double>(v)};
+    }
+    constexpr microelectronvolt operator""_ueV(unsigned long long int v)
+    {
+      return microelectronvolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal millielectronvolt value.
-    constexpr millielectronvolt operator""_meV (long double v)
-      { return millielectronvolt{ static_cast<double>(v) }; }
-    constexpr millielectronvolt operator""_meV (unsigned long long int v)
-      { return millielectronvolt{ static_cast<double>(v) }; }
+    constexpr millielectronvolt operator""_meV(long double v)
+    {
+      return millielectronvolt{static_cast<double>(v)};
+    }
+    constexpr millielectronvolt operator""_meV(unsigned long long int v)
+    {
+      return millielectronvolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal kilovolt value.
-    constexpr kiloelectronvolt operator""_keV (long double v)
-      { return kiloelectronvolt{ static_cast<double>(v) }; }
-    constexpr kiloelectronvolt operator""_keV (unsigned long long int v)
-      { return kiloelectronvolt{ static_cast<double>(v) }; }
+    constexpr kiloelectronvolt operator""_keV(long double v)
+    {
+      return kiloelectronvolt{static_cast<double>(v)};
+    }
+    constexpr kiloelectronvolt operator""_keV(unsigned long long int v)
+    {
+      return kiloelectronvolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal megaelectronvolt value.
-    constexpr megaelectronvolt operator""_MeV (long double v)
-      { return megaelectronvolt{ static_cast<double>(v) }; }
-    constexpr megaelectronvolt operator""_MeV (unsigned long long int v)
-      { return megaelectronvolt{ static_cast<double>(v) }; }
+    constexpr megaelectronvolt operator""_MeV(long double v)
+    {
+      return megaelectronvolt{static_cast<double>(v)};
+    }
+    constexpr megaelectronvolt operator""_MeV(unsigned long long int v)
+    {
+      return megaelectronvolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal gigaelectronvolt value.
-    constexpr gigaelectronvolt operator""_GeV (long double v)
-      { return gigaelectronvolt{ static_cast<double>(v) }; }
-    constexpr gigaelectronvolt operator""_GeV (unsigned long long int v)
-      { return gigaelectronvolt{ static_cast<double>(v) }; }
+    constexpr gigaelectronvolt operator""_GeV(long double v)
+    {
+      return gigaelectronvolt{static_cast<double>(v)};
+    }
+    constexpr gigaelectronvolt operator""_GeV(unsigned long long int v)
+    {
+      return gigaelectronvolt{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal teraelectronvolt value.
-    constexpr teraelectronvolt operator""_TeV (long double v)
-      { return teraelectronvolt{ static_cast<double>(v) }; }
-    constexpr teraelectronvolt operator""_TeV (unsigned long long int v)
-      { return teraelectronvolt{ static_cast<double>(v) }; }
+    constexpr teraelectronvolt operator""_TeV(long double v)
+    {
+      return teraelectronvolt{static_cast<double>(v)};
+    }
+    constexpr teraelectronvolt operator""_TeV(unsigned long long int v)
+    {
+      return teraelectronvolt{static_cast<double>(v)};
+    }
     // @}
 
   } // energy_literals
 
-
 } // namespace util::quantities
 
 //------------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ENERGY_H

@@ -14,11 +14,11 @@
 // LArSoft libraries
 #include "larcorealg/CoreUtils/ProviderPack.h"
 #include "larcorealg/Geometry/GeometryCore.h"
+#include "larcoreobj/SimpleTypesAndConstants/PhysicalConstants.h"
 #include "lardataalg/DetectorInfo/DetectorClocks.h"
 #include "lardataalg/DetectorInfo/DetectorProperties.h"
 #include "lardataalg/DetectorInfo/DetectorPropertiesData.h"
 #include "lardataalg/DetectorInfo/LArProperties.h"
-#include "larcoreobj/SimpleTypesAndConstants/PhysicalConstants.h"
 
 // framework libraries
 #include "fhiclcpp/ParameterSet.h"
@@ -126,17 +126,15 @@ namespace detinfo {
 
       fhicl::Atom<bool> SimpleBoundary{Name("SimpleBoundaryProcess"), Comment("")};
 
-      fhicl::Atom<double> ModBoxAlpha {
+      fhicl::Atom<double> ModBoxAlpha{
         Name("ModBoxAlpha"),
         Comment("alpha parameter in the Modified Box recombination model."),
-        util::kModBoxA
-      };
+        util::kModBoxA};
 
-      fhicl::Atom<double> ModBoxBeta {
+      fhicl::Atom<double> ModBoxBeta{
         Name("ModBoxBeta"),
         Comment("beta parameter in the Modified Box recombination model."),
-        util::kModBoxB
-      };
+        util::kModBoxB};
 
     }; // Configuration_t
 
@@ -148,11 +146,7 @@ namespace detinfo {
     DetectorPropertiesStandard(DetectorPropertiesStandard const&) = delete;
     virtual ~DetectorPropertiesStandard() = default;
 
-    void
-    SetNumberTimeSamples(unsigned int nsamp)
-    {
-      fNumberTimeSamples = nsamp;
-    }
+    void SetNumberTimeSamples(unsigned int nsamp) { fNumberTimeSamples = nsamp; }
 
     // Accessors.
 
@@ -167,8 +161,7 @@ namespace detinfo {
     double ModBoxCorrection(double dQdX) const override;
     double ModBoxCorrection(double dQdX, double EField) const override;
 
-    double
-    ElectronLifetime() const override
+    double ElectronLifetime() const override
     {
       return fElectronlifetime; //< microseconds
     }
@@ -186,11 +179,7 @@ namespace detinfo {
     double Density(double temperature = 0.) const override; ///< g/cm^3
 
     /// In kelvin.
-    double
-    Temperature() const override
-    {
-      return fTemperature;
-    }
+    double Temperature() const override { return fTemperature; }
 
     /**
      * @brief Restricted mean energy loss (dE/dx)
@@ -218,47 +207,15 @@ namespace detinfo {
      */
     double ElossVar(double mom, double mass) const override;
 
-    double
-    ElectronsToADC() const override
-    {
-      return fElectronsToADC;
-    }
-    unsigned int
-    NumberTimeSamples() const override
-    {
-      return fNumberTimeSamples;
-    }
-    unsigned int
-    ReadOutWindowSize() const override
-    {
-      return fReadOutWindowSize;
-    }
-    double
-    TimeOffsetU() const override
-    {
-      return fTimeOffsetU;
-    };
-    double
-    TimeOffsetV() const override
-    {
-      return fTimeOffsetV;
-    };
-    double
-    TimeOffsetZ() const override
-    {
-      return fTimeOffsetZ;
-    };
-    double
-    TimeOffsetY() const override
-    {
-      return fTimeOffsetY;
-    };
+    double ElectronsToADC() const override { return fElectronsToADC; }
+    unsigned int NumberTimeSamples() const override { return fNumberTimeSamples; }
+    unsigned int ReadOutWindowSize() const override { return fReadOutWindowSize; }
+    double TimeOffsetU() const override { return fTimeOffsetU; };
+    double TimeOffsetV() const override { return fTimeOffsetV; };
+    double TimeOffsetZ() const override { return fTimeOffsetZ; };
+    double TimeOffsetY() const override { return fTimeOffsetY; };
 
-    bool
-    SimpleBoundary() const override
-    {
-      return fSimpleBoundary;
-    }
+    bool SimpleBoundary() const override { return fSimpleBoundary; }
 
     DetectorPropertiesData DataFor(detinfo::DetectorClocksData const& clock_data) const override;
 

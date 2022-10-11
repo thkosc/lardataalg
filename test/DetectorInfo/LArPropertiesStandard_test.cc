@@ -10,7 +10,6 @@
 #include "lardataalg/DetectorInfo/LArPropertiesStandard.h"
 #include "lardataalg/DetectorInfo/LArPropertiesStandardTestHelpers.h"
 
-
 //------------------------------------------------------------------------------
 //---  The test environment
 //---
@@ -22,14 +21,11 @@
  * - `detinfo::LArProperties const* Provider<detinfo::LArProperties>()`
  *
  */
-using TestEnvironment
-  = testing::TesterEnvironment<testing::BasicEnvironmentConfiguration>;
-
+using TestEnvironment = testing::TesterEnvironment<testing::BasicEnvironmentConfiguration>;
 
 //------------------------------------------------------------------------------
 //---  The tests
 //---
-
 
 /** ****************************************************************************
  * @brief Runs the test
@@ -48,7 +44,8 @@ using TestEnvironment
  *
  */
 //------------------------------------------------------------------------------
-int main(int argc, char const** argv) {
+int main(int argc, char const** argv)
+{
 
   testing::BasicEnvironmentConfiguration config("larp_test");
 
@@ -58,10 +55,10 @@ int main(int argc, char const** argv) {
   int iParam = 0;
 
   // first argument: configuration file (mandatory)
-  if (++iParam < argc) config.SetConfigurationPath(argv[iParam]);
+  if (++iParam < argc)
+    config.SetConfigurationPath(argv[iParam]);
   else {
-    std::cerr << "FHiCL configuration file path required as first argument!"
-      << std::endl;
+    std::cerr << "FHiCL configuration file path required as first argument!" << std::endl;
     return 1;
   }
 
@@ -71,11 +68,9 @@ int main(int argc, char const** argv) {
 
   // third argument: path of the parameter set for LArProperties configuration
   // (optional; default: "services.LArProperties" from the inherited object)
-  if (++iParam < argc)
-    config.SetServiceParameterSetPath("LArPropertiesService", argv[iParam]);
+  if (++iParam < argc) config.SetServiceParameterSetPath("LArPropertiesService", argv[iParam]);
 
-
-  unsigned int nErrors = 0 /* Tester.Run() */ ;
+  unsigned int nErrors = 0 /* Tester.Run() */;
 
   //
   // testing environment setup
@@ -91,21 +86,17 @@ int main(int argc, char const** argv) {
   //
 
   // 1. we initialize it from the configuration in the environment,
-//  MyTestAlgo Tester(TestEnv.TesterParameters());
+  //  MyTestAlgo Tester(TestEnv.TesterParameters());
 
   // 2. we set it up with the geometry from the environment
-//  Tester.Setup(*(TestEnv.LArProperties()));
+  //  Tester.Setup(*(TestEnv.LArProperties()));
 
   // 3. then we run it!
-  mf::LogInfo("larp_test")
-    << "The atomic number of liquid argon is "
-    << TestEnv.Provider<detinfo::LArProperties>()->AtomicNumber()
-    ;
+  mf::LogInfo("larp_test") << "The atomic number of liquid argon is "
+                           << TestEnv.Provider<detinfo::LArProperties>()->AtomicNumber();
 
   // 4. And finally we cross fingers.
-  if (nErrors > 0) {
-    mf::LogError("larp_test") << nErrors << " errors detected!";
-  }
+  if (nErrors > 0) { mf::LogError("larp_test") << nErrors << " errors detected!"; }
 
   return nErrors;
 } // main()

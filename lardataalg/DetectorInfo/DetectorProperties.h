@@ -95,11 +95,7 @@ namespace detinfo {
     virtual double ElossVar(double mom, double mass) const = 0;
 
     /// Returns argon density at the temperature from Temperature()
-    virtual double
-    Density() const
-    {
-      return Density(Temperature());
-    }
+    virtual double Density() const { return Density(Temperature()); }
 
     virtual double ElectronsToADC() const = 0;
     virtual unsigned int NumberTimeSamples() const = 0;
@@ -107,8 +103,7 @@ namespace detinfo {
     virtual double TimeOffsetU() const = 0;
     virtual double TimeOffsetV() const = 0;
     virtual double TimeOffsetZ() const = 0;
-    virtual double
-    TimeOffsetY() const
+    virtual double TimeOffsetY() const
     {
       throw std::runtime_error("DetectorProperties::TimeOffsetY() not implemented");
     }

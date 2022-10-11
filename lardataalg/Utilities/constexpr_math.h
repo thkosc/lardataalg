@@ -37,13 +37,15 @@ namespace util {
    */
   // this bizarre implementation is supposed to guarantee that `abs(-0)` is `0`
   template <typename T>
-  constexpr auto abs(T v) { return (-T(0) < v)? v: -v; }
+  constexpr auto abs(T v)
+  {
+    return (-T(0) < v) ? v : -v;
+  }
 
   /// @}
 
   // --- END simple mathematical functions -------------------------------------
 
 } // namespace util
-
 
 #endif // LARDATAALG_UTILITIES_CONSTEXPR_MATH_H

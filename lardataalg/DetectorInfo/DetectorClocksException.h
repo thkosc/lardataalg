@@ -28,11 +28,7 @@ namespace detinfo {
     DetectorClocksException(std::string msg = "") : std::exception(), _msg(msg) {}
 
     virtual ~DetectorClocksException() throw(){};
-    virtual const char*
-    msg() const throw()
-    {
-      return _msg.c_str();
-    }
+    virtual const char* msg() const throw() { return _msg.c_str(); }
 
   private:
     std::string _msg;

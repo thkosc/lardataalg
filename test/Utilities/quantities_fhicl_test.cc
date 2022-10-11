@@ -8,7 +8,7 @@
  */
 
 // Boost libraries
-#define BOOST_TEST_MODULE ( quantities_fhicl_test )
+#define BOOST_TEST_MODULE (quantities_fhicl_test)
 #include <boost/test/unit_test.hpp>
 
 // LArSoft libraries
@@ -17,45 +17,46 @@
 #include "test/Utilities/disable_boost_fpc_tolerance.hpp"
 
 // support libraries
-#include "fhiclcpp/types/Table.h"
-#include "fhiclcpp/types/Atom.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "fhiclcpp/types/Atom.h"
+#include "fhiclcpp/types/Table.h"
 
 // C/C++ standard libraries
 #include <type_traits> // std::is_same_v<>
 
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 template <typename Config>
-fhicl::Table<Config> validateConfig(fhicl::ParameterSet const& pset) {
-  fhicl::Table<Config> validatedConfig { fhicl::Name("validatedConfig") };
+fhicl::Table<Config> validateConfig(fhicl::ParameterSet const& pset)
+{
+  fhicl::Table<Config> validatedConfig{fhicl::Name("validatedConfig")};
 
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "===> FHiCL configuration:";
-  if (pset.is_empty()) std::cout << " <empty>";
-  else                 std::cout << "\n" << pset.to_indented_string();
+  if (pset.is_empty())
+    std::cout << " <empty>";
+  else
+    std::cout << "\n" << pset.to_indented_string();
   std::cout << std::endl;
-  validatedConfig.print_allowed_configuration
-    (std::cout << "===> Expected configuration: ");
+  validatedConfig.print_allowed_configuration(std::cout << "===> Expected configuration: ");
   std::cout << std::endl;
 
   validatedConfig.validate_ParameterSet(pset);
   return validatedConfig;
 } // validateConfig()
 
-
 // -----------------------------------------------------------------------------
 template <typename Config>
-fhicl::Table<Config> validateConfig(std::string const& configStr) {
+fhicl::Table<Config> validateConfig(std::string const& configStr)
+{
   auto pset = fhicl::ParameterSet::make(configStr);
   return validateConfig<Config>(pset);
 } // validateConfig(Config)
 
-
 // -----------------------------------------------------------------------------
 // --- Quantity tests
 // -----------------------------------------------------------------------------
-void test_makeQuantity() {
+void test_makeQuantity()
+{
 
   using namespace std::string_view_literals;
   using namespace util::quantities::time_literals;
@@ -73,51 +74,39 @@ void test_makeQuantity() {
   t = util::quantities::makeQuantity<microsecond>("7e1"sv, true);
   BOOST_TEST(t == 70_us);
 
-  BOOST_CHECK_THROW(
-    util::quantities::makeQuantity<microsecond>("7e1"sv),
-    util::quantities::MissingUnit
-    );
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<microsecond>("7e1"sv),
+                    util::quantities::MissingUnit);
 
-  BOOST_CHECK_THROW(
-    util::quantities::makeQuantity<microsecond>("7g ms"sv),
-    util::quantities::ExtraCharactersError
-    );
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<microsecond>("7g ms"sv),
+                    util::quantities::ExtraCharactersError);
 
-  BOOST_CHECK_THROW(
-    util::quantities::makeQuantity<microsecond>("g7 ms"sv),
-    util::quantities::ValueError
-    );
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<microsecond>("g7 ms"sv),
+                    util::quantities::ValueError);
 
-  BOOST_CHECK_THROW(
-    util::quantities::makeQuantity<microsecond>(""sv),
-    util::quantities::MissingUnit
-    );
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<microsecond>(""sv),
+                    util::quantities::MissingUnit);
 
-  BOOST_CHECK_THROW(
-    util::quantities::makeQuantity<microsecond>(""sv, true),
-    util::quantities::ValueError
-    );
+  BOOST_CHECK_THROW(util::quantities::makeQuantity<microsecond>(""sv, true),
+                    util::quantities::ValueError);
 
 } // test_makeQuantity()
 
-
 // -----------------------------------------------------------------------------
-void test_readQuantity() {
+void test_readQuantity()
+{
 
   using namespace util::quantities::time_literals;
   using util::quantities::microsecond;
 
   struct Config {
 
-    fhicl::Atom<util::quantities::microsecond> start
-      { fhicl::Name("start"), 0_us };
+    fhicl::Atom<util::quantities::microsecond> start{fhicl::Name("start"), 0_us};
 
-    fhicl::Atom<util::quantities::microsecond> end
-      { fhicl::Name("end"), 6_ms };
+    fhicl::Atom<util::quantities::microsecond> end{fhicl::Name("end"), 6_ms};
 
   }; // struct Config
 
-  std::string const configStr { "end: 16ms" };
+  std::string const configStr{"end: 16ms"};
   util::quantities::microsecond const expectedStart = 0_us;
   util::quantities::microsecond const expectedEnd = 16_ms;
 
@@ -127,20 +116,18 @@ void test_readQuantity() {
 
 } // test_readQuantity()
 
-
 // -----------------------------------------------------------------------------
-void test_writeQuantity() {
+void test_writeQuantity()
+{
 
   using namespace util::quantities::time_literals;
   using util::quantities::microsecond;
 
   struct Config {
 
-    fhicl::Atom<util::quantities::microsecond> start
-      { fhicl::Name("start"), 0_us };
+    fhicl::Atom<util::quantities::microsecond> start{fhicl::Name("start"), 0_us};
 
-    fhicl::Atom<util::quantities::microsecond> end
-      { fhicl::Name("end"), 6_ms };
+    fhicl::Atom<util::quantities::microsecond> end{fhicl::Name("end"), 6_ms};
 
   }; // struct Config
 
@@ -155,18 +142,19 @@ void test_writeQuantity() {
 
 } // test_writeQuantity()
 
-
 // -----------------------------------------------------------------------------
 // BEGIN Test cases  -----------------------------------------------------------
 // -----------------------------------------------------------------------------
-BOOST_AUTO_TEST_CASE(quantities_testcase) {
+BOOST_AUTO_TEST_CASE(quantities_testcase)
+{
 
   test_makeQuantity();
 
 } // BOOST_AUTO_TEST_CASE(quantities_testcase)
 
 // -----------------------------------------------------------------------------
-BOOST_AUTO_TEST_CASE(quantities_fhicl_testcase) {
+BOOST_AUTO_TEST_CASE(quantities_fhicl_testcase)
+{
 
   test_readQuantity();
   test_writeQuantity();

@@ -66,8 +66,8 @@ namespace detinfo {
   template <typename Event>
   detinfo::DetectorClocksData detectorClocksStandardDataFor(
     detinfo::DetectorClocksStandard const& detClocks,
-    Event const& event
-  ) {
+    Event const& event)
+  {
 
     auto const& config_values = detClocks.ConfigValues();
     // Trigger times
@@ -85,9 +85,6 @@ namespace detinfo {
     return detClocks.DataFor(g4_ref_time, trig_time, beam_time);
   } // detinfo::detectorClocksStandardDataFor()
 
-
 } // namespace detinfo
-
-
 
 #endif // LARDATA_DETECTORINFO_DETECTORCLOCKSSTANDARDTRIGGERLOADER_H

@@ -14,31 +14,27 @@
 #define LARDATA_UTILITIES_STATCOLLECTOR_H
 
 // C/C++ standard libraries
-#include <cmath> // std::sqrt()
-#include <array>
-#include <tuple>
-#include <limits> // std::numeric_limits<>
-#include <initializer_list>
-#include <iterator> // std::begin(), std::end()
-#include <utility> // std::forward()
 #include <algorithm> // std::for_each()
+#include <array>
+#include <cmath> // std::sqrt()
+#include <initializer_list>
+#include <iterator>  // std::begin(), std::end()
+#include <limits>    // std::numeric_limits<>
 #include <stdexcept> // std::range_error
-
+#include <tuple>
+#include <utility> // std::forward()
 
 namespace lar {
   namespace util {
 
-
     /// A unary functor returning its own argument (any type)
     struct identity {
-      template<typename T>
-      constexpr auto operator()(T&& v) const noexcept
-        -> decltype(std::forward<T>(v))
+      template <typename T>
+      constexpr auto operator()(T&& v) const noexcept -> decltype(std::forward<T>(v))
       {
         return std::forward<T>(v);
       } // operator()
-    }; // class identity
-
+    };  // class identity
 
     namespace details {
 
@@ -46,14 +42,22 @@ namespace lar {
       /// @tparam W type of the weight
       template <typename W>
       class WeightTracker {
-          public:
+      public:
         using Weight_t = W; ///< type of the weight
 
         /// Adds the specified weight to the statistics
-        void add(Weight_t weight) { ++n; w += weight; }
+        void add(Weight_t weight)
+        {
+          ++n;
+          w += weight;
+        }
 
         /// Resets the count
-        void clear() { n= 0; w = Weight_t(0); }
+        void clear()
+        {
+          n = 0;
+          w = Weight_t(0);
+        }
 
         /// Returns the number of entries added
         int N() const { return n; }
@@ -68,17 +72,18 @@ namespace lar {
          */
         Weight_t AverageWeight() const;
 
-
         /// Returns the square of the specified value
         template <typename V>
-        static constexpr V sqr(V const& v) { return v*v; }
+        static constexpr V sqr(V const& v)
+        {
+          return v * v;
+        }
 
-          protected:
+      protected:
         int n = 0;                ///< number of added entries
         Weight_t w = Weight_t(0); ///< total weight
 
       }; // class WeightTracker<>
-
 
       /**
        * @brief Class tracking sums of variables up to a specified power
@@ -91,11 +96,11 @@ namespace lar {
        */
       template <unsigned int PWR, typename T, typename W = T>
       class DataTracker {
-          public:
+      public:
         static constexpr unsigned int Power = PWR;
         static_assert(Power >= 1, "DataTracker must have at least power 1");
 
-        using Data_t = T; ///< type of data
+        using Data_t = T;   ///< type of data
         using Weight_t = T; ///< type of weight
 
         /// Default constructor
@@ -103,10 +108,11 @@ namespace lar {
 
         /// Adds the specified weight to the statistics
         void add(Data_t v, Weight_t w)
-          {
-            Weight_t x = w;
-            for (size_t i = 0; i < Power; ++i) sums[i] += (x *= v);
-          }
+        {
+          Weight_t x = w;
+          for (size_t i = 0; i < Power; ++i)
+            sums[i] += (x *= v);
+        }
 
         /// Resets the count
         void clear() { sums.fill(Data_t(0)); }
@@ -114,11 +120,10 @@ namespace lar {
         /// Returns the sum of the values to the power N (1 <= N <= 2)
         template <unsigned int N>
         Weight_t SumN() const
-          {
-            static_assert
-              ((N > 0) && (N <= Power), "Invalid sum of power requested");
-            return sums[N - 1];
-          } // SumN()
+        {
+          static_assert((N > 0) && (N <= Power), "Invalid sum of power requested");
+          return sums[N - 1];
+        } // SumN()
 
         /// Returns the sum of the values to the power n (1 <= n <= 2, no check)
         Weight_t Sum(unsigned int n) const { return sums[n - 1]; }
@@ -126,11 +131,10 @@ namespace lar {
         /// Returns the weighted sum of the entries
         Weight_t Sum() const { return SumN<1>(); }
 
-          protected:
+      protected:
         std::array<Weight_t, Power> sums;
 
       }; // class DataTracker<>
-
 
       /**
        * @brief Class tracking sums of variables up to power 2
@@ -138,16 +142,15 @@ namespace lar {
        * @tparam W type of the weight (as T by default)
        */
       template <typename T, typename W = T, unsigned int PWR = 2>
-      class DataTracker2: public DataTracker<PWR, T, W> {
+      class DataTracker2 : public DataTracker<PWR, T, W> {
         using Base_t = DataTracker<PWR, T, W>; ///< base class type
-          public:
+      public:
         using Base_t::Power;
         static_assert(Power >= 2, "DataTracker2 must have Power >= 2");
         using Weight_t = typename Base_t::Weight_t;
 
         /// Returns the weighted sum of the square of the entries
-        Weight_t SumSq() const
-          { return Base_t::sums[1]; }
+        Weight_t SumSq() const { return Base_t::sums[1]; }
         //{ return Base_t::SumN<2>(); } // I can't make gcc 4.9.1 digest this...
 
       }; // class DataTracker2
@@ -158,23 +161,20 @@ namespace lar {
        * @tparam W type of the weight (as T by default)
        */
       template <typename T, typename W = T, unsigned int PWR = 3>
-      class DataTracker3: public DataTracker2<T, W, PWR> {
+      class DataTracker3 : public DataTracker2<T, W, PWR> {
         using Base_t = DataTracker2<T, W, PWR>; ///< base class type
-          public:
+      public:
         using Base_t::Power;
         static_assert(Power >= 3, "DataTracker3 must have Power >= 3");
         using Weight_t = typename Base_t::Weight_t;
 
         /// Returns the weighted sum of the square of the entries
-        Weight_t SumCube() const
-          { return Base_t::sums[2]; }
+        Weight_t SumCube() const { return Base_t::sums[2]; }
         //{ return Base_t::SumN<3>(); } // I can't make gcc 4.9.1 digest this...
 
       }; // class DataTracker3
 
     } // namespace details
-
-
 
     /** ************************************************************************
      * @brief Collects statistics on a single quantity (weighted)
@@ -240,12 +240,13 @@ namespace lar {
      * than `double`, typically 25 or 50% more).
      */
     template <typename T, typename W = T>
-    class StatCollector: protected details::WeightTracker<W> {
+    class StatCollector : protected details::WeightTracker<W> {
       using Base_t = details::WeightTracker<W>;
       using Base_t::sqr;
-        public:
-      using This_t = StatCollector<T, W>; ///< this type
-      using Data_t = T; ///< type of the data
+
+    public:
+      using This_t = StatCollector<T, W>;         ///< this type
+      using Data_t = T;                           ///< type of the data
       using Weight_t = typename Base_t::Weight_t; ///< type of the weight
 
       // default constructor, destructor and all the rest
@@ -267,7 +268,9 @@ namespace lar {
        */
       template <typename Iter>
       void add_unweighted(Iter begin, Iter end)
-        {  add_unweighted(begin, end, identity()); }
+      {
+        add_unweighted(begin, end, identity());
+      }
 
       /**
        * @brief Adds entries from a sequence with weight 1
@@ -301,7 +304,9 @@ namespace lar {
        */
       template <typename Cont, typename Pred>
       void add_unweighted(Cont cont, Pred extractor)
-        { add_unweighted(std::begin(cont), std::end(cont), extractor); }
+      {
+        add_unweighted(std::begin(cont), std::end(cont), extractor);
+      }
 
       /**
        * @brief Adds all entries from a container, with weight 1
@@ -314,8 +319,9 @@ namespace lar {
        */
       template <typename Cont>
       void add_unweighted(Cont cont)
-        { add_unweighted(std::begin(cont), std::end(cont)); }
-
+      {
+        add_unweighted(std::begin(cont), std::end(cont));
+      }
 
       /**
        * @brief Adds entries from a sequence with individually specified weights
@@ -340,17 +346,12 @@ namespace lar {
        * Weight_t WPred::operator() (typename WIter::value_type);
        * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
        */
-      template <
-        typename VIter, typename WIter,
-        typename VPred, typename WPred = identity
-        >
-      void add_weighted(
-        VIter begin_value, VIter end_value,
-        WIter begin_weight,
-        VPred value_extractor,
-        WPred weight_extractor = WPred()
-        );
-
+      template <typename VIter, typename WIter, typename VPred, typename WPred = identity>
+      void add_weighted(VIter begin_value,
+                        VIter end_value,
+                        WIter begin_weight,
+                        VPred value_extractor,
+                        WPred weight_extractor = WPred());
 
       /**
        * @brief Adds entries from a sequence with individually specified weights
@@ -378,7 +379,9 @@ namespace lar {
        */
       template <typename Cont>
       void add_weighted(Cont cont)
-        { add_weighted(std::begin(cont), std::end(cont)); }
+      {
+        add_weighted(std::begin(cont), std::end(cont));
+      }
 
       ///@}
 
@@ -422,7 +425,6 @@ namespace lar {
        */
       Weight_t RMS() const;
 
-
       /**
        * @brief Returns the arithmetic average of the weights
        * @return the weight average
@@ -432,14 +434,12 @@ namespace lar {
 
       /// @}
 
-
-        protected:
+    protected:
       using Variable_t = details::DataTracker2<Data_t, Weight_t>;
 
       Variable_t x; ///< accumulator for variable x
 
     }; // class StatCollector<>
-
 
     /** ************************************************************************
      * @brief Collects statistics on two homogeneous quantities (weighted)
@@ -474,13 +474,14 @@ namespace lar {
      * For additional examples, see the unit test StatCollector_test.cc .
      */
     template <typename T, typename W = T>
-    class StatCollector2D: public details::WeightTracker<W> {
-        public:
+    class StatCollector2D : public details::WeightTracker<W> {
+    public:
       using Base_t = details::WeightTracker<W>;
       using Base_t::sqr;
-        public:
-      using This_t = StatCollector2D<T, W>; ///< this type
-      using Data_t = T; ///< type of the data
+
+    public:
+      using This_t = StatCollector2D<T, W>;       ///< this type
+      using Data_t = T;                           ///< type of the data
       using Weight_t = typename Base_t::Weight_t; ///< type of the weight
 
       using Pair_t = std::tuple<Data_t, Data_t>;
@@ -496,10 +497,14 @@ namespace lar {
       void add(Data_t x, Data_t y, Weight_t weight = Weight_t(1.0));
 
       void add(Pair_t value, Weight_t weight = Weight_t(1.0))
-        { add(std::get<0>(value), std::get<1>(value), weight); }
+      {
+        add(std::get<0>(value), std::get<1>(value), weight);
+      }
 
       void add(WeightedPair_t value)
-        { add(std::get<0>(value), std::get<1>(value), std::get<2>(value)); }
+      {
+        add(std::get<0>(value), std::get<1>(value), std::get<2>(value));
+      }
       //@}
 
       /**
@@ -513,7 +518,9 @@ namespace lar {
        */
       template <typename Iter>
       void add_unweighted(Iter begin, Iter end)
-        {  add_unweighted(begin, end, identity()); }
+      {
+        add_unweighted(begin, end, identity());
+      }
 
       /**
        * @brief Adds entries from a sequence with weight 1
@@ -547,7 +554,9 @@ namespace lar {
        */
       template <typename Cont, typename Pred>
       void add_unweighted(Cont cont, Pred extractor)
-        { add_unweighted(std::begin(cont), std::end(cont), extractor); }
+      {
+        add_unweighted(std::begin(cont), std::end(cont), extractor);
+      }
 
       /**
        * @brief Adds all entries from a container, with weight 1
@@ -560,8 +569,9 @@ namespace lar {
        */
       template <typename Cont>
       void add_unweighted(Cont cont)
-        { add_unweighted(std::begin(cont), std::end(cont)); }
-
+      {
+        add_unweighted(std::begin(cont), std::end(cont));
+      }
 
       /**
        * @brief Adds entries from a sequence with individually specified weights
@@ -586,17 +596,12 @@ namespace lar {
        * Weight_t WPred::operator() (typename WIter::value_type);
        * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
        */
-      template <
-        typename VIter, typename WIter,
-        typename VPred, typename WPred = identity
-        >
-      void add_weighted(
-        VIter begin_value, VIter end_value,
-        WIter begin_weight,
-        VPred value_extractor,
-        WPred weight_extractor = WPred()
-        );
-
+      template <typename VIter, typename WIter, typename VPred, typename WPred = identity>
+      void add_weighted(VIter begin_value,
+                        VIter end_value,
+                        WIter begin_weight,
+                        VPred value_extractor,
+                        WPred weight_extractor = WPred());
 
       /**
        * @brief Adds entries from a sequence with individually specified weights
@@ -623,7 +628,9 @@ namespace lar {
        */
       template <typename Cont>
       void add_weighted(Cont cont)
-        { add_weighted(std::begin(cont), std::end(cont)); }
+      {
+        add_weighted(std::begin(cont), std::end(cont));
+      }
 
       ///@}
 
@@ -705,7 +712,6 @@ namespace lar {
        */
       Weight_t RMSy() const;
 
-
       /**
        * @brief Returns the linear correlation
        * @return the linear correlation RMS of the y values
@@ -713,7 +719,6 @@ namespace lar {
        * @throws std::range_error if any variance is non-positive
        */
       Weight_t LinearCorrelation() const;
-
 
       /**
        * @brief Returns the arithmetic average of the weights
@@ -724,16 +729,14 @@ namespace lar {
 
       /// @}
 
-        protected:
+    protected:
       using Variable_t = details::DataTracker2<Data_t, Weight_t>;
 
-      Variable_t x; ///< accumulator for variable x
-      Variable_t y; ///< accumulator for variable y
+      Variable_t x;                  ///< accumulator for variable x
+      Variable_t y;                  ///< accumulator for variable y
       Weight_t sum_xy = Weight_t(0); ///< weighted sum of xy
 
     }; // class StatCollector2D<>
-
-
 
     /** ************************************************************************
      * @brief Keeps track of the minimum and maximum value we observed
@@ -746,8 +749,8 @@ namespace lar {
      */
     template <typename T>
     class MinMaxCollector {
-        public:
-      using Data_t = T; ///< type of data we collect
+    public:
+      using Data_t = T;                  ///< type of data we collect
       using This_t = MinMaxCollector<T>; ///< this type
 
       //@{
@@ -755,8 +758,7 @@ namespace lar {
       MinMaxCollector() = default;
 
       /// Constructor: starts with parsing the specified data
-      MinMaxCollector(std::initializer_list<Data_t> init)
-        { add(init); }
+      MinMaxCollector(std::initializer_list<Data_t> init) { add(init); }
 
       /**
        * @brief Include a sequence of values in the statistics
@@ -766,9 +768,10 @@ namespace lar {
        */
       template <typename Iter>
       MinMaxCollector(Iter begin, Iter end)
-        { add(begin, end); }
+      {
+        add(begin, end);
+      }
       //@}
-
 
       // default copy and move constructor and assignment, and destructor
 
@@ -799,7 +802,6 @@ namespace lar {
       This_t& add(Iter begin, Iter end);
       /// @}
 
-
       /// Returns whether at least one datum has been added
       bool has_data() const { return minimum <= maximum; }
 
@@ -809,11 +811,10 @@ namespace lar {
       /// Returns the accumulated maximum, or a very small number if no values
       Data_t max() const { return maximum; }
 
-
       /// Removes all statistics and reinitializes the object
       void clear();
 
-        protected:
+    protected:
       /// the accumulated minimum
       Data_t minimum = std::numeric_limits<Data_t>::max();
 
@@ -822,15 +823,12 @@ namespace lar {
 
     }; // class MinMaxCollector<>
 
-
   } // namespace util
 } // namespace lar
-
 
 //==============================================================================
 //=== template implementation
 //==============================================================================
-
 
 //******************************************************************************
 //***  details::WeightTracker<>
@@ -838,45 +836,39 @@ namespace lar {
 
 template <typename W>
 typename lar::util::details::WeightTracker<W>::Weight_t
-  lar::util::details::WeightTracker<W>::AverageWeight() const
+lar::util::details::WeightTracker<W>::AverageWeight() const
 {
-  if (N() == 0)
-    throw std::range_error("WeightTracker<>::AverageWeight(): divide by 0");
+  if (N() == 0) throw std::range_error("WeightTracker<>::AverageWeight(): divide by 0");
   return Weights() / N();
 } // details::WeightTracker<W>::AverageWeight()
-
 
 //******************************************************************************
 //***  StatCollector<>
 //***
 
 template <typename T, typename W>
-void lar::util::StatCollector<T, W>::add
-  (Data_t value, Weight_t weight /* = Weight_t(1.0) */)
+void lar::util::StatCollector<T, W>::add(Data_t value, Weight_t weight /* = Weight_t(1.0) */)
 {
   Base_t::add(weight);
   x.add(value, weight);
 } // StatCollector<T, W>::add()
 
-
 template <typename T, typename W>
 template <typename Iter, typename Pred>
-void lar::util::StatCollector<T, W>::add_unweighted
-  (Iter begin, Iter end, Pred extractor)
+void lar::util::StatCollector<T, W>::add_unweighted(Iter begin, Iter end, Pred extractor)
 {
-  std::for_each
-    (begin, end, [this, extractor](auto item) { this->add(extractor(item)); });
+  std::for_each(begin, end, [this, extractor](auto item) { this->add(extractor(item)); });
 } // StatCollector<T, W>::add_unweighted(Iter, Iter, Pred)
-
 
 template <typename T, typename W>
 template <typename VIter, typename WIter, typename VPred, typename WPred>
-void lar::util::StatCollector<T, W>::add_weighted(
-  VIter begin_value, VIter end_value,
-  WIter begin_weight,
-  VPred value_extractor,
-  WPred weight_extractor /* = WPred() */
-) {
+void lar::util::StatCollector<T, W>::add_weighted(VIter begin_value,
+                                                  VIter end_value,
+                                                  WIter begin_weight,
+                                                  VPred value_extractor,
+                                                  WPred weight_extractor /* = WPred() */
+)
+{
   while (begin_value != end_value) {
     add(value_extractor(*begin_value), weight_extractor(*begin_weight));
     ++begin_value;
@@ -884,63 +876,53 @@ void lar::util::StatCollector<T, W>::add_weighted(
   } // while
 } // StatCollector<T, W>::add_weighted(VIter, VIter, WIter, VPred, WPred)
 
-
 template <typename T, typename W>
 template <typename Iter>
-void lar::util::StatCollector<T, W>::add_weighted(Iter begin, Iter end) {
+void lar::util::StatCollector<T, W>::add_weighted(Iter begin, Iter end)
+{
 
   std::for_each(begin, end, [this](auto p) { this->add(p.first, p.second); });
 
 } // StatCollector<T, W>::add_weighted(Iter, Iter)
 
-
-
 template <typename T, typename W>
-inline void lar::util::StatCollector<T, W>::clear() {
+inline void lar::util::StatCollector<T, W>::clear()
+{
   Base_t::clear();
   x.clear();
 } // StatCollector<T, W>::clear()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector<T, W>::Weight_t
-  lar::util::StatCollector<T, W>::Average() const
+typename lar::util::StatCollector<T, W>::Weight_t lar::util::StatCollector<T, W>::Average() const
 {
-  if (Weights() == Weight_t(0))
-    throw std::range_error("StatCollector<>::Average(): divide by 0");
+  if (Weights() == Weight_t(0)) throw std::range_error("StatCollector<>::Average(): divide by 0");
   return Sum() / Weights();
 } // StatCollector<T, W>::Average()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector<T, W>::Weight_t
-  lar::util::StatCollector<T, W>::Variance() const
+typename lar::util::StatCollector<T, W>::Weight_t lar::util::StatCollector<T, W>::Variance() const
 {
-  if (Weights() == Weight_t(0))
-    throw std::range_error("StatCollector<>::Variance(): divide by 0");
+  if (Weights() == Weight_t(0)) throw std::range_error("StatCollector<>::Variance(): divide by 0");
   return std::max(Weight_t(0), (SumSq() - sqr(Sum()) / Weights()) / Weights());
 } // StatCollector<T, W>::Variance()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector<T, W>::Weight_t
-  lar::util::StatCollector<T, W>::RMS() const
+typename lar::util::StatCollector<T, W>::Weight_t lar::util::StatCollector<T, W>::RMS() const
 {
   const Weight_t rms2 = Variance();
   if (rms2 < Weight_t(0)) return 0.;
-//    throw std::range_error("StatCollector<>::RMS(): negative RMS^2");
+  //    throw std::range_error("StatCollector<>::RMS(): negative RMS^2");
   return std::sqrt(rms2);
 } // StatCollector<T, W>::RMS()
-
-
 
 //******************************************************************************
 //***  StatCollector2D<>
 //***
 
 template <typename T, typename W>
-void lar::util::StatCollector2D<T, W>::add
-  (Data_t x_value, Data_t y_value, Weight_t weight /* = Weight_t(1.0) */)
+void lar::util::StatCollector2D<T, W>::add(Data_t x_value,
+                                           Data_t y_value,
+                                           Weight_t weight /* = Weight_t(1.0) */)
 {
   Base_t::add(weight);
   x.add(x_value, weight);
@@ -948,25 +930,22 @@ void lar::util::StatCollector2D<T, W>::add
   sum_xy += weight * x_value * y_value;
 } // StatCollector2D<T, W>::add()
 
-
 template <typename T, typename W>
 template <typename Iter, typename Pred>
-void lar::util::StatCollector2D<T, W>::add_unweighted
-  (Iter begin, Iter end, Pred extractor)
+void lar::util::StatCollector2D<T, W>::add_unweighted(Iter begin, Iter end, Pred extractor)
 {
-  std::for_each
-    (begin, end, [this, extractor](auto item) { this->add(extractor(item)); });
+  std::for_each(begin, end, [this, extractor](auto item) { this->add(extractor(item)); });
 } // StatCollector2D<T, W>::add_unweighted(Iter, Iter, Pred)
-
 
 template <typename T, typename W>
 template <typename VIter, typename WIter, typename VPred, typename WPred>
-void lar::util::StatCollector2D<T, W>::add_weighted(
-  VIter begin_value, VIter end_value,
-  WIter begin_weight,
-  VPred value_extractor,
-  WPred weight_extractor /* = WPred() */
-) {
+void lar::util::StatCollector2D<T, W>::add_weighted(VIter begin_value,
+                                                    VIter end_value,
+                                                    WIter begin_weight,
+                                                    VPred value_extractor,
+                                                    WPred weight_extractor /* = WPred() */
+)
+{
   while (begin_value != end_value) {
     add(value_extractor(*begin_value), weight_extractor(*begin_weight));
     ++begin_value;
@@ -974,101 +953,90 @@ void lar::util::StatCollector2D<T, W>::add_weighted(
   } // while
 } // StatCollector2D<T, W>::add_weighted(VIter, VIter, WIter, VPred, WPred)
 
-
 template <typename T, typename W>
 template <typename Iter>
-void lar::util::StatCollector2D<T, W>::add_weighted(Iter begin, Iter end) {
+void lar::util::StatCollector2D<T, W>::add_weighted(Iter begin, Iter end)
+{
 
   std::for_each(begin, end, [this](auto p) { this->add(p); });
 
 } // StatCollector2D<T, W>::add_weighted(Iter, Iter)
 
-
-
 template <typename T, typename W>
-inline void lar::util::StatCollector2D<T, W>::clear() {
+inline void lar::util::StatCollector2D<T, W>::clear()
+{
   Base_t::clear();
   x.clear();
   y.clear();
   sum_xy = Weight_t(0);
 } // StatCollector<T, W>::clear()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector2D<T, W>::Weight_t
-  lar::util::StatCollector2D<T, W>::AverageX() const
+typename lar::util::StatCollector2D<T, W>::Weight_t lar::util::StatCollector2D<T, W>::AverageX()
+  const
 {
   if (Weights() == Weight_t(0))
     throw std::range_error("StatCollector2D<>::AverageX(): divide by 0");
   return SumX() / Weights();
 } // StatCollector2D<T, W>::AverageX()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector2D<T, W>::Weight_t
-  lar::util::StatCollector2D<T, W>::VarianceX() const
+typename lar::util::StatCollector2D<T, W>::Weight_t lar::util::StatCollector2D<T, W>::VarianceX()
+  const
 {
   if (Weights() == Weight_t(0))
     throw std::range_error("StatCollector2D<>::VarianceX(): divide by 0");
   return (SumSqX() - sqr(SumX()) / Weights()) / Weights();
 } // StatCollector2D<T, W>::VarianceX()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector2D<T, W>::Weight_t
-  lar::util::StatCollector2D<T, W>::RMSx() const
+typename lar::util::StatCollector2D<T, W>::Weight_t lar::util::StatCollector2D<T, W>::RMSx() const
 {
   const Weight_t rms2 = VarianceX();
   if (rms2 < Weight_t(0)) return 0.;
-//    throw std::range_error("StatCollector2D<>::RMSx(): negative RMS^2");
+  //    throw std::range_error("StatCollector2D<>::RMSx(): negative RMS^2");
   return std::sqrt(rms2);
 } // StatCollector2D<T, W>::RMSx()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector2D<T, W>::Weight_t
-  lar::util::StatCollector2D<T, W>::AverageY() const
+typename lar::util::StatCollector2D<T, W>::Weight_t lar::util::StatCollector2D<T, W>::AverageY()
+  const
 {
   if (Weights() == Weight_t(0))
     throw std::range_error("StatCollector2D<>::AverageY(): divide by 0");
   return SumY() / Weights();
 } // StatCollector2D<T, W>::AverageY()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector2D<T, W>::Weight_t
-  lar::util::StatCollector2D<T, W>::VarianceY() const
+typename lar::util::StatCollector2D<T, W>::Weight_t lar::util::StatCollector2D<T, W>::VarianceY()
+  const
 {
   if (Weights() == Weight_t(0))
     throw std::range_error("StatCollector2D<>::VarianceY(): divide by 0");
   return (SumSqY() - sqr(SumY()) / Weights()) / Weights();
 } // StatCollector2D<T, W>::VarianceY()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector2D<T, W>::Weight_t
-  lar::util::StatCollector2D<T, W>::Covariance() const
+typename lar::util::StatCollector2D<T, W>::Weight_t lar::util::StatCollector2D<T, W>::Covariance()
+  const
 {
   if (Weights() == Weight_t(0))
     throw std::range_error("StatCollector2D<>::Covariance(): divide by 0");
   return (SumXY() - SumX() * SumY() / Weights()) / Weights();
 } // StatCollector2D<T, W>::VarianceY()
 
-
 template <typename T, typename W>
-typename lar::util::StatCollector2D<T, W>::Weight_t
-  lar::util::StatCollector2D<T, W>::RMSy() const
+typename lar::util::StatCollector2D<T, W>::Weight_t lar::util::StatCollector2D<T, W>::RMSy() const
 {
   const Weight_t rms2 = VarianceY();
   if (rms2 < Weight_t(0)) return 0.;
-//    throw std::range_error("StatCollector2D<>::RMSy(): negative RMS^2");
+  //    throw std::range_error("StatCollector2D<>::RMSy(): negative RMS^2");
   return std::sqrt(rms2);
 } // StatCollector2D<T, W>::RMSy()
 
-
 template <typename T, typename W>
 typename lar::util::StatCollector2D<T, W>::Weight_t
-  lar::util::StatCollector2D<T, W>::LinearCorrelation() const
+lar::util::StatCollector2D<T, W>::LinearCorrelation() const
 {
   if (Weights() == Data_t(0))
     throw std::range_error("StatCollector2D<>::LinearCorrelation(): divide by 0");
@@ -1079,8 +1047,6 @@ typename lar::util::StatCollector2D<T, W>::Weight_t
 
   return Covariance() / std::sqrt(var_prod);
 } // StatCollector2D<T, W>::LinearCorrelation()
-
-
 
 //******************************************************************************
 //*** MinMaxCollector
@@ -1094,29 +1060,28 @@ lar::util::MinMaxCollector<T>& lar::util::MinMaxCollector<T>::add(Data_t value)
   return *this;
 } // lar::util::MinMaxCollector<T>::add
 
+template <typename T>
+inline lar::util::MinMaxCollector<T>& lar::util::MinMaxCollector<T>::add(
+  std::initializer_list<Data_t> values)
+{
+  return add(values.begin(), values.end());
+}
 
 template <typename T>
-inline lar::util::MinMaxCollector<T>& lar::util::MinMaxCollector<T>::add
-  (std::initializer_list<Data_t> values)
-  { return add(values.begin(), values.end()); }
-
-
-template <typename T> template <typename Iter>
-inline lar::util::MinMaxCollector<T>& lar::util::MinMaxCollector<T>::add
-  (Iter begin, Iter end)
+template <typename Iter>
+inline lar::util::MinMaxCollector<T>& lar::util::MinMaxCollector<T>::add(Iter begin, Iter end)
 {
   std::for_each(begin, end, [this](Data_t value) { this->add(value); });
   return *this;
 } // lar::util::MinMaxCollector<T>::add(Iter)
 
-
 template <typename T>
-inline void lar::util::MinMaxCollector<T>::clear() {
+inline void lar::util::MinMaxCollector<T>::clear()
+{
   minimum = std::numeric_limits<Data_t>::max();
   maximum = std::numeric_limits<Data_t>::min();
 } // lar::util::MinMaxCollector<T>::clear()
 
 //******************************************************************************
-
 
 #endif // LARDATA_UTILITIES_STATCOLLECTOR_H

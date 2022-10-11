@@ -10,17 +10,16 @@
 #define LARDATAALG_UTILITIES_QUANTITIES_FHICL_H
 
 // LArSoft libraries
-#include "lardataalg/Utilities/quantities.h"
 #include "larcorealg/CoreUtils/StdUtils.h" // util::to_string()
+#include "lardataalg/Utilities/quantities.h"
 
 // support libraries
 #include "fhiclcpp/coding.h"
 
 // C++ libraries
-#include <string_view>
-#include <string>
 #include <any>
-
+#include <string>
+#include <string_view>
 
 namespace util::quantities::concepts {
 
@@ -46,7 +45,6 @@ namespace util::quantities::concepts {
   template <typename... Args>
   void decode(std::any const& src, Quantity<Args...>& q);
 
-
   /**
    * @brief Encodes a quantity into a FHiCL parameter set atom.
    * @tparam Args types defining the quantity type
@@ -66,13 +64,11 @@ namespace util::quantities::concepts {
 
 } // namespace util::quantities::concepts
 
-
 // -----------------------------------------------------------------------------
 // ---  template implementation
 // -----------------------------------------------------------------------------
 template <typename... Args>
-void util::quantities::concepts::decode
-  (std::any const& src, Quantity<Args...>& q)
+void util::quantities::concepts::decode(std::any const& src, Quantity<Args...>& q)
 {
   using quantity_t = Quantity<Args...>;
 
@@ -83,17 +79,13 @@ void util::quantities::concepts::decode
 
 } // util::quantities::concepts::decode(Quantity)
 
-
 // -----------------------------------------------------------------------------
 template <typename... Args>
-::fhicl::detail::ps_atom_t util::quantities::concepts::encode
-  (Quantity<Args...> const& q)
+::fhicl::detail::ps_atom_t util::quantities::concepts::encode(Quantity<Args...> const& q)
 {
   return ::fhicl::detail::encode(util::to_string(q));
 } // util::quantities::concepts::encode()
 
-
 // -----------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_UTILITIES_QUANTITIES_FHICL_H

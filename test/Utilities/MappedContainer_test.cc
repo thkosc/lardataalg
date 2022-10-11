@@ -8,23 +8,22 @@
  */
 
 // Boost libraries
-#define BOOST_TEST_MODULE ( MappedContainer_test )
+#define BOOST_TEST_MODULE (MappedContainer_test)
 #include <boost/test/unit_test.hpp>
 
 // LArSoft libraries
-#include "lardataalg/Utilities/MappedContainer.h"
 #include "larcorealg/CoreUtils/ContainerMeta.h" // util::collection_value_t<>
+#include "lardataalg/Utilities/MappedContainer.h"
 
 // C/C++ standard libraries
-#include <iostream> // std::cout
-#include <array>
-#include <functional> // std::ref()
 #include <algorithm> // std::copy()
-#include <iterator> // std::back_inserter()
-#include <type_traits> // std::is_copy_assignable_v<>...
-#include <cstddef> // std::size_t
+#include <array>
+#include <cstddef>    // std::size_t
+#include <functional> // std::ref()
+#include <iostream>   // std::cout
+#include <iterator>   // std::back_inserter()
 #include <limits>
-
+#include <type_traits> // std::is_copy_assignable_v<>...
 
 //------------------------------------------------------------------------------
 //--- Test code
@@ -38,57 +37,59 @@ struct TestDataMakerBase {
 
 // BUG the double brace syntax is required to work around clang bug 21629
 // (https://bugs.llvm.org/show_bug.cgi?id=21629)
-std::array<int, TestDataMakerBase::Dim> const TestDataMakerBase::sourceValues
-  {{ 0, -1, -2, -3, -4, -5, -6, -7, -8, -9 }};
+std::array<int, TestDataMakerBase::Dim> const TestDataMakerBase::sourceValues{
+  {0, -1, -2, -3, -4, -5, -6, -7, -8, -9}};
 
 template <typename Cont>
-struct TestDataMakerClass: public TestDataMakerBase {
+struct TestDataMakerClass : public TestDataMakerBase {
   using Container_t = Cont;
   static Container_t make()
-    {
-      Container_t data;
-      std::copy
-        (sourceValues.cbegin(), sourceValues.cend(), std::back_inserter(data));
-      return data;
-    }
+  {
+    Container_t data;
+    std::copy(sourceValues.cbegin(), sourceValues.cend(), std::back_inserter(data));
+    return data;
+  }
 }; // TestDataMakerClass
 
 template <typename T, std::size_t N>
-struct TestDataMakerClass<std::array<T, N>>: public TestDataMakerBase {
+struct TestDataMakerClass<std::array<T, N>> : public TestDataMakerBase {
   using Container_t = std::array<T, N>;
   static Container_t make()
-    {
-      static_assert(N >= sourceSize());
-      Container_t data;
-      std::copy(sourceValues.cbegin(), sourceValues.cend(), data.begin());
-      return data;
-    }
+  {
+    static_assert(N >= sourceSize());
+    Container_t data;
+    std::copy(sourceValues.cbegin(), sourceValues.cend(), data.begin());
+    return data;
+  }
 }; // TestDataMakerClass<std::array>
 
 template <typename T>
-struct TestDataMakerClass<std::unique_ptr<T[]>>: public TestDataMakerBase {
+struct TestDataMakerClass<std::unique_ptr<T[]>> : public TestDataMakerBase {
   using Container_t = std::unique_ptr<T[]>;
   static Container_t make()
-    {
-      Container_t data { new T[sourceSize()] };
-      std::copy(sourceValues.cbegin(), sourceValues.cend(), data.get());
-      return data;
-    }
+  {
+    Container_t data{new T[sourceSize()]};
+    std::copy(sourceValues.cbegin(), sourceValues.cend(), data.get());
+    return data;
+  }
 }; // TestDataMakerClass<std::array>
 
 template <typename Cont>
-auto makeTestData() { return TestDataMakerClass<std::decay_t<Cont>>::make(); }
-
+auto makeTestData()
+{
+  return TestDataMakerClass<std::decay_t<Cont>>::make();
+}
 
 //------------------------------------------------------------------------------
 template <typename Cont>
-void copyTest() {
+void copyTest()
+{
 
   using Container_t = Cont;
   using Literal_t = util::collection_value_t<Container_t>;
   using Data_t = Literal_t;
 
-  constexpr Literal_t defaultValue { 42 };
+  constexpr Literal_t defaultValue{42};
 
   constexpr auto InvalidIndex = util::MappedContainerBase::invalidIndex();
 
@@ -102,17 +103,24 @@ void copyTest() {
   // BUG the double brace syntax is required to work around clang bug 21629
   // (https://bugs.llvm.org/show_bug.cgi?id=21629)
   std::array<std::size_t, 12U> const mapping1 = {{
-    4U, 3U, 2U, 1U, 0U, InvalidIndex,
-    9U, 8U, 7U, 6U, 5U, InvalidIndex,
+    4U,
+    3U,
+    2U,
+    1U,
+    0U,
+    InvalidIndex,
+    9U,
+    8U,
+    7U,
+    6U,
+    5U,
+    InvalidIndex,
   }};
 
-  std::array<Data_t, 12U> const expectedMappedData1 = {{
-    -4, -3, -2, -1,  0, defaultValue,
-    -9, -8, -7, -6, -5, defaultValue
-  }};
+  std::array<Data_t, 12U> const expectedMappedData1 = {
+    {-4, -3, -2, -1, 0, defaultValue, -9, -8, -7, -6, -5, defaultValue}};
 
-  util::MappedContainer const mappedData1
-    (data, mapping1, expectedMappedData1.size(), defaultValue);
+  util::MappedContainer const mappedData1(data, mapping1, expectedMappedData1.size(), defaultValue);
 
   BOOST_TEST(mappedData1.size() == expectedMappedData1.size());
   BOOST_TEST(mappedData1.minimal_size() == expectedMappedData1.size());
@@ -124,14 +132,12 @@ void copyTest() {
   auto const beginIterator = mappedData1.begin();
   auto const secondIterator = beginIterator + 1;
   auto mappedIterator = beginIterator;
-  for (auto&& mappedValue: mappedData1) {
+  for (auto&& mappedValue : mappedData1) {
     BOOST_TEST_CHECKPOINT("mapped item: " << i);
 
     Data_t const expectedValue = expectedMappedData1[i];
-    Data_t const& expectedRef = (mapping1[i] == InvalidIndex)
-      ? mappedData1.defaultValue()
-      : data[mapping1[i]]
-      ;
+    Data_t const& expectedRef =
+      (mapping1[i] == InvalidIndex) ? mappedData1.defaultValue() : data[mapping1[i]];
     BOOST_TEST(expectedRef == expectedValue); // test the test
 
     BOOST_TEST(mappedValue == expectedMappedData1[i]);
@@ -141,34 +147,34 @@ void copyTest() {
     BOOST_TEST(*(beginIterator + i) == expectedMappedData1[i]);
     BOOST_TEST(*mappedIterator == expectedMappedData1[i]);
     if (i >= 1) {
-      BOOST_TEST(secondIterator[i-1] == expectedMappedData1[i]);
+      BOOST_TEST(secondIterator[i - 1] == expectedMappedData1[i]);
       BOOST_TEST(*(secondIterator + i - 1) == expectedMappedData1[i]);
-      BOOST_TEST( (mappedIterator != beginIterator));
+      BOOST_TEST((mappedIterator != beginIterator));
       BOOST_TEST(!(mappedIterator == beginIterator));
-      BOOST_TEST( (mappedIterator >  beginIterator));
-      BOOST_TEST( (mappedIterator >= beginIterator));
-      BOOST_TEST(!(mappedIterator <  beginIterator));
+      BOOST_TEST((mappedIterator > beginIterator));
+      BOOST_TEST((mappedIterator >= beginIterator));
+      BOOST_TEST(!(mappedIterator < beginIterator));
       BOOST_TEST(!(mappedIterator <= beginIterator));
-      BOOST_TEST( (beginIterator != mappedIterator));
+      BOOST_TEST((beginIterator != mappedIterator));
       BOOST_TEST(!(beginIterator == mappedIterator));
-      BOOST_TEST(!(beginIterator >  mappedIterator));
+      BOOST_TEST(!(beginIterator > mappedIterator));
       BOOST_TEST(!(beginIterator >= mappedIterator));
-      BOOST_TEST( (beginIterator <  mappedIterator));
-      BOOST_TEST( (beginIterator <= mappedIterator));
+      BOOST_TEST((beginIterator < mappedIterator));
+      BOOST_TEST((beginIterator <= mappedIterator));
     }
     else {
       BOOST_TEST(!(mappedIterator != beginIterator));
-      BOOST_TEST( (mappedIterator == beginIterator));
-      BOOST_TEST(!(mappedIterator >  beginIterator));
-      BOOST_TEST( (mappedIterator >= beginIterator));
-      BOOST_TEST(!(mappedIterator <  beginIterator));
-      BOOST_TEST( (mappedIterator <= beginIterator));
+      BOOST_TEST((mappedIterator == beginIterator));
+      BOOST_TEST(!(mappedIterator > beginIterator));
+      BOOST_TEST((mappedIterator >= beginIterator));
+      BOOST_TEST(!(mappedIterator < beginIterator));
+      BOOST_TEST((mappedIterator <= beginIterator));
       BOOST_TEST(!(beginIterator != mappedIterator));
-      BOOST_TEST( (beginIterator == mappedIterator));
-      BOOST_TEST(!(beginIterator >  mappedIterator));
-      BOOST_TEST( (beginIterator >= mappedIterator));
-      BOOST_TEST(!(beginIterator <  mappedIterator));
-      BOOST_TEST( (beginIterator <= mappedIterator));
+      BOOST_TEST((beginIterator == mappedIterator));
+      BOOST_TEST(!(beginIterator > mappedIterator));
+      BOOST_TEST((beginIterator >= mappedIterator));
+      BOOST_TEST(!(beginIterator < mappedIterator));
+      BOOST_TEST((beginIterator <= mappedIterator));
     }
 
     BOOST_TEST(&mappedData1[i] != &expectedMappedData1[i]);
@@ -184,19 +190,18 @@ void copyTest() {
     ++i;
   } // for
 
-
 } // copyTest()
-
 
 //------------------------------------------------------------------------------
 template <typename Cont>
-void referenceTest() {
+void referenceTest()
+{
 
   using Container_t = Cont;
   using Literal_t = util::collection_value_t<Container_t>;
   using Data_t = Literal_t;
 
-  constexpr Literal_t defaultValue { 42 };
+  constexpr Literal_t defaultValue{42};
 
   constexpr auto InvalidIndex = util::MappedContainerBase::invalidIndex();
 
@@ -205,29 +210,31 @@ void referenceTest() {
   // BUG the double brace syntax is required to work around clang bug 21629
   // (https://bugs.llvm.org/show_bug.cgi?id=21629)
   std::array<std::size_t, 12U> const mapping1 = {{
-    4U, 3U, 2U, 1U, 0U, InvalidIndex,
-    9U, 8U, 7U, 6U, 5U, InvalidIndex,
+    4U,
+    3U,
+    2U,
+    1U,
+    0U,
+    InvalidIndex,
+    9U,
+    8U,
+    7U,
+    6U,
+    5U,
+    InvalidIndex,
   }};
 
-  std::array<Literal_t, 12U> const expectedMappedData1 = {{
-    -4, -3, -2, -1,  0, defaultValue,
-    -9, -8, -7, -6, -5, defaultValue
-  }};
+  std::array<Literal_t, 12U> const expectedMappedData1 = {
+    {-4, -3, -2, -1, 0, defaultValue, -9, -8, -7, -6, -5, defaultValue}};
 
   util::MappedContainer const mappedData1(
-    std::ref(data), mapping1, expectedMappedData1.size(),
-    defaultValue
-    );
+    std::ref(data), mapping1, expectedMappedData1.size(), defaultValue);
 
   // a similar mapping, but the mapping itself is not copied
   util::MappedContainer const mappedData2(std::ref(data), std::ref(mapping1));
 
   static_assert(
-    std::is_same_v<
-      typename decltype(mappedData1)::const_iterator::reference,
-      Data_t const&
-      >
-    );
+    std::is_same_v<typename decltype(mappedData1)::const_iterator::reference, Data_t const&>);
 
   BOOST_TEST(mappedData1.size() == expectedMappedData1.size());
   BOOST_TEST(mappedData1.minimal_size() == expectedMappedData1.size());
@@ -239,15 +246,13 @@ void referenceTest() {
   auto const beginIterator = mappedData1.begin();
   auto const secondIterator = beginIterator + 1;
   auto mappedIterator = beginIterator;
-  for (auto&& mappedValue: mappedData1) {
+  for (auto&& mappedValue : mappedData1) {
     BOOST_TEST_CHECKPOINT("mapped item: " << i);
 
     std::size_t const& expectedMappedIndex = mapping1[i];
     Data_t const expectedValue = expectedMappedData1[i];
-    Data_t const& expectedRef = (expectedMappedIndex == InvalidIndex)
-      ? mappedData1.defaultValue()
-      : data[expectedMappedIndex]
-      ;
+    Data_t const& expectedRef = (expectedMappedIndex == InvalidIndex) ? mappedData1.defaultValue() :
+                                                                        data[expectedMappedIndex];
     BOOST_TEST(expectedRef == expectedValue); // test the test
 
     decltype(auto) mappedDataRef = mappedData1[i];
@@ -261,34 +266,34 @@ void referenceTest() {
     BOOST_TEST(*(beginIterator + i) == expectedValue);
     BOOST_TEST(*mappedIterator == expectedValue);
     if (i >= 1) {
-      BOOST_TEST(secondIterator[i-1] == expectedValue);
+      BOOST_TEST(secondIterator[i - 1] == expectedValue);
       BOOST_TEST(*(secondIterator + i - 1) == expectedValue);
-      BOOST_TEST( (mappedIterator != beginIterator));
+      BOOST_TEST((mappedIterator != beginIterator));
       BOOST_TEST(!(mappedIterator == beginIterator));
-      BOOST_TEST( (mappedIterator >  beginIterator));
-      BOOST_TEST( (mappedIterator >= beginIterator));
-      BOOST_TEST(!(mappedIterator <  beginIterator));
+      BOOST_TEST((mappedIterator > beginIterator));
+      BOOST_TEST((mappedIterator >= beginIterator));
+      BOOST_TEST(!(mappedIterator < beginIterator));
       BOOST_TEST(!(mappedIterator <= beginIterator));
-      BOOST_TEST( (beginIterator != mappedIterator));
+      BOOST_TEST((beginIterator != mappedIterator));
       BOOST_TEST(!(beginIterator == mappedIterator));
-      BOOST_TEST(!(beginIterator >  mappedIterator));
+      BOOST_TEST(!(beginIterator > mappedIterator));
       BOOST_TEST(!(beginIterator >= mappedIterator));
-      BOOST_TEST( (beginIterator <  mappedIterator));
-      BOOST_TEST( (beginIterator <= mappedIterator));
+      BOOST_TEST((beginIterator < mappedIterator));
+      BOOST_TEST((beginIterator <= mappedIterator));
     }
     else {
       BOOST_TEST(!(mappedIterator != beginIterator));
-      BOOST_TEST( (mappedIterator == beginIterator));
-      BOOST_TEST(!(mappedIterator >  beginIterator));
-      BOOST_TEST( (mappedIterator >= beginIterator));
-      BOOST_TEST(!(mappedIterator <  beginIterator));
-      BOOST_TEST( (mappedIterator <= beginIterator));
+      BOOST_TEST((mappedIterator == beginIterator));
+      BOOST_TEST(!(mappedIterator > beginIterator));
+      BOOST_TEST((mappedIterator >= beginIterator));
+      BOOST_TEST(!(mappedIterator < beginIterator));
+      BOOST_TEST((mappedIterator <= beginIterator));
       BOOST_TEST(!(beginIterator != mappedIterator));
-      BOOST_TEST( (beginIterator == mappedIterator));
-      BOOST_TEST(!(beginIterator >  mappedIterator));
-      BOOST_TEST( (beginIterator >= mappedIterator));
-      BOOST_TEST(!(beginIterator <  mappedIterator));
-      BOOST_TEST( (beginIterator <= mappedIterator));
+      BOOST_TEST((beginIterator == mappedIterator));
+      BOOST_TEST(!(beginIterator > mappedIterator));
+      BOOST_TEST((beginIterator >= mappedIterator));
+      BOOST_TEST(!(beginIterator < mappedIterator));
+      BOOST_TEST((beginIterator <= mappedIterator));
     }
 
     // since `data` is captured via reference, the returned elements should be
@@ -298,8 +303,7 @@ void referenceTest() {
 
     // mapping by reference should be equivalent to mapping by value;
     // because of out test choice, the default values are different though
-    if (mapping1[i] != InvalidIndex)
-      BOOST_TEST(mappedData2[i] == mappedData1[i]);
+    if (mapping1[i] != InvalidIndex) BOOST_TEST(mappedData2[i] == mappedData1[i]);
     BOOST_TEST(&mappedData2.map_index(i) == &expectedMappedIndex);
 
     ++i;
@@ -316,24 +320,24 @@ void referenceTest() {
 
 } // referenceTest()
 
-
 //------------------------------------------------------------------------------
-void defaultConstructorTest() {
+void defaultConstructorTest()
+{
 
   using Mapping_t = std::array<std::size_t, 6U>;
 
-  (void) util::MappedContainer<std::array<float, 4U>                        , Mapping_t>();
-  (void) util::MappedContainer<float[4U]                                    , Mapping_t>();
-  (void) util::MappedContainer<float*                                       , Mapping_t>();
-  (void) util::MappedContainer<float const*                                 , Mapping_t>();
-  (void) util::MappedContainer<std::unique_ptr<float>                       , Mapping_t>();
-  (void) util::MappedContainer<std::reference_wrapper<std::array<float, 4U>>, Mapping_t>();
+  (void)util::MappedContainer<std::array<float, 4U>, Mapping_t>();
+  (void)util::MappedContainer<float[4U], Mapping_t>();
+  (void)util::MappedContainer<float*, Mapping_t>();
+  (void)util::MappedContainer<float const*, Mapping_t>();
+  (void)util::MappedContainer<std::unique_ptr<float>, Mapping_t>();
+  (void)util::MappedContainer<std::reference_wrapper<std::array<float, 4U>>, Mapping_t>();
 
 } // defaultConstructorTest()
 
-
 //------------------------------------------------------------------------------
-void autosizeTest() {
+void autosizeTest()
+{
   /*
    * Tests that the size is correctly evinced from the mapping.
    */
@@ -341,11 +345,15 @@ void autosizeTest() {
 
   // BUG the double brace syntax is required to work around clang bug 21629
   // (https://bugs.llvm.org/show_bug.cgi?id=21629)
-  std::array<double, 4U> const data {{ 0.0, -1.0, -2.0, -3.0 }};
+  std::array<double, 4U> const data{{0.0, -1.0, -2.0, -3.0}};
 
   std::array<std::size_t, 6U> const mapping = {{
-    1U, 0U, InvalidIndex,
-    3U, 2U, InvalidIndex,
+    1U,
+    0U,
+    InvalidIndex,
+    3U,
+    2U,
+    InvalidIndex,
   }};
 
   util::MappedContainer const mappedData(std::ref(data), mapping);
@@ -355,9 +363,9 @@ void autosizeTest() {
 
 } // autosizeTest()
 
-
 //------------------------------------------------------------------------------
-void classDoc1Test() {
+void classDoc1Test()
+{
   /*
    * constexpr auto InvalidIndex = util::MappedContainerBase::invalidIndex();
    *
@@ -381,24 +389,26 @@ void classDoc1Test() {
 
   // BUG the double brace syntax is required to work around clang bug 21629
   // (https://bugs.llvm.org/show_bug.cgi?id=21629)
-  std::array<double, 4U> const data {{ 0.0, -1.0, -2.0, -3.0 }};
+  std::array<double, 4U> const data{{0.0, -1.0, -2.0, -3.0}};
 
   std::array<std::size_t, 6U> const mapping = {{
-    1U, 0U, InvalidIndex,
-    3U, 2U, InvalidIndex,
+    1U,
+    0U,
+    InvalidIndex,
+    3U,
+    2U,
+    InvalidIndex,
   }};
 
-  util::MappedContainer const mappedData
-    (std::ref(data), mapping, 6U, std::numeric_limits<double>::quiet_NaN());
+  util::MappedContainer const mappedData(
+    std::ref(data), mapping, 6U, std::numeric_limits<double>::quiet_NaN());
 
   for (std::size_t i = 0; i < 6U; ++i) {
-    std::cout
-      << "Mapped element #" << i << ": " << mappedData[i] << std::endl;
+    std::cout << "Mapped element #" << i << ": " << mappedData[i] << std::endl;
   }
   // END example ---------------------------------------------------------------
 
 } // classDoc1Test()
-
 
 //------------------------------------------------------------------------------
 //--- registration of tests
@@ -407,7 +417,8 @@ void classDoc1Test() {
 //
 // stat collector tests
 //
-BOOST_AUTO_TEST_CASE(TestCase) {
+BOOST_AUTO_TEST_CASE(TestCase)
+{
   copyTest<std::array<double, 10U>>();
   referenceTest<std::array<double, 10U>>();
   referenceTest<std::unique_ptr<double[]>>();
@@ -415,6 +426,7 @@ BOOST_AUTO_TEST_CASE(TestCase) {
   autosizeTest();
 } // TestCase
 
-BOOST_AUTO_TEST_CASE(DocumentationTestCase) {
+BOOST_AUTO_TEST_CASE(DocumentationTestCase)
+{
   classDoc1Test();
 } // DocumentationTestCase

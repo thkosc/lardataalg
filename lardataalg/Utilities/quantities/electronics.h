@@ -21,10 +21,9 @@
 #include "lardataalg/Utilities/quantities.h"
 
 // C/C++ standard libraries
-#include <string_view>
-#include <ratio>
 #include <cstddef> // std::ptrdiff_t
-
+#include <ratio>
+#include <string_view>
 
 //------------------------------------------------------------------------------
 namespace util::quantities {
@@ -33,18 +32,17 @@ namespace util::quantities {
 
     using namespace std::string_view_literals; // for operator""sv()
 
-    struct Tick: public concepts::UnitBase {
+    struct Tick : public concepts::UnitBase {
       static constexpr auto symbol = "#"sv;
-      static constexpr auto name   = "tick"sv;
+      static constexpr auto name = "tick"sv;
     };
 
-    struct Counts: public concepts::UnitBase {
+    struct Counts : public concepts::UnitBase {
       static constexpr auto symbol = "#"sv;
-      static constexpr auto name   = "counts"sv;
+      static constexpr auto name = "counts"sv;
     };
 
   } // namespace units
-
 
   // -- BEGIN Ticks ------------------------------------------------------------
   /**
@@ -89,10 +87,8 @@ namespace util::quantities {
   /// Alias for common language habits.
   using ticks_d = tick_d;
 
-
   /// @}
   // -- END Ticks --------------------------------------------------------------
-
 
   // -- BEGIN ADC counts -------------------------------------------------------
   /**
@@ -120,7 +116,6 @@ namespace util::quantities {
 
   // -- END ADC counts ---------------------------------------------------------
 
-
   /**
    * @brief Literal constants for electronics quantities.
    *
@@ -141,39 +136,38 @@ namespace util::quantities {
 
     // @{
     /// Literal tick value.
-    constexpr tick operator""_tick (long double v)
-      { return tick::castFrom(v); }
-    constexpr tick operator""_tick (unsigned long long int v)
-      { return tick::castFrom(v); }
+    constexpr tick operator""_tick(long double v) { return tick::castFrom(v); }
+    constexpr tick operator""_tick(unsigned long long int v) { return tick::castFrom(v); }
     // @}
 
     // @{
     /// Literal tick (`double`-based, `tick_d`) value.
-    constexpr tick_d operator""_tickd (long double v)
-      { return tick_d::castFrom(v); }
-    constexpr tick_d operator""_tickd (unsigned long long int v)
-      { return tick_d::castFrom(v); }
+    constexpr tick_d operator""_tickd(long double v) { return tick_d::castFrom(v); }
+    constexpr tick_d operator""_tickd(unsigned long long int v) { return tick_d::castFrom(v); }
     // @}
 
     // @{
     /// Literal ADC count value.
-    constexpr counts operator""_ADC (long double v)
-      { return counts{ static_cast<signed short int>(v) }; }
-    constexpr counts operator""_ADC (unsigned long long int v)
-      { return counts{ static_cast<signed short int>(v) }; }
+    constexpr counts operator""_ADC(long double v)
+    {
+      return counts{static_cast<signed short int>(v)};
+    }
+    constexpr counts operator""_ADC(unsigned long long int v)
+    {
+      return counts{static_cast<signed short int>(v)};
+    }
     // @}
 
     // @{
     /// Literal ADC count value (single precision floating points).
-    constexpr counts_f operator""_ADCf (long double v)
-      { return counts_f{ static_cast<float>(v) }; }
-    constexpr counts_f operator""_ADCf (unsigned long long int v)
-      { return counts_f{ static_cast<float>(v) }; }
+    constexpr counts_f operator""_ADCf(long double v) { return counts_f{static_cast<float>(v)}; }
+    constexpr counts_f operator""_ADCf(unsigned long long int v)
+    {
+      return counts_f{static_cast<float>(v)};
+    }
     // @}
 
-
   } // electronics_literals
-
 
   // --- BEGIN Tick intervals --------------------------------------------------
 
@@ -196,16 +190,12 @@ namespace util::quantities {
 
   // --- END Time intervals ----------------------------------------------------
 
-
   // --- BEGIN Time points -----------------------------------------------------
 
   namespace points {
 
     /// A `units::Ticks`-based point.
-    template <
-      typename T = util::quantities::tick_as<>::value_t,
-      typename Cat = NoCategory
-      >
+    template <typename T = util::quantities::tick_as<>::value_t, typename Cat = NoCategory>
     using tick_as = concepts::Point<util::quantities::tick_as<T>, Cat>;
 
     /// A tick value based on `std::ptrdiff_t`.
@@ -221,12 +211,10 @@ namespace util::quantities {
 
   // --- END Tick points -------------------------------------------------------
 
-
   /// @}
 
 } // namespace util::quantities
 
 //------------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_UTILITIES_QUANTITIES_ELECTRONICS_H

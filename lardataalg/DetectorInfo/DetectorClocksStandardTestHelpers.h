@@ -41,8 +41,7 @@ namespace testing {
   template <>
   struct ProviderSetupClass<detinfo::DetectorClocksStandard> {
 
-    static std::unique_ptr<detinfo::DetectorClocksStandard>
-    setup(fhicl::ParameterSet const& pset)
+    static std::unique_ptr<detinfo::DetectorClocksStandard> setup(fhicl::ParameterSet const& pset)
     {
       // some feedback about whether we are using the right configuration
       std::string ServiceProviderPath;
@@ -106,8 +105,7 @@ namespace testing {
    */
   template <typename TestEnv>
   struct SimpleEnvironmentSetupClass<detinfo::DetectorClocksStandard, TestEnv> {
-    static detinfo::DetectorClocksStandard*
-    setup(TestEnv& env)
+    static detinfo::DetectorClocksStandard* setup(TestEnv& env)
     {
       return SimpleEnvironmentStandardSetupByName<detinfo::DetectorClocksStandard,
                                                   detinfo::DetectorClocks,

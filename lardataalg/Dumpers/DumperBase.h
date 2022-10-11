@@ -11,20 +11,18 @@
 #ifndef LARDATAALG_DUMPERS_DUMPERBASE_H
 #define LARDATAALG_DUMPERS_DUMPERBASE_H
 
-
 // LArSoft includes
 #include "lardataalg/Utilities/StatCollector.h" // lar::util::MinMaxCollector
 #include "lardataobj/RawData/OpDetWaveform.h"
 
 // C//C++ standard libraries
-#include <string>
-#include <vector>
 #include <algorithm> // std::min()
-#include <ios> // std::fixed
-#include <iomanip> // std::setprecision(), std::setw()
-#include <utility> // std::forward(), std::swap(), std::move()
 #include <cassert>
-
+#include <iomanip> // std::setprecision(), std::setw()
+#include <ios>     // std::fixed
+#include <string>
+#include <utility> // std::forward(), std::swap(), std::move()
+#include <vector>
 
 /// Collection of utilities for dumping data on screen.
 namespace dump {
@@ -37,28 +35,30 @@ namespace dump {
    *
    */
   class DumperBase {
-    
-    struct IndentSettings {
-      std::string indent = ""; ///< Default indentation string.
-      std::string firstIndent = ""; ///< Indentation string for the first line.
-      
-      void set(std::string const& newIndent, std::string const& newFirstIndent)
-        { indent = newIndent; firstIndent = newFirstIndent; }
-      void set(std::string&& newIndent, std::string&& newFirstIndent)
-        { 
-          indent = std::move(newIndent); 
-          firstIndent = std::move(newFirstIndent); 
-        }
-      void set(std::string const& newIndent) { set(newIndent, newIndent); }
-      
-    }; // struct IndentSettings
-    
-    std::vector<IndentSettings> fIndentSettings; ///< All indentation settings.
-    
-      public:
 
+    struct IndentSettings {
+      std::string indent = "";      ///< Default indentation string.
+      std::string firstIndent = ""; ///< Indentation string for the first line.
+
+      void set(std::string const& newIndent, std::string const& newFirstIndent)
+      {
+        indent = newIndent;
+        firstIndent = newFirstIndent;
+      }
+      void set(std::string&& newIndent, std::string&& newFirstIndent)
+      {
+        indent = std::move(newIndent);
+        firstIndent = std::move(newFirstIndent);
+      }
+      void set(std::string const& newIndent) { set(newIndent, newIndent); }
+
+    }; // struct IndentSettings
+
+    std::vector<IndentSettings> fIndentSettings; ///< All indentation settings.
+
+  public:
     /// Default constructor: no indentation.
-    DumperBase(): fIndentSettings{ {} } {}
+    DumperBase() : fIndentSettings{{}} {}
 
     /**
      * @brief Constructor: sets indentation.
@@ -67,15 +67,14 @@ namespace dump {
      * @param firstIndent indentation for the first line (see `firstIndent()`)
      */
     DumperBase(std::string const& indent, std::string const& firstIndent)
-      : fIndentSettings{ { indent, firstIndent } }
-      {}
+      : fIndentSettings{{indent, firstIndent}}
+    {}
 
     /**
      * @brief Constructor: sets indentation.
      * @param indent indentation for all lines
      */
-    DumperBase(std::string const& indent): DumperBase(indent, indent) {}
-
+    DumperBase(std::string const& indent) : DumperBase(indent, indent) {}
 
     /**
      * @name Indentation.
@@ -96,36 +95,42 @@ namespace dump {
     std::string const& indent() const { return indentSettings().indent; }
 
     /// Returns the indentation string currently configured for the first line.
-    std::string const& firstIndent() const
-      { return indentSettings().firstIndent; }
+    std::string const& firstIndent() const { return indentSettings().firstIndent; }
 
     /// Sets indentation strings to the specified values.
     void setIndent(std::string const& indent, std::string const& firstIndent)
-      { indentSettings() = { indent, firstIndent }; }
+    {
+      indentSettings() = {indent, firstIndent};
+    }
 
     /// Sets both indentation strings to the same specified value.
     void setIndent(std::string const& indent) { setIndent(indent, indent); }
 
-
     /// Writes the indentation into a stream, and returns it for further output.
     template <typename Stream>
     Stream& indented(Stream&& out, bool first = false) const
-      { out << (first? firstIndent(): indent()); return out; }
+    {
+      out << (first ? firstIndent() : indent());
+      return out;
+    }
 
     /// Writes first line indentation into a stream, and returns it for further
     /// output.
     template <typename Stream>
     Stream& firstIndented(Stream&& out) const
-      { return indented(std::forward<Stream>(out), true); }
+    {
+      return indented(std::forward<Stream>(out), true);
+    }
 
     /// Initiates a new output line, including indentation, and returns the
     /// stream for further output.
     template <typename Stream>
     Stream& newline(Stream&& out) const
-      { return indented(std::forward<Stream>(out)); }
+    {
+      return indented(std::forward<Stream>(out));
+    }
 
     /// @}
-
 
     /**
      * @brief Helper class to keep track of indenting.
@@ -163,86 +168,94 @@ namespace dump {
       Stream out;
       DumperBase const& dumper;
 
-        public:
+    public:
       using indenter_t = Indenter<Stream>; ///< This type.
 
       /// Records the underlying stream and the dumper associated.
       Indenter(Stream out, DumperBase const& dumper)
-        : out(std::forward<Stream>(out)), dumper(dumper) {}
+        : out(std::forward<Stream>(out)), dumper(dumper)
+      {}
 
       /// Returns the default indentation string.
       std::string const& indentString() const { return dumper.indent(); }
 
       /// Returns the indentation string for the first line.
-      std::string const& firstIndentString() const
-        { return dumper.firstIndent(); }
+      std::string const& firstIndentString() const { return dumper.firstIndent(); }
 
       /// Forwards data to the underlying stream.
       template <typename T>
-      indenter_t& operator<< (T&& v)
-        { out << std::forward<T>(v); return *this; }
+      indenter_t& operator<<(T&& v)
+      {
+        out << std::forward<T>(v);
+        return *this;
+      }
 
       /// Inserts an indentation and returns the indenter for further output.
       indenter_t& indent(bool first = false)
-        { dumper.indented(out, first); return *this; }
+      {
+        dumper.indented(out, first);
+        return *this;
+      }
 
       /// Breaks the current line and returns the indenter for further output.
-      indenter_t& newline() { out << '\n'; return indent(); }
+      indenter_t& newline()
+      {
+        out << '\n';
+        return indent();
+      }
 
       /// Inserts a first-line indentation and returns the indenter for further
       /// output.
       indenter_t& start() { return indent(true); }
-      
-      
-    }; // Indenter<>
 
+    }; // Indenter<>
 
     /// Returns an `Indenter` object tied to this dumper and `out` stream.
     template <typename Stream>
     decltype(auto) indenter(Stream&& out) const
-      { return Indenter<Stream>(std::forward<Stream>(out), *this); }
+    {
+      return Indenter<Stream>(std::forward<Stream>(out), *this);
+    }
 
-      protected:
-    
+  protected:
     IndentSettings& indentSettings() { return fIndentSettings.back(); }
-    IndentSettings const& indentSettings() const
-      { return fIndentSettings.back(); }
-    
+    IndentSettings const& indentSettings() const { return fIndentSettings.back(); }
+
     /// Stacks a copy of the current settings, and returns the "new" ones.
     IndentSettings& saveIndentSettings()
-      {
-        auto oldSettings = indentSettings();
-        fIndentSettings.push_back(std::move(oldSettings));
-        return indentSettings(); 
-      }
-    
+    {
+      auto oldSettings = indentSettings();
+      fIndentSettings.push_back(std::move(oldSettings));
+      return indentSettings();
+    }
+
     /// Restores and returns the last saved settings.
     IndentSettings& restoreIndentSettings()
-      {
-        if (fIndentSettings.size() > 1U) fIndentSettings.pop_back();
-        assert(!fIndentSettings.empty());
-        return indentSettings(); 
-      }
-    
+    {
+      if (fIndentSettings.size() > 1U) fIndentSettings.pop_back();
+      assert(!fIndentSettings.empty());
+      return indentSettings();
+    }
+
   }; // DumperBase
 
+  /// Changes the indentation settings of a dumper class and returns it back.
+  template <typename Dumper>
+  auto withIndentation(Dumper&& dumper, std::string const& indent, std::string const& firstIndent)
+  {
+    dumper.setIndent(indent, firstIndent);
+    return dumper;
+  }
 
   /// Changes the indentation settings of a dumper class and returns it back.
   template <typename Dumper>
-  auto withIndentation
-    (Dumper&& dumper, std::string const& indent, std::string const& firstIndent)
-    { dumper.setIndent(indent, firstIndent); return dumper; }
-
-  /// Changes the indentation settings of a dumper class and returns it back.
-  template <typename Dumper>
-  auto withIndentation
-    (Dumper&& dumper, std::string const& indent)
-    { return withIndentation(std::forward<Dumper>(dumper), indent, indent); }
+  auto withIndentation(Dumper&& dumper, std::string const& indent)
+  {
+    return withIndentation(std::forward<Dumper>(dumper), indent, indent);
+  }
 
 } // namespace dump
 
-
 //----------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_DUMPERS_DUMPERBASE_H

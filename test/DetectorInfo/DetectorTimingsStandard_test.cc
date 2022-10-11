@@ -25,31 +25,31 @@
 //------------------------------------------------------------------------------
 //---  static tests
 //------------------------------------------------------------------------------
-void StaticChecks() {
+void StaticChecks()
+{
   using namespace detinfo::timescales;
   static_assert(!is_tick_v<electronics_time>);
-  static_assert( is_tick_v<electronics_tick>);
-  static_assert( is_tick_v<electronics_tick_d>);
-  static_assert( is_tick_v<electronics_time_ticks>);
-  static_assert( is_tick_v<electronics_time_ticks_d>);
+  static_assert(is_tick_v<electronics_tick>);
+  static_assert(is_tick_v<electronics_tick_d>);
+  static_assert(is_tick_v<electronics_time_ticks>);
+  static_assert(is_tick_v<electronics_time_ticks_d>);
   static_assert(!is_tick_v<TPCelectronics_time>);
-  static_assert( is_tick_v<TPCelectronics_tick>);
-  static_assert( is_tick_v<TPCelectronics_tick_d>);
-  static_assert( is_tick_v<TPCelectronics_time_ticks>);
-  static_assert( is_tick_v<TPCelectronics_time_ticks_d>);
+  static_assert(is_tick_v<TPCelectronics_tick>);
+  static_assert(is_tick_v<TPCelectronics_tick_d>);
+  static_assert(is_tick_v<TPCelectronics_time_ticks>);
+  static_assert(is_tick_v<TPCelectronics_time_ticks_d>);
   static_assert(!is_tick_v<trigger_time>);
-  static_assert( is_tick_v<trigger_tick>);
-  static_assert( is_tick_v<trigger_tick_d>);
-  static_assert( is_tick_v<trigger_time_ticks>);
-  static_assert( is_tick_v<trigger_time_ticks_d>);
+  static_assert(is_tick_v<trigger_tick>);
+  static_assert(is_tick_v<trigger_tick_d>);
+  static_assert(is_tick_v<trigger_time_ticks>);
+  static_assert(is_tick_v<trigger_time_ticks_d>);
   static_assert(!is_tick_v<simulation_time>);
   static_assert(!is_tick_v<optical_time>);
-  static_assert( is_tick_v<optical_tick>);
-  static_assert( is_tick_v<optical_tick_d>);
-  static_assert( is_tick_v<optical_time_ticks>);
-  static_assert( is_tick_v<optical_time_ticks_d>);
+  static_assert(is_tick_v<optical_tick>);
+  static_assert(is_tick_v<optical_tick_d>);
+  static_assert(is_tick_v<optical_time_ticks>);
+  static_assert(is_tick_v<optical_time_ticks_d>);
 } // StaticChecks()
-
 
 //------------------------------------------------------------------------------
 //---  The test environment
@@ -64,8 +64,7 @@ void StaticChecks() {
 using TestEnvironment = testing::TesterEnvironment<testing::BasicEnvironmentConfiguration>;
 
 namespace {
-  double
-  close_in_value(double const a, double const b)
+  double close_in_value(double const a, double const b)
   {
     return std::abs(a - b) < std::numeric_limits<double>::epsilon();
   }
@@ -74,8 +73,7 @@ namespace {
 //------------------------------------------------------------------------------
 //---  The tests
 //---
-unsigned int
-testTriggerTime(detinfo::DetectorTimings const& timings)
+unsigned int testTriggerTime(detinfo::DetectorTimings const& timings)
 {
 
   unsigned int nErrors = 0U;
@@ -103,8 +101,7 @@ testTriggerTime(detinfo::DetectorTimings const& timings)
 } // testTriggerTime()
 
 //------------------------------------------------------------------------------
-unsigned int
-testBeamGateTime(detinfo::DetectorTimings const& timings)
+unsigned int testBeamGateTime(detinfo::DetectorTimings const& timings)
 {
   unsigned int nErrors = 0U;
 
@@ -132,8 +129,7 @@ testBeamGateTime(detinfo::DetectorTimings const& timings)
 } // testBeamGateTime()
 
 //------------------------------------------------------------------------------
-unsigned int
-testSimulationTimes(detinfo::DetectorTimings const& timings)
+unsigned int testSimulationTimes(detinfo::DetectorTimings const& timings)
 {
 
   using namespace detinfo::timescales; // simulation_time, electronics_time, ...
@@ -268,8 +264,7 @@ testSimulationTimes(detinfo::DetectorTimings const& timings)
 } // testSimulationTimes()
 
 //------------------------------------------------------------------------------
-unsigned int
-testTriggerTimes(detinfo::DetectorTimings const& timings)
+unsigned int testTriggerTimes(detinfo::DetectorTimings const& timings)
 {
 
   using namespace detinfo::timescales; // trigger_time, electronics_time
@@ -362,8 +357,7 @@ testTriggerTimes(detinfo::DetectorTimings const& timings)
 } // testTriggerTimes()
 
 //------------------------------------------------------------------------------
-unsigned int
-testOpticalClockTimings(detinfo::DetectorTimings const& timings)
+unsigned int testOpticalClockTimings(detinfo::DetectorTimings const& timings)
 {
 
   using namespace util::quantities::time_literals;
@@ -529,10 +523,8 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
   }
 
   // back to optical tick:
-  auto const trigTick
-    = timings.toTick<optical_tick>(trigger_time{expectedTrigTime_us});
-  static_assert
-    (util::is_same_decay_v<decltype(trigTick.quantity()), util::quantities::tick>);
+  auto const trigTick = timings.toTick<optical_tick>(trigger_time{expectedTrigTime_us});
+  static_assert(util::is_same_decay_v<decltype(trigTick.quantity()), util::quantities::tick>);
 
   if (trigTick == inputTick) {
     mf::LogVerbatim("DetectorTimingsStandard_test")
@@ -549,49 +541,43 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
   //
   // to electronics tick
   //
-  
+
   auto const expectedElecTick = timings.toTick<electronics_tick>(time);
-  
+
   auto const elecTick = timings.toTick<electronics_tick>(inputTick);
-  static_assert
-    (util::is_same_decay_v<decltype(elecTick.quantity()), util::quantities::tick>);
+  static_assert(util::is_same_decay_v<decltype(elecTick.quantity()), util::quantities::tick>);
 
   if (elecTick == expectedElecTick) {
     mf::LogVerbatim("DetectorTimingsStandard_test")
-      << "DetectorTimings::toTick<electronics_tick>(" << inputTick << ") => "
-      << elecTick;
+      << "DetectorTimings::toTick<electronics_tick>(" << inputTick << ") => " << elecTick;
   }
   else {
     ++nErrors;
     mf::LogProblem("DetectorTimingsStandard_test")
-      << "Optical tick #" << inputTick_count << " is expected to be "
-      << expectedElecTick << " (electronics tick), but got "
-      << elecTick << " instead";
+      << "Optical tick #" << inputTick_count << " is expected to be " << expectedElecTick
+      << " (electronics tick), but got " << elecTick << " instead";
   }
-  
+
   // back to optical tick:
-  optical_tick const expectedOptTick
-    = timings.toTick<optical_tick>(timings.toElectronicsTime(expectedElecTick));
-  
+  optical_tick const expectedOptTick =
+    timings.toTick<optical_tick>(timings.toElectronicsTime(expectedElecTick));
+
   auto const tickFromElecTick = timings.toTick<optical_tick>(elecTick);
   static_assert(
-    util::is_same_decay_v
-      <decltype(tickFromElecTick.quantity()), util::quantities::tick>
-    );
+    util::is_same_decay_v<decltype(tickFromElecTick.quantity()), util::quantities::tick>);
 
   if (tickFromElecTick == expectedOptTick) {
     mf::LogVerbatim("DetectorTimingsStandard_test")
       << "DetectorTimings::toTick<optical_tick, "
-      << detinfo::timescales::timescale_traits<decltype(elecTick)::category_t>::name()
-      << ">(" << elecTick << ") => " << tickFromElecTick;
+      << detinfo::timescales::timescale_traits<decltype(elecTick)::category_t>::name() << ">("
+      << elecTick << ") => " << tickFromElecTick;
   }
   else {
     ++nErrors;
     mf::LogProblem("DetectorTimingsStandard_test")
-      << detinfo::timescales::timescale_traits<decltype(elecTick)::category_t>::name()
-      << " " << elecTick
-      << " is expected to be optical tick " << expectedOptTick
-      << ", but got " << tickFromElecTick << " instead";
+      << detinfo::timescales::timescale_traits<decltype(elecTick)::category_t>::name() << " "
+      << elecTick << " is expected to be optical tick " << expectedOptTick << ", but got "
+      << tickFromElecTick << " instead";
   }
 
   //
@@ -659,8 +645,7 @@ testOpticalClockTimings(detinfo::DetectorTimings const& timings)
  *
  */
 //------------------------------------------------------------------------------
-int
-main(int argc, char const** argv)
+int main(int argc, char const** argv)
 {
 
   testing::BasicEnvironmentConfiguration config("clocks_test");
@@ -728,5 +713,5 @@ main(int argc, char const** argv)
   // 4. And finally we cross fingers.
   if (nErrors > 0) { mf::LogError("clocks_test") << nErrors << " errors detected!"; }
 
-  return (nErrors > 0U)? 1: 0;
+  return (nErrors > 0U) ? 1 : 0;
 } // main()

@@ -30,25 +30,24 @@
 #define LARDATAALG_UTILITIES_QUANTITIES_H
 
 // LArSoft libraries
+#include "larcorealg/CoreUtils/MetaUtils.h"      // util::always_true_v<>
+#include "larcorealg/CoreUtils/StdUtils.h"       // util::to_string(), ...
 #include "lardataalg/Utilities/constexpr_math.h" // util::abs()
-#include "larcorealg/CoreUtils/MetaUtils.h" // util::always_true_v<>
-#include "larcorealg/CoreUtils/StdUtils.h" // util::to_string(), ...
 
 // Boost libraries
 #include "boost/integer/common_factor_rt.hpp" // boost::integer::gcd()
 
 // C/C++ standard libraries
-#include <ostream>
+#include <cctype>     // std::isblank()
+#include <functional> // std::hash<>
+#include <limits>
 #include <map>
+#include <ostream>
+#include <ratio>
+#include <regex>
 #include <string>
 #include <string_view>
-#include <regex>
-#include <ratio>
-#include <limits>
-#include <functional> // std::hash<>
 #include <type_traits> // std::is_same<>, std::enable_if_t<>, ...
-#include <cctype> // std::isblank()
-
 
 /**
  * @brief Types of variables with a unit.
@@ -234,7 +233,9 @@ namespace util::quantities {
       /// Applies the specified `Ratio` to the value in `v`.
       template <typename Ratio, typename Value>
       static constexpr auto applyRatioToValue(Value&& v)
-        { return v * Ratio::num / Ratio::den; }
+      {
+        return v * Ratio::num / Ratio::den;
+      }
 
       template <typename R>
       struct invert_ratio;
@@ -275,7 +276,6 @@ namespace util::quantities {
       template <typename Q>
       constexpr bool has_quantity_v = has_quantity<Q>();
 
-
       //------------------------------------------------------------------------
       /// Trait: type of value of `T`: may be `T` or, for objects with units,
       /// `T::value_t`.
@@ -287,7 +287,6 @@ namespace util::quantities {
       template <typename T>
       using quantity_value_t = typename quantity_value_type<T>::type;
 
-
       /**
        * Trait: `true_type` if the type `T` is a value compatible with the value
        * of `Q`.
@@ -297,9 +296,7 @@ namespace util::quantities {
 
       /// Trait: `true` if the type `T` is compatible with the value of `Q`.
       template <typename T, typename Q>
-      constexpr bool is_value_compatible_with_v
-        = is_value_compatible_with<T, Q>();
-
+      constexpr bool is_value_compatible_with_v = is_value_compatible_with<T, Q>();
 
       /**
        * Trait: `true_type` if the value type of `T` is compatible with the one
@@ -314,9 +311,7 @@ namespace util::quantities {
 
       /// Trait: `true` if the value type of `T` is compatible with `U`'s.
       template <typename T, typename U>
-      constexpr bool has_value_compatible_with_v
-        = has_value_compatible_with<T, U>();
-
+      constexpr bool has_value_compatible_with_v = has_value_compatible_with<T, U>();
 
       //------------------------------------------------------------------------
       //---  constexpr string concatenation
@@ -328,25 +323,20 @@ namespace util::quantities {
       template <typename Q>
       class numeric_limits;
 
-
       //------------------------------------------------------------------------
 
     } // namespace details
-
 
     using namespace std::string_view_literals;
 
     //------------------------------------------------------------------------
     /// A ratio product (like `std::ratio_multiply`) with simplified terms.
     template <typename ARatio, typename BRatio>
-    using simplified_ratio_multiply
-      = details::simplify_ratio<std::ratio_multiply<ARatio, BRatio>>;
+    using simplified_ratio_multiply = details::simplify_ratio<std::ratio_multiply<ARatio, BRatio>>;
 
     /// A ratio division (like `std::ratio_divide`) with simplified terms.
     template <typename NumRatio, typename DenRatio>
-    using simplified_ratio_divide
-      = details::simplify_ratio<std::ratio_divide<NumRatio, DenRatio>>;
-
+    using simplified_ratio_divide = details::simplify_ratio<std::ratio_divide<NumRatio, DenRatio>>;
 
     //------------------------------------------------------------------------
     /**
@@ -373,7 +363,6 @@ namespace util::quantities {
       static constexpr std::string_view name = "unknown"sv;
     }; // struct UnitBase
 
-
     template <typename R>
     struct Prefix {
       using ratio = R; ///< The ratio this prefix is about.
@@ -389,15 +378,13 @@ namespace util::quantities {
 
     }; // struct Prefix
 
-
     template <typename U, typename R = std::ratio<1>>
     struct ScaledUnit {
 
-      using baseunit_t = U; ///< Base, unscaled unit.
+      using baseunit_t = U;            ///< Base, unscaled unit.
       using unit_t = ScaledUnit<U, R>; ///< Unit with scale (i.e. this object).
-      using ratio = R; ///< The ratio to go from the base unit to this one.
-      using prefix_t = Prefix<ratio>; ///< The prefix of the unit.
-
+      using ratio = R;                 ///< The ratio to go from the base unit to this one.
+      using prefix_t = Prefix<ratio>;  ///< The prefix of the unit.
 
       // -- BEGIN Conversion to string -----------------------------------------
       /**
@@ -410,17 +397,14 @@ namespace util::quantities {
       /// @{
 
       /// Returns short symbol of the unit (e.g. "ns") is a string-like object.
-      static auto symbol()
-        { return std::string(prefix().symbol()) + baseUnit().symbol.data(); }
+      static auto symbol() { return std::string(prefix().symbol()) + baseUnit().symbol.data(); }
 
       /// Returns full name of the unit (e.g. "nanoseconds") as a string-like
       /// object.
-      static auto name()
-        { return std::string(prefix().name()) + baseUnit().name.data(); }
+      static auto name() { return std::string(prefix().name()) + baseUnit().name.data(); }
 
       /// @}
       // -- END Conversion to string -------------------------------------------
-
 
       // -- BEGIN Representation conversions -----------------------------------
       /// @{
@@ -429,28 +413,30 @@ namespace util::quantities {
       /// Converts a value from the base unit to this one.
       template <typename T>
       static constexpr T scale(T v)
-        { return details::applyRatioToValue<details::invert_t<ratio>>(v); }
+      {
+        return details::applyRatioToValue<details::invert_t<ratio>>(v);
+      }
 
       /// Converts a value from this scaled unit to the base one.
       template <typename T>
       static constexpr T unscale(T v)
-        { return details::applyRatioToValue<ratio>(v); }
+      {
+        return details::applyRatioToValue<ratio>(v);
+      }
 
       /// Converts a value from the scaled unit to a different `TargetRatio`.
       template <typename TargetRatio, typename T>
       static constexpr T scaleTo(T v)
-        {
-          return details::applyRatioToValue
-            <simplified_ratio_divide<ratio, TargetRatio>>(v);
-        }
+      {
+        return details::applyRatioToValue<simplified_ratio_divide<ratio, TargetRatio>>(v);
+      }
 
       /// Converts a value from `TargetRatio` scale to this scaled unit.
       template <typename TargetRatio, typename T>
       static constexpr T fromRepr(T v)
-        {
-          return details::applyRatioToValue
-            <simplified_ratio_divide<TargetRatio, ratio>>(v);
-        }
+      {
+        return details::applyRatioToValue<simplified_ratio_divide<TargetRatio, ratio>>(v);
+      }
 
       /// @}
       // -- END Representation conversions -------------------------------------
@@ -471,26 +457,28 @@ namespace util::quantities {
       /// Returns whether scaled unit `U` has the same base unit as this one.
       template <typename OU>
       static constexpr bool sameBaseUnitAs()
-        { return std::is_same<baseunit_t, typename OU::baseunit_t>(); }
+      {
+        return std::is_same<baseunit_t, typename OU::baseunit_t>();
+      }
 
       /// Returns whether scaled unit `U` has the same base unit as this one.
       template <typename OU>
       static constexpr bool sameUnitAs()
-        { return std::is_same<unit_t, typename OU::unit_t>(); }
+      {
+        return std::is_same<unit_t, typename OU::unit_t>();
+      }
 
       /// @}
       // -- END Type features --------------------------------------------------
 
     }; // ScaledUnit<>
 
-
     template <typename U, typename R>
-    std::ostream& operator<< (std::ostream& out, ScaledUnit<U, R> const& unit)
-      {
-        using unit_t = ScaledUnit<U, R>;
-        return out << unit_t::prefix_t::symbol() << unit_t::baseunit_t::symbol;
-      }
-
+    std::ostream& operator<<(std::ostream& out, ScaledUnit<U, R> const& unit)
+    {
+      using unit_t = ScaledUnit<U, R>;
+      return out << unit_t::prefix_t::symbol() << unit_t::baseunit_t::symbol;
+    }
 
     /** ************************************************************************
      * @brief A value measured in the specified unit.
@@ -565,15 +553,13 @@ namespace util::quantities {
     template <typename Unit, typename T = double>
     struct Quantity {
 
-        public:
-
-      using value_t = T; ///< Type of the stored value.
-      using unit_t = Unit; ///< The unit and scale of this quantity.
+    public:
+      using value_t = T;                    ///< Type of the stored value.
+      using unit_t = Unit;                  ///< The unit and scale of this quantity.
       using quantity_t = Quantity<Unit, T>; ///< The type of this class.
 
       /// Description of the unscaled unit.
       using baseunit_t = typename unit_t::baseunit_t;
-
 
       /// Constructor: value is left uninitialized.
       // NOTE: this is not `constexpr` because using it n a constexpr would
@@ -581,7 +567,7 @@ namespace util::quantities {
       explicit Quantity() = default;
 
       /// Constructor: takes a value in the intended representation.
-      explicit constexpr Quantity(value_t v): fValue(v) {}
+      explicit constexpr Quantity(value_t v) : fValue(v) {}
 
       /**
        * @brief Constructor: converts from another quantity.
@@ -592,25 +578,19 @@ namespace util::quantities {
        * The value in `q` is converted from its native scale into the one of
        * this quantity.
        */
-      template <
-        typename Q,
-        typename std::enable_if_t<details::is_quantity_v<Q>>* = nullptr
-        >
+      template <typename Q, typename std::enable_if_t<details::is_quantity_v<Q>>* = nullptr>
       constexpr Quantity(Q q)
-        : fValue
-          {unit_t::template fromRepr<typename Q::unit_t::ratio>(q.value()) }
-        {
-          static_assert(sameBaseUnitAs<Q>(),
-            "Can't construct from quantity with different base unit"
-            );
-        }
+        : fValue{unit_t::template fromRepr<typename Q::unit_t::ratio>(q.value())}
+      {
+        static_assert(sameBaseUnitAs<Q>(),
+                      "Can't construct from quantity with different base unit");
+      }
 
       /// Returns the value of the quantity.
       constexpr value_t value() const { return fValue; }
 
       /// Explicit conversion to the base quantity.
-      explicit constexpr operator value_t() const
-        { return value(); }
+      explicit constexpr operator value_t() const { return value(); }
 
       // -- BEGIN Asymmetric arithmetic operations -----------------------------
       /**
@@ -663,7 +643,7 @@ namespace util::quantities {
 
       /// Division by a quantity, returns a pure number.
       template <typename OU, typename OT>
-      constexpr value_t operator/ (Quantity<OU, OT> q) const;
+      constexpr value_t operator/(Quantity<OU, OT> q) const;
 
       /// Add the `other` quantity (possibly concerted) to this one.
       template <typename OU, typename OT>
@@ -675,13 +655,19 @@ namespace util::quantities {
 
       /// Scale this quantity by a factor.
       template <typename OT>
-      std::enable_if_t<std::is_arithmetic_v<OT>, quantity_t&>
-      operator*=(OT factor) { fValue *= factor; return *this; }
+      std::enable_if_t<std::is_arithmetic_v<OT>, quantity_t&> operator*=(OT factor)
+      {
+        fValue *= factor;
+        return *this;
+      }
 
       /// Scale the quantity dividing it by a quotient.
       template <typename OT>
-      std::enable_if_t<std::is_arithmetic_v<OT>, quantity_t&>
-      operator/=(OT quot) { fValue /= quot; return *this; }
+      std::enable_if_t<std::is_arithmetic_v<OT>, quantity_t&> operator/=(OT quot)
+      {
+        fValue /= quot;
+        return *this;
+      }
 
       /// Returns a quantity with same value.
       constexpr quantity_t operator+() const { return quantity_t(value()); }
@@ -690,12 +676,10 @@ namespace util::quantities {
       constexpr quantity_t operator-() const { return quantity_t(-value()); }
 
       /// Returns a quantity with the absolute value of this one.
-      constexpr quantity_t abs() const
-        { return quantity_t(util::abs(value())); }
+      constexpr quantity_t abs() const { return quantity_t(util::abs(value())); }
 
       /// @}
       // -- END Asymmetric arithmetic operations -------------------------------
-
 
       // -- BEGIN Comparisons --------------------------------------------------
       /**
@@ -736,7 +720,6 @@ namespace util::quantities {
       /// @}
       // -- END Asymmetric arithmetic operations -------------------------------
 
-
       // -- BEGIN Access to the scaled unit ------------------------------------
       /// @name Access to the scaled unit.
       /// @{
@@ -760,7 +743,9 @@ namespace util::quantities {
        */
       template <typename OU>
       static constexpr bool sameBaseUnitAs()
-        { return unit_t::template sameBaseUnitAs<OU>(); }
+      {
+        return unit_t::template sameBaseUnitAs<OU>();
+      }
 
       /**
        * @brief Returns whether this quantity has same unit and scale as `OU`.
@@ -769,37 +754,43 @@ namespace util::quantities {
        */
       template <typename OU>
       static constexpr bool sameUnitAs()
-        { return unit_t::template sameUnitAs<OU>(); }
+      {
+        return unit_t::template sameUnitAs<OU>();
+      }
 
       /// Whether `U` is a value type compatible with `value_t`.
       template <typename U>
-      static constexpr bool is_compatible_value_v
-        = details::is_value_compatible_with_v<U, value_t>;
+      static constexpr bool is_compatible_value_v = details::is_value_compatible_with_v<U, value_t>;
 
       /// Whether `U` has (or is) a value type compatible with `value_t`.
       template <typename U>
-      static constexpr bool has_compatible_value_v
-        = details::has_value_compatible_with_v<U, value_t>;
+      static constexpr bool has_compatible_value_v =
+        details::has_value_compatible_with_v<U, value_t>;
 
       /// Returns whether `U` is a value type compatible with `value_t`.
       template <typename U>
       static constexpr bool isCompatibleValue()
-        { return quantity_t::is_compatible_value_v<U>; }
+      {
+        return quantity_t::is_compatible_value_v<U>;
+      }
 
       /// Returns whether `U` has (or is) a value type compatible with
       /// `value_t`.
       template <typename U>
       static constexpr bool hasCompatibleValue()
-        { return quantity_t::has_compatible_value_v<U>; }
-
+      {
+        return quantity_t::has_compatible_value_v<U>;
+      }
 
       /// @}
       // -- END Access to the scaled unit --------------------------------------
 
       /// Convert this quantity into the specified one.
       template <typename OQ>
-      constexpr OQ convertInto() const { return OQ(*this); }
-
+      constexpr OQ convertInto() const
+      {
+        return OQ(*this);
+      }
 
       /**
        * @brief Returns a new quantity initialized with the specified value
@@ -823,18 +814,20 @@ namespace util::quantities {
        */
       template <typename U>
       static constexpr quantity_t castFrom(U value)
-        { return quantity_t{ static_cast<value_t>(value) }; }
+      {
+        return quantity_t{static_cast<value_t>(value)};
+      }
 
-
-        private:
-      value_t fValue {}; ///< Stored value.
+    private:
+      value_t fValue{}; ///< Stored value.
 
     }; // struct Quantity
 
     template <typename... Args>
-    std::ostream& operator<< (std::ostream& out, Quantity<Args...> const q)
-      { return out << q.value() << " " << q.unit(); }
-
+    std::ostream& operator<<(std::ostream& out, Quantity<Args...> const q)
+    {
+      return out << q.value() << " " << q.unit();
+    }
 
     // -- BEGIN Arithmetic operations ------------------------------------------
     /**
@@ -859,56 +852,50 @@ namespace util::quantities {
      * both return centimeters, or meters?).
      */
     template <typename U, typename T>
-    constexpr Quantity<U, T> operator+ (Quantity<U, T> const q, T shift)
-      = delete;
+    constexpr Quantity<U, T> operator+(Quantity<U, T> const q, T shift) = delete;
     template <typename U, typename T>
-    constexpr Quantity<U, T> operator+ (T shift, Quantity<U, T> const q)
-      = delete;
+    constexpr Quantity<U, T> operator+(T shift, Quantity<U, T> const q) = delete;
     template <typename U, typename T>
-    constexpr Quantity<U, T> operator- (Quantity<U, T> const q, T shift)
-      = delete;
+    constexpr Quantity<U, T> operator-(Quantity<U, T> const q, T shift) = delete;
     template <typename U, typename T>
-    constexpr Quantity<U, T> operator- (T shift, Quantity<U, T> const q)
-      = delete;
+    constexpr Quantity<U, T> operator-(T shift, Quantity<U, T> const q) = delete;
     //@}
 
     //@{
     /// Multiplication with a scalar.
     template <typename U, typename T, typename OT>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<OT>, Quantity<U, T>>
-    operator* (Quantity<U, T> const q, OT factor)
-      { return Quantity<U, T>{ q.value() * static_cast<T>(factor) }; }
+    constexpr std::enable_if_t<Quantity<U, T>::template is_compatible_value_v<OT>, Quantity<U, T>>
+    operator*(Quantity<U, T> const q, OT factor)
+    {
+      return Quantity<U, T>{q.value() * static_cast<T>(factor)};
+    }
     template <typename U, typename T, typename OT>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<OT>, Quantity<U, T>>
-    operator* (OT factor, Quantity<U, T> const q)
-      { return q * factor; }
+    constexpr std::enable_if_t<Quantity<U, T>::template is_compatible_value_v<OT>, Quantity<U, T>>
+    operator*(OT factor, Quantity<U, T> const q)
+    {
+      return q * factor;
+    }
     //@}
 
     //@{
     /// Multiplication between quantities is forbidden.
     template <typename AU, typename AT, typename BU, typename BT>
-    constexpr auto operator* (Quantity<AU, AT>, Quantity<BU, BT>)
-      -> decltype(std::declval<AT>() * std::declval<BT>())
-      = delete;
+    constexpr auto operator*(Quantity<AU, AT>, Quantity<BU, BT>)
+      -> decltype(std::declval<AT>() * std::declval<BT>()) = delete;
     //@}
 
     //@{
     // Division by a scalar.
     template <typename U, typename T, typename OT>
-    constexpr
-    std::enable_if_t
-      <Quantity<U, T>::template is_compatible_value_v<OT>, Quantity<U, T>>
-    operator/ (Quantity<U, T> q, OT quot)
-      { return Quantity<U, T>{ q.value() / static_cast<T>(quot) }; }
+    constexpr std::enable_if_t<Quantity<U, T>::template is_compatible_value_v<OT>, Quantity<U, T>>
+    operator/(Quantity<U, T> q, OT quot)
+    {
+      return Quantity<U, T>{q.value() / static_cast<T>(quot)};
+    }
     //@}
 
     /// @}
     // -- END Arithmetic operations --------------------------------------------
-
 
     // -------------------------------------------------------------------------
     /**
@@ -920,12 +907,10 @@ namespace util::quantities {
     template <typename Unit, typename Ratio, typename T>
     using scaled_quantity = Quantity<ScaledUnit<Unit, Ratio>, T>;
 
-
     // -------------------------------------------------------------------------
     /// Type of a quantity like `Q`, but with a different unit scale `R`.
     template <typename Q, typename R, typename T = typename Q::value_t>
     using rescale = Quantity<ScaledUnit<typename Q::unit_t::baseunit_t, R>, T>;
-
 
     // -------------------------------------------------------------------------
 
@@ -938,22 +923,21 @@ namespace util::quantities {
     /// @see `util::to_string()`
     template <typename... Args>
     std::string to_string(ScaledUnit<Args...> const& unit)
-      {
-        return
-          std::string(unit.prefix().symbol()) + unit.baseUnit().symbol.data();
-      }
+    {
+      return std::string(unit.prefix().symbol()) + unit.baseUnit().symbol.data();
+    }
 
     /// Converts a quantity into a string.
     /// @see `util::to_string()`
     template <typename... Args>
     std::string to_string(Quantity<Args...> const& q)
-      { return util::to_string(q.value()) + ' ' + util::to_string(q.unit()); }
-
+    {
+      return util::to_string(q.value()) + ' ' + util::to_string(q.unit());
+    }
 
     // -------------------------------------------------------------------------
 
   } // namespace concepts
-
 
   // ---------------------------------------------------------------------------
   /**
@@ -1007,12 +991,9 @@ namespace util::quantities {
   namespace prefixes { // we expect other libraries to fill it
 
     // ratios imported from C++ standard library:
-    using
-      std::atto, std::femto, std::pico, std::nano, std::micro,
-      std::milli, std::centi, std::deci,
-      std::deca, std::hecto, std::kilo,
-      std::mega, std::giga, std::tera, std::peta, std::exa
-      ;
+    using std::atto, std::femto, std::pico, std::nano, std::micro, std::milli, std::centi,
+      std::deci, std::deca, std::hecto, std::kilo, std::mega, std::giga, std::tera, std::peta,
+      std::exa;
 
   } // namespace prefixes
 
@@ -1043,7 +1024,6 @@ namespace util::quantities {
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    */
   namespace units {} // we expect other libraries to fill it
-
 
   // -------------------------------------------------------------------------
   // @{
@@ -1089,33 +1069,35 @@ namespace util::quantities {
   // --- BEGIN -- Specific exceptions ------------------------------------------
 
   /// String representing a quantity has no unit.
-  struct MissingUnit: std::runtime_error
-    { using std::runtime_error::runtime_error; };
+  struct MissingUnit : std::runtime_error {
+    using std::runtime_error::runtime_error;
+  };
 
   /// String representing a quantity has unsupported unit prefix.
-  struct InvalidUnitPrefix: std::runtime_error
-    { using std::runtime_error::runtime_error; };
+  struct InvalidUnitPrefix : std::runtime_error {
+    using std::runtime_error::runtime_error;
+  };
 
   /// String representing a quantity has incompatible unit.
-  struct MismatchingUnit: std::runtime_error
-    { using std::runtime_error::runtime_error; };
+  struct MismatchingUnit : std::runtime_error {
+    using std::runtime_error::runtime_error;
+  };
 
   /// String representing a quantity has an invalid number.
-  struct ValueError: std::runtime_error
-    { using std::runtime_error::runtime_error; };
+  struct ValueError : std::runtime_error {
+    using std::runtime_error::runtime_error;
+  };
 
   /// String representing a quantity has spurious characters after the number.
-  struct ExtraCharactersError: std::runtime_error
-    { using std::runtime_error::runtime_error; };
-
+  struct ExtraCharactersError : std::runtime_error {
+    using std::runtime_error::runtime_error;
+  };
 
   // --- END -- Specific exceptions --------------------------------------------
 
   // ---------------------------------------------------------------------------
 
 } // namespace util::quantities
-
-
 
 //------------------------------------------------------------------------------
 //---  template implementation
@@ -1124,9 +1106,9 @@ namespace util::quantities::concepts::details {
 
   //----------------------------------------------------------------------------
   template <std::intmax_t Num, std::intmax_t Den>
-  struct invert_ratio<std::ratio<Num, Den>>
-    { using type = std::ratio<Den, Num>; };
-
+  struct invert_ratio<std::ratio<Num, Den>> {
+    using type = std::ratio<Den, Num>;
+  };
 
   //----------------------------------------------------------------------------
   template <std::intmax_t Num, std::intmax_t Den>
@@ -1135,42 +1117,34 @@ namespace util::quantities::concepts::details {
     using type = std::ratio<Num / gcd, Den / gcd>;
   }; // ratio_simplifier
 
-
   //----------------------------------------------------------------------------
   template <typename U, typename Enable = void>
-  struct has_unit_impl: public std::false_type {};
+  struct has_unit_impl : public std::false_type {};
 
   template <typename U>
-  struct has_unit_impl
-    <U, std::enable_if_t<util::always_true_v<typename U::unit_t>>>
-    : public std::true_type
-    {};
+  struct has_unit_impl<U, std::enable_if_t<util::always_true_v<typename U::unit_t>>>
+    : public std::true_type {};
 
   template <typename U>
-  struct has_unit: public has_unit_impl<U> {};
-
+  struct has_unit : public has_unit_impl<U> {};
 
   //----------------------------------------------------------------------------
   template <typename Q>
-  struct is_quantity: public std::false_type {};
+  struct is_quantity : public std::false_type {};
 
   template <typename... Args>
-  struct is_quantity<Quantity<Args...>>: public std::true_type {};
-
+  struct is_quantity<Quantity<Args...>> : public std::true_type {};
 
   //----------------------------------------------------------------------------
   template <typename Q, typename Enable = void>
-  struct has_quantity_impl: public std::false_type {};
+  struct has_quantity_impl : public std::false_type {};
 
   template <typename Q>
-  struct has_quantity_impl
-    <Q, std::enable_if_t<util::always_true_v<typename Q::quantity_t>>>
-    : public std::true_type
-    {};
+  struct has_quantity_impl<Q, std::enable_if_t<util::always_true_v<typename Q::quantity_t>>>
+    : public std::true_type {};
 
   template <typename Q>
-  struct has_quantity: public has_quantity_impl<Q> {};
-
+  struct has_quantity : public has_quantity_impl<Q> {};
 
   //----------------------------------------------------------------------------
   template <typename T, typename = void>
@@ -1181,58 +1155,55 @@ namespace util::quantities::concepts::details {
   template <typename T>
   struct quantity_value_type_impl<
     T,
-    std::enable_if_t
-      <(has_unit_v<T> && util::always_true_v<typename T::value_t>)>
-    >
-  {
+    std::enable_if_t<(has_unit_v<T> && util::always_true_v<typename T::value_t>)>> {
     using type = typename T::value_t;
   }; // quantity_value_type_impl<unit>
 
-
   template <typename T>
-  struct quantity_value_type: quantity_value_type_impl<T> {};
-
+  struct quantity_value_type : quantity_value_type_impl<T> {};
 
   //----------------------------------------------------------------------------
   template <typename T, typename Q>
   struct is_value_compatible_with
-    : std::bool_constant<std::is_convertible_v<T, quantity_value_t<Q>>>
-  {};
+    : std::bool_constant<std::is_convertible_v<T, quantity_value_t<Q>>> {};
 
   //----------------------------------------------------------------------------
   template <typename T, typename U>
-  struct has_value_compatible_with
-    : is_value_compatible_with<quantity_value_t<T>, U>
-  {};
+  struct has_value_compatible_with : is_value_compatible_with<quantity_value_t<T>, U> {};
 
   //----------------------------------------------------------------------------
   /// Limits of a quantity are the same as the underlying type.
   template <typename Q>
-  class numeric_limits: public std::numeric_limits<typename Q::value_t> {
+  class numeric_limits : public std::numeric_limits<typename Q::value_t> {
 
     using quantity_t = Q;
     using value_traits_t = std::numeric_limits<typename quantity_t::value_t>;
 
-      public:
-
-    static constexpr quantity_t min() noexcept
-      { return quantity_t{ value_traits_t::min() }; }
-    static constexpr quantity_t max() noexcept
-      { return quantity_t{ value_traits_t::max() }; }
-    static constexpr quantity_t lowest() noexcept
-      { return quantity_t{ value_traits_t::lowest() }; }
-    static constexpr quantity_t epsilon() noexcept
-      { return quantity_t{ value_traits_t::epsilon() }; }
+  public:
+    static constexpr quantity_t min() noexcept { return quantity_t{value_traits_t::min()}; }
+    static constexpr quantity_t max() noexcept { return quantity_t{value_traits_t::max()}; }
+    static constexpr quantity_t lowest() noexcept { return quantity_t{value_traits_t::lowest()}; }
+    static constexpr quantity_t epsilon() noexcept { return quantity_t{value_traits_t::epsilon()}; }
     static constexpr quantity_t round_error() noexcept
-      { return quantity_t{ value_traits_t::round_error() }; }
+    {
+      return quantity_t{value_traits_t::round_error()};
+    }
     static constexpr quantity_t infinity() noexcept
-      { return quantity_t{ value_traits_t::infinity() }; }
+    {
+      return quantity_t{value_traits_t::infinity()};
+    }
     static constexpr quantity_t quiet_NaN() noexcept
-      { return quantity_t{ value_traits_t::quiet_NaN() }; }
+    {
+      return quantity_t{value_traits_t::quiet_NaN()};
+    }
     static constexpr quantity_t signaling_NaN() noexcept
-      { return quantity_t{ value_traits_t::signaling_NaN() }; }
+    {
+      return quantity_t{value_traits_t::signaling_NaN()};
+    }
     static constexpr quantity_t denorm_min() noexcept
-      { return quantity_t{ value_traits_t::denorm_min() }; }
+    {
+      return quantity_t{value_traits_t::denorm_min()};
+    }
 
   }; // numeric_limits<Quantity>
 
@@ -1240,86 +1211,63 @@ namespace util::quantities::concepts::details {
 
 } // namespace util::quantities::concepts::details
 
-
 //------------------------------------------------------------------------------
 //--- template implementation
 //------------------------------------------------------------------------------
 //--- util::quantities::concepts::Prefix
 //------------------------------------------------------------------------------
 template <typename R>
-constexpr auto util::quantities::concepts::Prefix<R>::names
-  (bool Long /* = false */)
+constexpr auto util::quantities::concepts::Prefix<R>::names(bool Long /* = false */)
 {
-  if constexpr(std::is_same<ratio, std::tera>())
-    return Long? "tera"sv: "T"sv;
-  if constexpr(std::is_same<ratio, std::giga>())
-    return Long? "giga"sv: "G"sv;
-  if constexpr(std::is_same<ratio, std::mega>())
-    return Long? "mega"sv: "M"sv;
-  if constexpr(std::is_same<ratio, std::kilo>())
-    return Long? "kilo"sv: "k"sv;
-  if constexpr(std::is_same<ratio, std::ratio<1>>())
-    return ""sv;
-  if constexpr(std::is_same<ratio, std::deci>())
-    return Long? "deci"sv: "d"sv;
-  if constexpr(std::is_same<ratio, std::centi>())
-    return Long? "centi"sv: "c"sv;
-  if constexpr(std::is_same<ratio, std::milli>())
-    return Long? "milli"sv: "m"sv;
-  if constexpr(std::is_same<ratio, std::micro>())
-    return Long? "micro"sv: "u"sv;
-  if constexpr(std::is_same<ratio, std::nano>())
-    return Long? "nano"sv:  "n"sv;
-  if constexpr(std::is_same<ratio, std::pico>())
-    return Long? "pico"sv:  "p"sv;
-  if constexpr(std::is_same<ratio, std::femto>())
-    return Long? "femto"sv: "f"sv;
+  if constexpr (std::is_same<ratio, std::tera>()) return Long ? "tera"sv : "T"sv;
+  if constexpr (std::is_same<ratio, std::giga>()) return Long ? "giga"sv : "G"sv;
+  if constexpr (std::is_same<ratio, std::mega>()) return Long ? "mega"sv : "M"sv;
+  if constexpr (std::is_same<ratio, std::kilo>()) return Long ? "kilo"sv : "k"sv;
+  if constexpr (std::is_same<ratio, std::ratio<1>>()) return ""sv;
+  if constexpr (std::is_same<ratio, std::deci>()) return Long ? "deci"sv : "d"sv;
+  if constexpr (std::is_same<ratio, std::centi>()) return Long ? "centi"sv : "c"sv;
+  if constexpr (std::is_same<ratio, std::milli>()) return Long ? "milli"sv : "m"sv;
+  if constexpr (std::is_same<ratio, std::micro>()) return Long ? "micro"sv : "u"sv;
+  if constexpr (std::is_same<ratio, std::nano>()) return Long ? "nano"sv : "n"sv;
+  if constexpr (std::is_same<ratio, std::pico>()) return Long ? "pico"sv : "p"sv;
+  if constexpr (std::is_same<ratio, std::femto>()) return Long ? "femto"sv : "f"sv;
   // TODO complete the long list of prefixes
 
   // backup; can't use `to_string()` because of `constexpr` requirement
-  return Long? "???"sv:  "?"sv;
+  return Long ? "???"sv : "?"sv;
 } // util::quantities::concepts::Prefix<R>::names()
-
 
 //------------------------------------------------------------------------------
 //---  util::quantities::concepts::Quantity
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr auto util::quantities::concepts::Quantity<U, T>::operator+
-  (Quantity<OU, OT> const other) const
-  -> quantity_t
+constexpr auto util::quantities::concepts::Quantity<U, T>::operator+(
+  Quantity<OU, OT> const other) const -> quantity_t
 {
   static_assert(std::is_same<Quantity<OU, OT>, quantity_t>(),
-    "Only quantities with exactly the same unit can be added."
-    );
+                "Only quantities with exactly the same unit can be added.");
   return quantity_t(value() + other.value());
 } // util::quantities::concepts::Quantity<>::operator+
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr auto util::quantities::concepts::Quantity<U, T>::operator-
-  (Quantity<OU, OT> const other) const
-  -> quantity_t
+constexpr auto util::quantities::concepts::Quantity<U, T>::operator-(
+  Quantity<OU, OT> const other) const -> quantity_t
 {
   static_assert(std::is_same<Quantity<OU, OT>, quantity_t>(),
-    "Only quantities with exactly the same unit can be subtracted."
-    );
+                "Only quantities with exactly the same unit can be subtracted.");
   return quantity_t(value() - other.value());
 } // util::quantities::concepts::Quantity<>::operator+
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr auto util::quantities::concepts::Quantity<U, T>::plus
-  (Quantity<OU, OT> const other) const
+constexpr auto util::quantities::concepts::Quantity<U, T>::plus(Quantity<OU, OT> const other) const
   -> quantity_t
 {
-  static_assert
-    (sameBaseUnitAs<OU>(), "Can't add quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't add quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, add
   if constexpr (sameUnitAs<OU>()) {
@@ -1332,16 +1280,13 @@ constexpr auto util::quantities::concepts::Quantity<U, T>::plus
   }
 } // util::quantities::concepts::Quantity<>::operator+()
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr auto util::quantities::concepts::Quantity<U, T>::minus
-  (Quantity<OU, OT> const other) const
+constexpr auto util::quantities::concepts::Quantity<U, T>::minus(Quantity<OU, OT> const other) const
   -> quantity_t
 {
-  static_assert
-   (sameBaseUnitAs<OU>(), "Can't subtract quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't subtract quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, add
   if constexpr (sameUnitAs<OU>()) {
@@ -1354,37 +1299,29 @@ constexpr auto util::quantities::concepts::Quantity<U, T>::minus
   }
 } // util::quantities::concepts::Quantity<>::minus()
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr auto util::quantities::concepts::Quantity<U, T>::operator/
-  (Quantity<OU, OT> const q) const
+constexpr auto util::quantities::concepts::Quantity<U, T>::operator/(Quantity<OU, OT> const q) const
   -> value_t
 {
-  static_assert
-    (sameBaseUnitAs<OU>(), "Can't divide quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't divide quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, divide
-  if constexpr (sameUnitAs<OU>()) {
-    return value() / q.value();
-  }
+  if constexpr (sameUnitAs<OU>()) { return value() / q.value(); }
   else {
     // otherwise, they have same base unit but different scale: convert `other`
     return (*this) / quantity_t(q);
   }
 } // util::quantities::concepts::Quantity<>::operator/(Quantity)
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-auto util::quantities::concepts::Quantity<U, T>::operator+=
-  (Quantity<OU, OT> const other)
+auto util::quantities::concepts::Quantity<U, T>::operator+=(Quantity<OU, OT> const other)
   -> quantity_t&
 {
-  static_assert
-    (sameBaseUnitAs<OU>(), "Can't add quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't add quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, add
   if constexpr (sameUnitAs<OU>()) {
@@ -1397,17 +1334,13 @@ auto util::quantities::concepts::Quantity<U, T>::operator+=
   }
 } // util::quantities::concepts::Quantity<>::operator+=()
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-auto util::quantities::concepts::Quantity<U, T>::operator-=
-  (Quantity<OU, OT> const other)
+auto util::quantities::concepts::Quantity<U, T>::operator-=(Quantity<OU, OT> const other)
   -> quantity_t&
 {
-  static_assert(sameBaseUnitAs<OU>(),
-    "Can't subtract quantities with different base unit"
-    );
+  static_assert(sameBaseUnitAs<OU>(), "Can't subtract quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, add
   if constexpr (sameUnitAs<OU>()) {
@@ -1420,126 +1353,101 @@ auto util::quantities::concepts::Quantity<U, T>::operator-=
   }
 } // util::quantities::concepts::Quantity<>::operator-=()
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr bool util::quantities::concepts::Quantity<U, T>::operator==
-  (Quantity<OU, OT> const other) const
+constexpr bool util::quantities::concepts::Quantity<U, T>::operator==(
+  Quantity<OU, OT> const other) const
 {
-  static_assert
-    (sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, just compare the values
-  if constexpr (sameUnitAs<OU>()) {
-    return value() == other.value();
-  }
+  if constexpr (sameUnitAs<OU>()) { return value() == other.value(); }
   else {
     // otherwise, they have same base unit but different scale: convert `other`
     return *this == quantity_t(other);
   }
 } // util::quantities::concepts::Quantity<>::operator==()
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr bool util::quantities::concepts::Quantity<U, T>::operator!=
-  (Quantity<OU, OT> const other) const
+constexpr bool util::quantities::concepts::Quantity<U, T>::operator!=(
+  Quantity<OU, OT> const other) const
 {
-  static_assert
-    (sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, just compare the values
-  if constexpr (sameUnitAs<OU>()) {
-    return value() != other.value();
-  }
+  if constexpr (sameUnitAs<OU>()) { return value() != other.value(); }
   else {
     // otherwise, they have same base unit but different scale: convert `other`
     return *this != quantity_t(other);
   }
 } // util::quantities::concepts::Quantity<>::operator!=()
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr bool util::quantities::concepts::Quantity<U, T>::operator<=
-  (Quantity<OU, OT> const other) const
+constexpr bool util::quantities::concepts::Quantity<U, T>::operator<=(
+  Quantity<OU, OT> const other) const
 {
-  static_assert
-    (sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, just compare the values
-  if constexpr (sameUnitAs<OU>()) {
-    return value() <= other.value();
-  }
+  if constexpr (sameUnitAs<OU>()) { return value() <= other.value(); }
   else {
     // otherwise, they have same base unit but different scale: convert `other`
     return *this <= quantity_t(other);
   }
 } // util::quantities::concepts::Quantity<>::operator<=()
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr bool util::quantities::concepts::Quantity<U, T>::operator>=
-  (Quantity<OU, OT> const other) const
+constexpr bool util::quantities::concepts::Quantity<U, T>::operator>=(
+  Quantity<OU, OT> const other) const
 {
-  static_assert
-    (sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, just compare the values
-  if constexpr (sameUnitAs<OU>()) {
-    return value() >= other.value();
-  }
+  if constexpr (sameUnitAs<OU>()) { return value() >= other.value(); }
   else {
     // otherwise, they have same base unit but different scale: convert `other`
     return *this >= quantity_t(other);
   }
 } // util::quantities::concepts::Quantity<>::operator>=()
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr bool util::quantities::concepts::Quantity<U, T>::operator<
-  (Quantity<OU, OT> const other) const
+constexpr bool util::quantities::concepts::Quantity<U, T>::operator<(
+  Quantity<OU, OT> const other) const
 {
-  static_assert
-    (sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, just compare the values
-  if constexpr (sameUnitAs<OU>()) {
-    return value() < other.value();
-  }
+  if constexpr (sameUnitAs<OU>()) { return value() < other.value(); }
   else {
     // otherwise, they have same base unit but different scale: convert `other`
     return *this < quantity_t(other);
   }
 } // util::quantities::concepts::Quantity<>::operator<()
 
-
 //------------------------------------------------------------------------------
 template <typename U, typename T>
 template <typename OU, typename OT>
-constexpr bool util::quantities::concepts::Quantity<U, T>::operator>
-  (Quantity<OU, OT> const other) const
+constexpr bool util::quantities::concepts::Quantity<U, T>::operator>(
+  Quantity<OU, OT> const other) const
 {
-  static_assert
-    (sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
+  static_assert(sameBaseUnitAs<OU>(), "Can't compare quantities with different base unit");
 
   // if the two quantities have the same *scaled* unit, just compare the values
-  if constexpr (sameUnitAs<OU>()) {
-    return value() > other.value();
-  }
+  if constexpr (sameUnitAs<OU>()) { return value() > other.value(); }
   else {
     // otherwise, they have same base unit but different scale: convert `other`
     return *this > quantity_t(other);
   }
 } // util::quantities::concepts::Quantity<>::operator>()
-
 
 //------------------------------------------------------------------------------
 namespace util::quantities::details {
@@ -1556,17 +1464,16 @@ namespace util::quantities::details {
    *                             (including an unrecognised unit prefix)
    */
   template <typename Quantity>
-  std::pair<std::string, typename Quantity::value_t> readUnit
-    (std::string const& str, bool unitOptional = false);
+  std::pair<std::string, typename Quantity::value_t> readUnit(std::string const& str,
+                                                              bool unitOptional = false);
 
 } // util::quantities::details
 
-
 //------------------------------------------------------------------------------
 template <typename Quantity>
-std::pair<std::string, typename Quantity::value_t>
-util::quantities::details::readUnit
-  (std::string const& str, bool unitOptional /* = false */)
+std::pair<std::string, typename Quantity::value_t> util::quantities::details::readUnit(
+  std::string const& str,
+  bool unitOptional /* = false */)
 {
   using Quantity_t = Quantity;
   using value_t = typename Quantity_t::value_t;
@@ -1578,51 +1485,47 @@ util::quantities::details::readUnit
 
   using PrefixMap_t = std::map<std::string, value_t>;
   using PrefixValue_t = typename PrefixMap_t::value_type;
-  static PrefixMap_t const factors {
-    PrefixValue_t{ "a"s,  1e-18 },
-    PrefixValue_t{ "f"s,  1e-15 },
-    PrefixValue_t{ "p"s,  1e-12 },
-    PrefixValue_t{ "n"s,  1e-09 },
-    PrefixValue_t{ "u"s,  1e-06 },
-    PrefixValue_t{ "m"s,  1e-03 },
-    PrefixValue_t{ "c"s,  1e-02 },
-    PrefixValue_t{ "d"s,  1e-01 },
-    PrefixValue_t{ ""s,   1e+00 },
-    PrefixValue_t{ "da"s, 1e+01 },
-    PrefixValue_t{ "h"s,  1e+02 },
-    PrefixValue_t{ "k"s,  1e+03 },
-    PrefixValue_t{ "M"s,  1e+06 },
-    PrefixValue_t{ "G"s,  1e+09 },
-    PrefixValue_t{ "T"s,  1e+12 },
-    PrefixValue_t{ "P"s,  1e+15 },
-    PrefixValue_t{ "E"s,  1e+18 }
-  }; // factors
-  static auto const composePrefixPattern = [](auto b, auto e) -> std::string
-    {
-      std::string pattern = "(";
-      if (b != e) {
+  static PrefixMap_t const factors{PrefixValue_t{"a"s, 1e-18},
+                                   PrefixValue_t{"f"s, 1e-15},
+                                   PrefixValue_t{"p"s, 1e-12},
+                                   PrefixValue_t{"n"s, 1e-09},
+                                   PrefixValue_t{"u"s, 1e-06},
+                                   PrefixValue_t{"m"s, 1e-03},
+                                   PrefixValue_t{"c"s, 1e-02},
+                                   PrefixValue_t{"d"s, 1e-01},
+                                   PrefixValue_t{""s, 1e+00},
+                                   PrefixValue_t{"da"s, 1e+01},
+                                   PrefixValue_t{"h"s, 1e+02},
+                                   PrefixValue_t{"k"s, 1e+03},
+                                   PrefixValue_t{"M"s, 1e+06},
+                                   PrefixValue_t{"G"s, 1e+09},
+                                   PrefixValue_t{"T"s, 1e+12},
+                                   PrefixValue_t{"P"s, 1e+15},
+                                   PrefixValue_t{"E"s, 1e+18}}; // factors
+  static auto const composePrefixPattern = [](auto b, auto e) -> std::string {
+    std::string pattern = "(";
+    if (b != e) {
+      pattern += b->first;
+      while (++b != e) {
+        pattern += '|';
         pattern += b->first;
-        while (++b != e) { pattern += '|'; pattern += b->first; }
       }
-      return pattern += ")";
-    };
-  static std::string const prefixPattern
-    = composePrefixPattern(factors.begin(), factors.end());
+    }
+    return pattern += ")";
+  };
+  static std::string const prefixPattern = composePrefixPattern(factors.begin(), factors.end());
   // --- END -- static initialization ------------------------------------------
 
-  std::regex const unitPattern {
-    "[[:blank:]]*(" + prefixPattern + "?"
-    + util::to_string(baseunit_t::symbol) + ")[[:blank:]]*$"
-    };
+  std::regex const unitPattern{"[[:blank:]]*(" + prefixPattern + "?" +
+                               util::to_string(baseunit_t::symbol) + ")[[:blank:]]*$"};
 
   std::smatch unitMatch;
   if (!std::regex_search(str, unitMatch, unitPattern)) {
     if (!unitOptional) {
-      throw MissingUnit("Unit is mandatory and must derive from '"
-        + util::to_string(baseunit_t::symbol) + "' (parsing: '" + str + "')"
-        );
+      throw MissingUnit("Unit is mandatory and must derive from '" +
+                        util::to_string(baseunit_t::symbol) + "' (parsing: '" + str + "')");
     }
-    return { str, value_t{ 1 } };
+    return {str, value_t{1}};
   }
 
   //
@@ -1632,25 +1535,18 @@ util::quantities::details::readUnit
   // " 7 cm " => [0] full match (" cm ") [1] unit ("cm") [2] unit prefix ("c")
   auto const iFactor = factors.find(unitMatch.str(2U));
   if (iFactor == factors.end()) {
-    throw InvalidUnitPrefix(
-      "Unit '" + unitMatch.str(1U)
-      + "' has unsupported prefix '" + unitMatch.str(2U)
-      + "' (parsing '" + str + "')"
-      );
+    throw InvalidUnitPrefix("Unit '" + unitMatch.str(1U) + "' has unsupported prefix '" +
+                            unitMatch.str(2U) + "' (parsing '" + str + "')");
   }
 
-  return {
-    str.substr(0U, str.length() - unitMatch.length()),
-    static_cast<value_t>(unit_t::scale(iFactor->second))
-    };
+  return {str.substr(0U, str.length() - unitMatch.length()),
+          static_cast<value_t>(unit_t::scale(iFactor->second))};
 
 } // util::quantities::details::readUnit()
 
-
 //------------------------------------------------------------------------------
 template <typename Quantity>
-Quantity util::quantities::makeQuantity
-  (std::string const& s, bool unitOptional /* = false */)
+Quantity util::quantities::makeQuantity(std::string const& s, bool unitOptional /* = false */)
 {
   //
   // all this function is horrible;
@@ -1658,21 +1554,19 @@ Quantity util::quantities::makeQuantity
   //
   using value_t = typename Quantity::value_t;
 
-  auto const [ num_s, factor ] = details::readUnit<Quantity>(s, unitOptional);
+  auto const [num_s, factor] = details::readUnit<Quantity>(s, unitOptional);
 
   char* parseEnd = nullptr;
-  auto const value
-    = static_cast<value_t>(std::strtod(num_s.c_str(), &parseEnd));
+  auto const value = static_cast<value_t>(std::strtod(num_s.c_str(), &parseEnd));
   const char* send = num_s.c_str() + num_s.length();
   if (parseEnd == num_s.c_str()) {
     throw ValueError("Could not convert '" + num_s + "' into a number!");
   }
   while (parseEnd != send) {
     if (!std::isblank(static_cast<unsigned char>(*parseEnd))) {
-      throw ExtraCharactersError("Spurious characters after value "
-        + std::to_string(value) + " in '" + num_s + "' ('"
-        + std::string(parseEnd, send - parseEnd) + "')\n"
-        );
+      throw ExtraCharactersError("Spurious characters after value " + std::to_string(value) +
+                                 " in '" + num_s + "' ('" + std::string(parseEnd, send - parseEnd) +
+                                 "')\n");
     }
     ++parseEnd;
   } // while
@@ -1680,29 +1574,22 @@ Quantity util::quantities::makeQuantity
   //
   // create and return the quantity
   //
-  return Quantity{ static_cast<value_t>(value * factor) };
+  return Quantity{static_cast<value_t>(value * factor)};
 } // util::quantities::makeQuantity(string_view)
-
 
 //------------------------------------------------------------------------------
 template <typename Quantity>
-Quantity util::quantities::makeQuantity
-  (std::string_view s, bool unitOptional /* = false */)
+Quantity util::quantities::makeQuantity(std::string_view s, bool unitOptional /* = false */)
 {
-  return util::quantities::makeQuantity<Quantity>
-    (std::string{ s.begin(), s.end() }, unitOptional);
+  return util::quantities::makeQuantity<Quantity>(std::string{s.begin(), s.end()}, unitOptional);
 } // util::quantities::makeQuantity(string_view)
-
 
 //------------------------------------------------------------------------------
 template <typename Quantity>
-Quantity util::quantities::makeQuantity
-  (char const* s, bool unitOptional /* = false */)
+Quantity util::quantities::makeQuantity(char const* s, bool unitOptional /* = false */)
 {
-  return
-    util::quantities::makeQuantity<Quantity>(std::string_view{s}, unitOptional);
+  return util::quantities::makeQuantity<Quantity>(std::string_view{s}, unitOptional);
 } // util::quantities::makeQuantity(string)
-
 
 //------------------------------------------------------------------------------
 //---  Standard library extensions
@@ -1713,51 +1600,43 @@ namespace std {
   /// Hash function of a quantity is delegated to its value
   template <typename... Args>
   struct hash<util::quantities::concepts::Quantity<Args...>> {
-      private:
+  private:
     using quantity_t = util::quantities::concepts::Quantity<Args...>;
     using value_t = typename quantity_t::value_t;
 
-      public:
+  public:
     constexpr auto operator()(quantity_t key) const
       noexcept(noexcept(std::hash<value_t>()(key.value())))
-      { return std::hash<value_t>()(key.value()); }
+    {
+      return std::hash<value_t>()(key.value());
+    }
   };
-
 
   // ---------------------------------------------------------------------------
   /// Limits of a quantity are the same as the underlying type.
   template <typename Unit, typename T>
   class numeric_limits<util::quantities::concepts::Quantity<Unit, T>>
-    : public util::quantities::concepts::details::numeric_limits
-      <util::quantities::concepts::Quantity<Unit, T>>
-  {};
+    : public util::quantities::concepts::details::numeric_limits<
+        util::quantities::concepts::Quantity<Unit, T>> {};
 
   template <typename Unit, typename T>
-  class numeric_limits
-    <util::quantities::concepts::Quantity<Unit, T> const>
-    : public util::quantities::concepts::details::numeric_limits
-      <util::quantities::concepts::Quantity<Unit, T> const>
-  {};
+  class numeric_limits<util::quantities::concepts::Quantity<Unit, T> const>
+    : public util::quantities::concepts::details::numeric_limits<
+        util::quantities::concepts::Quantity<Unit, T> const> {};
 
   template <typename Unit, typename T>
-  class numeric_limits
-    <util::quantities::concepts::Quantity<Unit, T> volatile>
-    : public util::quantities::concepts::details::numeric_limits
-      <util::quantities::concepts::Quantity<Unit, T> volatile>
-  {};
+  class numeric_limits<util::quantities::concepts::Quantity<Unit, T> volatile>
+    : public util::quantities::concepts::details::numeric_limits<
+        util::quantities::concepts::Quantity<Unit, T> volatile> {};
 
   template <typename Unit, typename T>
-  class numeric_limits
-    <util::quantities::concepts::Quantity<Unit, T> const volatile>
-    : public util::quantities::concepts::details::numeric_limits
-      <util::quantities::concepts::Quantity<Unit, T> const volatile>
-  {};
-
+  class numeric_limits<util::quantities::concepts::Quantity<Unit, T> const volatile>
+    : public util::quantities::concepts::details::numeric_limits<
+        util::quantities::concepts::Quantity<Unit, T> const volatile> {};
 
   // ---------------------------------------------------------------------------
 
 } // namespace std
-
 
 //------------------------------------------------------------------------------
 

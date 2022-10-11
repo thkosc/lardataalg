@@ -9,11 +9,11 @@
 #include "larcorealg/CoreUtils/RealComparisons.h"
 #include "larcorealg/Geometry/ChannelMapStandardAlg.h"
 #include "larcorealg/Geometry/GeometryCore.h"
+#include "larcorealg/TestUtils/geometry_unit_test_base.h"
 #include "lardataalg/DetectorInfo/DetectorClocksStandardTestHelpers.h"
 #include "lardataalg/DetectorInfo/DetectorPropertiesStandard.h"
 #include "lardataalg/DetectorInfo/DetectorPropertiesStandardTestHelpers.h"
 #include "lardataalg/DetectorInfo/LArPropertiesStandardTestHelpers.h"
-#include "larcorealg/TestUtils/geometry_unit_test_base.h"
 
 // C/C++ standard libraries
 #include <array>
@@ -54,8 +54,7 @@ using TestEnvironment = testing::GeometryTesterEnvironment<TesterConfiguration>;
  *
  */
 //------------------------------------------------------------------------------
-int
-main(int argc, char const** argv)
+int main(int argc, char const** argv)
 {
 
   TesterConfiguration config("detp_test");
@@ -123,8 +122,10 @@ main(int argc, char const** argv)
                                << " kV/cm"
                                << "\nSampling rate:       " << TDCtick << " ns"
                                << "\nArgon temperature:   " << detp.Temperature() << " K"
-                               << "\nArgon density:       " << detp.Density() << " kg/dm^3 (at " << detp.Temperature() << " K)"
-                               << "\nArgon density:       " << detp.Density(87.0) << " kg/dm^3 (at 87 K)"
+                               << "\nArgon density:       " << detp.Density() << " kg/dm^3 (at "
+                               << detp.Temperature() << " K)"
+                               << "\nArgon density:       " << detp.Density(87.0)
+                               << " kg/dm^3 (at 87 K)"
                                << "\nDrift velocity:      " << driftVelocity << " cm/us"
                                << "\nReadout window:      " << nReadoutWindowTicks << " ticks ("
                                << (nReadoutWindowTicks * TDCtick / 1000) << " us)"

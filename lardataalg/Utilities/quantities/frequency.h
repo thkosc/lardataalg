@@ -25,14 +25,12 @@
 #define LARDATAALG_UTILITIES_QUANTITIES_FREQUENCY_H
 
 // LArSoft libraries
-#include "lardataalg/Utilities/quantities/spacetime.h" // ...::units::Second
 #include "lardataalg/Utilities/quantities.h"
-
+#include "lardataalg/Utilities/quantities/spacetime.h" // ...::units::Second
 
 // C/C++ standard libraries
-#include <string_view>
 #include <ratio>
-
+#include <string_view>
 
 //------------------------------------------------------------------------------
 namespace util::quantities {
@@ -41,13 +39,12 @@ namespace util::quantities {
 
     using namespace std::string_view_literals; // for operator""sv()
 
-    struct Hertz: public concepts::UnitBase {
+    struct Hertz : public concepts::UnitBase {
       static constexpr auto symbol = "Hz"sv;
-      static constexpr auto name   = "hertz"sv;
+      static constexpr auto name = "hertz"sv;
     };
 
   } // namespace units
-
 
   // -- BEGIN Frequency --------------------------------------------------------
   /**
@@ -110,7 +107,6 @@ namespace util::quantities {
   /// Type of frequency stored in gigahertz, in double precision.
   using gigahertz = gigahertz_as<>;
 
-
   /**
    * @brief Literal constants for frequency quantities.
    *
@@ -131,42 +127,44 @@ namespace util::quantities {
 
     // @{
     /// Literal hertz value.
-    constexpr hertz operator""_Hz (long double v)
-      { return hertz{ static_cast<double>(v) }; }
-    constexpr hertz operator""_Hz (unsigned long long int v)
-      { return hertz{ static_cast<double>(v) }; }
+    constexpr hertz operator""_Hz(long double v) { return hertz{static_cast<double>(v)}; }
+    constexpr hertz operator""_Hz(unsigned long long int v)
+    {
+      return hertz{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal kilohertz value.
-    constexpr kilohertz operator""_kHz (long double v)
-      { return kilohertz{ static_cast<double>(v) }; }
-    constexpr kilohertz operator""_kHz (unsigned long long int v)
-      { return kilohertz{ static_cast<double>(v) }; }
+    constexpr kilohertz operator""_kHz(long double v) { return kilohertz{static_cast<double>(v)}; }
+    constexpr kilohertz operator""_kHz(unsigned long long int v)
+    {
+      return kilohertz{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal megahertz value.
-    constexpr megahertz operator""_MHz (long double v)
-      { return megahertz{ static_cast<double>(v) }; }
-    constexpr megahertz operator""_MHz (unsigned long long int v)
-      { return megahertz{ static_cast<double>(v) }; }
+    constexpr megahertz operator""_MHz(long double v) { return megahertz{static_cast<double>(v)}; }
+    constexpr megahertz operator""_MHz(unsigned long long int v)
+    {
+      return megahertz{static_cast<double>(v)};
+    }
     // @}
 
     // @{
     /// Literal gigahertz value.
-    constexpr gigahertz operator""_GHz (long double v)
-      { return gigahertz{ static_cast<double>(v) }; }
-    constexpr gigahertz operator""_GHz (unsigned long long int v)
-      { return gigahertz{ static_cast<double>(v) }; }
+    constexpr gigahertz operator""_GHz(long double v) { return gigahertz{static_cast<double>(v)}; }
+    constexpr gigahertz operator""_GHz(unsigned long long int v)
+    {
+      return gigahertz{static_cast<double>(v)};
+    }
     // @}
 
   } // namespace frequency_literals
 
-
   /// @}
   // -- END Frequency ----------------------------------------------------------
-
 
   // -- BEGIN Special operations between Second and Hertz units ----------------
   /**
@@ -195,20 +193,16 @@ namespace util::quantities {
      *
      */
     template <typename TR, typename TT, typename FR, typename FT>
-    constexpr auto operator*(
-      scaled_quantity<util::quantities::units::Second, TR, TT> t,
-      scaled_quantity<util::quantities::units::Hertz, FR, FT> f
-      )
-      -> decltype(std::declval<TT>() * std::declval<FT>())
-      ;
+    constexpr auto operator*(scaled_quantity<util::quantities::units::Second, TR, TT> t,
+                             scaled_quantity<util::quantities::units::Hertz, FR, FT> f)
+      -> decltype(std::declval<TT>() * std::declval<FT>());
     template <typename FR, typename FT, typename TR, typename TT>
-    constexpr auto operator*(
-      scaled_quantity<util::quantities::units::Hertz, FR, FT> f,
-      scaled_quantity<util::quantities::units::Second, TR, TT> t
-      )
-      { return t * f; }
+    constexpr auto operator*(scaled_quantity<util::quantities::units::Hertz, FR, FT> f,
+                             scaled_quantity<util::quantities::units::Second, TR, TT> t)
+    {
+      return t * f;
+    }
     //@}
-
 
     /**
      * @brief Returns a frequency as the inverse of a time.
@@ -224,16 +218,9 @@ namespace util::quantities {
      * `util::quantities::kilohertz`).
      */
     template <typename T, typename TR, typename TT>
-    constexpr auto operator/(T v, scaled_second<TR, TT> t)
-      -> std::enable_if_t<
-        std::is_convertible_v<T, TT>,
-        scaled_hertz<
-          details::invert_t<TR>,
-          decltype(std::declval<T>() / std::declval<TT>())
-        >
-        >
-      ;
-
+    constexpr auto operator/(T v, scaled_second<TR, TT> t) -> std::enable_if_t<
+      std::is_convertible_v<T, TT>,
+      scaled_hertz<details::invert_t<TR>, decltype(std::declval<T>() / std::declval<TT>())>>;
 
     /**
      * @brief Returns a time as the inverse of a frequency.
@@ -249,22 +236,14 @@ namespace util::quantities {
      * `util::quantities::millisecond`).
      */
     template <typename T, typename FR, typename FT>
-    constexpr auto operator/(T v, scaled_hertz<FR, FT> f)
-      -> std::enable_if_t<
-        std::is_convertible_v<T, FT>,
-        scaled_second<
-          details::invert_t<FR>,
-          decltype(std::declval<T>() / std::declval<FT>())
-        >
-        >
-      ;
-
+    constexpr auto operator/(T v, scaled_hertz<FR, FT> f) -> std::enable_if_t<
+      std::is_convertible_v<T, FT>,
+      scaled_second<details::invert_t<FR>, decltype(std::declval<T>() / std::declval<FT>())>>;
 
   } // namespace concepts
 
   /// @}
   // -- END Special operations between Second and Hertz units ------------------
-
 
 } // namespace util::quantities
 
@@ -273,51 +252,36 @@ namespace util::quantities {
 template <typename TR, typename TT, typename FR, typename FT>
 constexpr auto util::quantities::concepts::operator*(
   scaled_quantity<util::quantities::units::Second, TR, TT> t,
-  scaled_quantity<util::quantities::units::Hertz, FR, FT> f
-  )
+  scaled_quantity<util::quantities::units::Hertz, FR, FT> f)
   -> decltype(std::declval<TT>() * std::declval<FT>())
 {
-  return details::applyRatioToValue<simplified_ratio_multiply<TR, FR> >
-    (t.value() * f.value());
+  return details::applyRatioToValue<simplified_ratio_multiply<TR, FR>>(t.value() * f.value());
 } // util::quantities::operator*(Second, Hertz)
-
 
 //------------------------------------------------------------------------------
 template <typename T, typename TR, typename TT>
-constexpr auto util::quantities::concepts::operator/
-  (T v, scaled_second<TR, TT> t)
+constexpr auto util::quantities::concepts::operator/(T v, scaled_second<TR, TT> t)
   -> std::enable_if_t<
     std::is_convertible_v<T, TT>,
-    scaled_hertz
-      <details::invert_t<TR>, decltype(std::declval<T>() / std::declval<TT>())>
-    >
+    scaled_hertz<details::invert_t<TR>, decltype(std::declval<T>() / std::declval<TT>())>>
 {
-  return scaled_hertz
-    <details::invert_t<TR>, decltype(std::declval<T>() / std::declval<TT>())>
-    ::castFrom(v / t.value());
+  return scaled_hertz<details::invert_t<TR>,
+                      decltype(std::declval<T>() / std::declval<TT>())>::castFrom(v / t.value());
 } // util::quantities::operator/(Second)
-
 
 //------------------------------------------------------------------------------
 template <typename T, typename FR, typename FT>
-constexpr auto util::quantities::concepts::operator/
-  (T v, scaled_hertz<FR, FT> f)
+constexpr auto util::quantities::concepts::operator/(T v, scaled_hertz<FR, FT> f)
   -> std::enable_if_t<
     std::is_convertible_v<T, FT>,
-    scaled_second
-      <details::invert_t<FR>, decltype(std::declval<T>() / std::declval<FT>())>
-    >
+    scaled_second<details::invert_t<FR>, decltype(std::declval<T>() / std::declval<FT>())>>
 {
-  return scaled_second
-    <details::invert_t<FR>, decltype(std::declval<T>() / std::declval<FT>())>
-    ::castFrom( v / f.value() );
+  return scaled_second<details::invert_t<FR>,
+                       decltype(std::declval<T>() / std::declval<FT>())>::castFrom(v / f.value());
 } // util::quantities::operator/(Hertz)
 
-
 //------------------------------------------------------------------------------
 
-
 //------------------------------------------------------------------------------
-
 
 #endif // LARDATAALG_UTILITIES_QUANTITIES_FREQUENCY_H

@@ -17,7 +17,6 @@
 // C/C++ standard libraries
 #include <string>
 
-
 namespace sim {
 
   /// @{
@@ -31,17 +30,15 @@ namespace sim {
 
   /// @}
 
-
   /// @{
   /// @name Functions to name `simb::MCTruth` enumerators and codes.
-  
+
   /// Possible sources of rescattering code (which is generator-dependent).
   enum class RescatterCategory {
     GENIE_INukeFateHA, ///< GENIE `genie::EINukeFateHA_t`
     LArSoftDefault = GENIE_INukeFateHA
   };
-  
-  
+
   /// Returns a string representing the specified process origin.
   std::string TruthOriginName(simb::Origin_t origin);
 
@@ -68,16 +65,13 @@ namespace sim {
    * code is unassigned by the generator, it will default to
    * `simb::MCParticle::s_uninitialized`.
    */
-  std::string RescatteringName
-    (int code, RescatterCategory cat = RescatterCategory::LArSoftDefault);
+  std::string RescatteringName(int code, RescatterCategory cat = RescatterCategory::LArSoftDefault);
 
   /// Description of a rescattering code from GENIE `INukeFateHA_t`.
   std::string GENIE_INukeFateHA_RescatteringName(int code);
-  
+
   /// @}
 
-
 } // namespace sim
-
 
 #endif // LARDATAALG_MCDUMPERS_MCDUMPERUTILS_H

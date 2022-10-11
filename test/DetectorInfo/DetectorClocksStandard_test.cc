@@ -43,8 +43,7 @@ using TestEnvironment = testing::TesterEnvironment<testing::BasicEnvironmentConf
  *
  */
 //------------------------------------------------------------------------------
-int
-main(int argc, char const** argv)
+int main(int argc, char const** argv)
 {
 
   testing::BasicEnvironmentConfiguration config("clocks_test");
@@ -84,8 +83,8 @@ main(int argc, char const** argv)
   // this is the right way to go.
   auto const* detClocks = TestEnv.Provider<detinfo::DetectorClocks>();
   auto const& detClocksData = detClocks->DataForJob();
-  mf::LogVerbatim("clocks_test")
-    << "TPC clock frame: " << detClocksData.TPCClock().FramePeriod() << " us";
+  mf::LogVerbatim("clocks_test") << "TPC clock frame: " << detClocksData.TPCClock().FramePeriod()
+                                 << " us";
 
   detClocksData.debugReport(std::cout);
 

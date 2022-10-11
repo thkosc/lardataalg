@@ -10,7 +10,7 @@
 // Define the following non-zero to exclude include code that is required
 // not to be compilable
 #ifndef PROVIDERPACK_TEST_SKIP_COMPILATION_ERRORS
-#  define PROVIDERPACK_TEST_SKIP_COMPILATION_ERRORS 1
+#define PROVIDERPACK_TEST_SKIP_COMPILATION_ERRORS 1
 #endif // !PROVIDERPACK_TEST_SKIP_COMPILATION_ERRORS
 
 // Boost libraries
@@ -23,25 +23,24 @@
  * This also makes fairly complicate to receive parameters from the command line
  * (for example, a random seed).
  */
-#define BOOST_TEST_MODULE ( ProviderPack_test )
+#define BOOST_TEST_MODULE (ProviderPack_test)
 #include <boost/test/unit_test.hpp>
 
 // LArSoft libraries
 #include "lardata/DetectorInfo/ProviderPack.h"
 
 // C/C++ standard libraries
-#include <string>
 #include <ostream>
+#include <string>
 
 namespace svc {
 
   /// A service provider class
   struct ProviderA {
 
-    ProviderA(): count(max_count++) {}
+    ProviderA() : count(max_count++) {}
 
-    operator std::string() const
-      { return "ProviderA[" + std::to_string(count) + "]"; }
+    operator std::string() const { return "ProviderA[" + std::to_string(count) + "]"; }
 
     unsigned int count;
 
@@ -52,10 +51,9 @@ namespace svc {
   /// A service provider class
   struct ProviderB {
 
-    ProviderB(): count(max_count++) {}
+    ProviderB() : count(max_count++) {}
 
-    operator std::string() const
-      { return "ProviderB[" + std::to_string(count) + "]"; }
+    operator std::string() const { return "ProviderB[" + std::to_string(count) + "]"; }
 
     unsigned int count;
 
@@ -66,10 +64,9 @@ namespace svc {
   /// A service provider class
   struct ProviderC {
 
-    ProviderC(): count(max_count++) {}
+    ProviderC() : count(max_count++) {}
 
-    operator std::string() const
-      { return "ProviderC[" + std::to_string(count) + "]"; }
+    operator std::string() const { return "ProviderC[" + std::to_string(count) + "]"; }
 
     unsigned int count;
 
@@ -80,10 +77,9 @@ namespace svc {
   /// A service provider class
   struct ProviderD {
 
-    ProviderD(): count(max_count++) {}
+    ProviderD() : count(max_count++) {}
 
-    operator std::string() const
-      { return "ProviderD[" + std::to_string(count) + "]"; }
+    operator std::string() const { return "ProviderD[" + std::to_string(count) + "]"; }
 
     unsigned int count;
 
@@ -91,11 +87,10 @@ namespace svc {
   }; // ProviderD
   unsigned int ProviderD::max_count = 0;
 
-
 } // namespace svc
 
-
-BOOST_AUTO_TEST_CASE(test_ProviderPack) {
+BOOST_AUTO_TEST_CASE(test_ProviderPack)
+{
 
   // instantiate a ProviderPack with two classes
   svc::ProviderA providerA;
@@ -104,29 +99,25 @@ BOOST_AUTO_TEST_CASE(test_ProviderPack) {
   auto SP1 = lar::makeProviderPack(&providerA, &providerB, &providerC);
 
   // get element A
-  static_assert
-    (decltype(SP1)::has<svc::ProviderA>(), "We don't believe to have ProviderA!!");
+  static_assert(decltype(SP1)::has<svc::ProviderA>(), "We don't believe to have ProviderA!!");
   auto myA = SP1.get<svc::ProviderA>();
   static_assert(std::is_same<decltype(myA), svc::ProviderA const*>(),
-    "Failed to get the element of type A");
+                "Failed to get the element of type A");
   BOOST_TEST(myA == &providerA);
 
   // get element B
-  static_assert
-    (decltype(SP1)::has<svc::ProviderB>(), "We don't believe to have ProviderB!!");
+  static_assert(decltype(SP1)::has<svc::ProviderB>(), "We don't believe to have ProviderB!!");
   auto myB = SP1.get<svc::ProviderB>();
   static_assert(std::is_same<decltype(myB), svc::ProviderB const*>(),
-    "Failed to get the element of type B");
+                "Failed to get the element of type B");
   BOOST_TEST(myB == &providerB);
 
   // get element C
-  static_assert
-    (decltype(SP1)::has<svc::ProviderC>(), "We don't believe to have ProviderC!!");
+  static_assert(decltype(SP1)::has<svc::ProviderC>(), "We don't believe to have ProviderC!!");
   auto myC = SP1.get<svc::ProviderC>();
   static_assert(std::is_same<decltype(myC), svc::ProviderC const*>(),
-    "Failed to get the element of type C");
+                "Failed to get the element of type C");
   BOOST_TEST(myC == &providerC);
-
 
   // set element A
   svc::ProviderA providerA2;
@@ -143,8 +134,7 @@ BOOST_AUTO_TEST_CASE(test_ProviderPack) {
 #endif // !PROVIDERPACK_TEST_SKIP_COMPILATION_ERRORS
 
   // check what we believe we have
-  static_assert
-    (!decltype(SP1)::has<svc::ProviderD>(), "We believe to have ProviderD!!");
+  static_assert(!decltype(SP1)::has<svc::ProviderD>(), "We believe to have ProviderD!!");
 
   // default constructor: all null
   lar::ProviderPack<svc::ProviderA, svc::ProviderB> SP2;
@@ -159,12 +149,9 @@ BOOST_AUTO_TEST_CASE(test_ProviderPack) {
   // multiple elements of the same type
   // should be a compilation error
 #if PROVIDERPACK_TEST_SKIP_COMPILATION_ERRORS
-  BOOST_TEST_MESSAGE
-    ("  (test to create a pack with many providers with same type skipped)");
+  BOOST_TEST_MESSAGE("  (test to create a pack with many providers with same type skipped)");
 #else
-  lar::ProviderPack
-    <svc::ProviderA, svc::ProviderB, svc::ProviderA, svc::ProviderD> SP3;
+  lar::ProviderPack<svc::ProviderA, svc::ProviderB, svc::ProviderA, svc::ProviderD> SP3;
 #endif // !PROVIDERPACK_TEST_SKIP_COMPILATION_ERRORS
-
 
 } // BOOST_AUTO_TEST_CASE(test_ProviderPack)
