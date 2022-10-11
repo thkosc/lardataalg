@@ -58,7 +58,7 @@ namespace sim {
    * @param code the rescattering code
    * @param type the category of rescattering `code` belongs to
    * @return a string describing the rescattering code
-   * 
+   *
    * The meaning of the rescattering code is generator-dependent, and also
    * within a generator it may be algorithm-dependent. The category pins down
    * which set of possible meaning the `code` belongs to. In LArSoft, if the

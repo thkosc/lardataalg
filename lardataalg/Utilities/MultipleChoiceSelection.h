@@ -3,7 +3,7 @@
  * @brief  Helper to select an string option among a set of allowed choices.
  * @author Gianluca Petrillo (petrillo@slac.stanford.edu)
  * @date   December 13, 2019
- * 
+ *
  */
 
 #ifndef LARDATAALG_UTILITIES_MULTIPLECHOICESELECTION_H
@@ -57,11 +57,11 @@ namespace util::details {
   // ---------------------------------------------------------------------------
   /**
    * @brief Class representing one of the available options to be selected.
-   * 
+   *
    * An option has a value (of type `Choices_t`) and a name as a string.
    * It may also have aliases. The identity of the option is defined by the
    * value: two option objects with the same value represent the same option.
-   * 
+   *
    * Matching a label is encoded in this class: the option matches a label if
    * its name or any of its aliases matches the proposed label in a
    * case-insensitive comparison.
@@ -200,11 +200,11 @@ namespace util {
 /**
  * @brief Helper to select one among multiple choices via strings.
  * @tparam Choices type describing the choices
- * 
- * 
+ *
+ *
  * @note If the type to describe the choice is a string, its value still need
  *       to be explicitly added as an option label.
- * 
+ *
  */
 template <typename Choices>
 class util::MultipleChoiceSelection : public util::MultipleChoiceSelectionBase {
@@ -226,7 +226,7 @@ public:
    * @brief Constructor: adds the specified options.
    * @tparam Options a number of `Option_t` objects
    * @param options a list of options to add to the selector
-   * 
+   *
    * All specified options are added as with `addOption()`.
    */
   template <typename... Options>
@@ -253,7 +253,7 @@ public:
    * @return the newly created option
    * @throw OptionAlreadyExistsError if there is already an option with `value`
    * @see `addAlias()`
-   * 
+   *
    * An option must always have a label; aliases are instead optional.
    * There must be no existing option with the specified `value`, otherwise
    * an exception will be thrown with the label of the existing option.
@@ -270,7 +270,7 @@ public:
    * @param aliases the additional alias(es) to assign to this option
    * @return the option being changed
    * @throw UnknownOptionError if no option with `value` is registered yet
-   * 
+   *
    */
   template <typename... Aliases>
   std::enable_if_t<details::AllConvertibleToStrings_v<Aliases...>, Option_t const&> addAlias(
@@ -284,7 +284,7 @@ public:
    * @param aliases the additional alias(es) to assign to this option
    * @return the option being changed
    * @throw UnknownOptionError if no option with `value` is registered yet
-   * 
+   *
    * The option with the same value as the `option` argument is assigned the
    * specified aliases.
    */

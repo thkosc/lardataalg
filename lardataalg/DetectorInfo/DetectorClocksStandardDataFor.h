@@ -3,7 +3,7 @@
  * @brief  Helper to get clocks data from `detinfo::DetectorClocksStandard`.
  * @author Gianluca Petrillo (petrillo@slac.stanford.edu)
  * @date   October 14, 2020
- * 
+ *
  * This library is header-only.
  */
 
@@ -30,32 +30,32 @@ namespace detinfo {
    * @param detClocks service provider generating the data
    * @param event event to read information from
    * @return `DetectorClocksData` tuned on the specified `event`
-   * 
+   *
    * This function takes care to extract all what is needed by
    * `DetectorClocksStandard` service provider in order to provide data for
    * the event.
-   * 
+   *
    * Example:
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
    * detinfo::DetectorClocksStandard const detClocks
    *   { config.get<fhicl::ParameterSet>("services.DetectorClocksService") };
-   * 
+   *
    * for (gallery::Event event(inputFiles); !event.atEnd(); event.next()) {
-   *   
+   *
    *   detinfo::DetectorClocksData const clockData
    *     = detinfo::detectorClocksStandardDataFor(detClocks, event);
-   *   
+   *
    *   auto const triggerTime = clockData.TriggerTime();
-   *   
+   *
    *   // etc...
-   *   
+   *
    * } // for
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   * 
-   * 
+   *
+   *
    * Requirements
    * -------------
-   * 
+   *
    * The implementation is effectively dependent on the framework managing the
    * `event`, but it is not _formally_ dependent on any implementation.
    * Assumptions include everything that is required by other helper functions

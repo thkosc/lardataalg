@@ -196,7 +196,7 @@ std::string sim::GENIE_INukeFateHA_RescatteringName(int code)
    * which directly refers to GENIE.
    * But LArSoft does not do that, because we don't want to be forced to have
    * GENIE around all the time we use `simb::MCParticle`.
-   * 
+   *
    */
   switch (code) {
   // from Fermilab UPS GENIE v3_0_0_b4a, `Physics/HadronTransport/INukeHadroFates.h`:

@@ -93,7 +93,7 @@ namespace dump::raw {
     /**
      * @brief Chooses which time label maker to use.
      * @param timeLabelMaker a pointer to the external time label maker
-     * 
+     *
      * A time label maker is an object derived from `TimeLabelMaker` which can
      * convert a waveform and tick into a string representing that tick within
      * the waveform. If never specified or if `nullptr`, no time label will be
