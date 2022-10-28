@@ -134,7 +134,7 @@ int main(int argc, char const** argv)
 
   // accumulate the plane IDs; needed just for table formatting
   unsigned int headerColWidth = 0U;
-  for (auto planeID : geom.IteratePlaneIDs()) {
+  for (auto planeID : geom.Iterate<geo::PlaneID>()) {
     auto const l = std::string(planeID).length();
     if (headerColWidth < l) headerColWidth = l;
   }
@@ -144,7 +144,7 @@ int main(int argc, char const** argv)
   bool allSameDrift = true;
   lar::util::RealComparisons<double> check(1.0); // 1 cm tolerance
   auto driftDistances = geom.makeTPCData<double>();
-  for (auto const& TPC : geom.IterateTPCs()) {
+  for (auto const& TPC : geom.Iterate<geo::TPCGeo>()) {
     auto const driftDistance = TPC.DriftDistance();
     driftDistances[TPC.ID()] = driftDistance;
     allSameDrift = allSameDrift & check.equal(driftDistance, driftDistances.first());
@@ -168,7 +168,7 @@ int main(int argc, char const** argv)
         << " | " << std::setw(columnSizes[3]) << "ticks";
 
     // print drift distances by TPC
-    for (auto const& TPCID : geom.IterateTPCIDs()) {
+    for (auto const& TPCID : geom.Iterate<geo::TPCID>()) {
       auto const driftDistance = driftDistances[TPCID];
       auto const driftTime = driftDistance / driftVelocity;
       log << "\n"

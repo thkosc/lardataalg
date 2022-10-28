@@ -358,11 +358,12 @@ namespace detinfo {
     std::vector<std::vector<double>> drift_direction(fGeo->Ncryostats());
 
     for (size_t cstat = 0; cstat < fGeo->Ncryostats(); ++cstat) {
-      x_ticks_offsets[cstat].resize(fGeo->Cryostat(cstat).NTPC());
-      drift_direction[cstat].resize(fGeo->Cryostat(cstat).NTPC());
+      auto const& cryostat = fGeo->Cryostat(geo::CryostatID(cstat));
+      x_ticks_offsets[cstat].resize(cryostat.NTPC());
+      drift_direction[cstat].resize(cryostat.NTPC());
 
-      for (size_t tpc = 0; tpc < fGeo->Cryostat(cstat).NTPC(); ++tpc) {
-        const geo::TPCGeo& tpcgeom = fGeo->Cryostat(cstat).TPC(tpc);
+      for (size_t tpc = 0; tpc < cryostat.NTPC(); ++tpc) {
+        const geo::TPCGeo& tpcgeom = cryostat.TPC(tpc);
 
         const double dir((tpcgeom.DriftDirection() == geo::kNegX) ? +1.0 : -1.0);
         drift_direction[cstat][tpc] = dir;
@@ -377,7 +378,7 @@ namespace detinfo {
           auto const xyz = tpcgeom.Plane(0).GetCenter();
 
           x_ticks_offsets[cstat][tpc][plane] =
-            -xyz[0] / (dir * x_ticks_coefficient) + triggerOffset;
+            -xyz.X() / (dir * x_ticks_coefficient) + triggerOffset;
 
           if (fIncludeInterPlanePitchInXTickOffsets) {
             // Get field in gap between planes
