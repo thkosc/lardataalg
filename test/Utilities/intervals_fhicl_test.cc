@@ -40,7 +40,7 @@ Config validateConfig(fhicl::ParameterSet const& pset)
   validatedConfig.print_allowed_configuration(std::cout << "===> Expected configuration: ");
   std::cout << std::endl;
 
-  validatedConfig.validate_ParameterSet(pset);
+  validatedConfig.validate(pset);
   return validatedConfig();
 } // validateConfig()
 
