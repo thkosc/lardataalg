@@ -19,6 +19,7 @@
 #include <ostream>
 #include <string>
 #include <type_traits> // std::conjunction_v, std::is_convertible...
+#include <map>
 #include <vector>
 
 // -----------------------------------------------------------------------------
