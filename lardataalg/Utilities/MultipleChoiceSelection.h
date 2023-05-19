@@ -15,11 +15,11 @@
 #include <cctype>    // std::tolower()
 #include <cstddef>   // std::size_t
 #include <exception> // std::exception
+#include <map>
 #include <optional>
 #include <ostream>
 #include <string>
 #include <type_traits> // std::conjunction_v, std::is_convertible...
-#include <map>
 #include <vector>
 
 // -----------------------------------------------------------------------------
