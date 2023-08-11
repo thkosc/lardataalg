@@ -491,7 +491,8 @@ bool my_lexicographical_compare(B1 b1, E1 e1, B2 b2, E2 e2, Comp less)
   return true; // 1 is shorter
 } // my_lexicographical_compare()
 
-inline bool util::details::CaseInsensitiveComparer::equal(std::string const& a, std::string const& b)
+inline bool util::details::CaseInsensitiveComparer::equal(std::string const& a,
+                                                          std::string const& b)
 {
   return std::equal(a.begin(), a.end(), b.begin(), b.end(), eq_lower);
 }
