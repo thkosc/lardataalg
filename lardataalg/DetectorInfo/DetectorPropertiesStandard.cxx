@@ -374,11 +374,12 @@ namespace detinfo {
           const geo::PlaneGeo& pgeom = tpcgeom.Plane(plane);
 
           //Choose which plane to propagate to
-          //If accounting for the drift time between planes, start with the first plane, 
+          //If accounting for the drift time between planes, start with the first plane,
           //and iteratively add distances between planes
           //Otherwise propagate straight to the last plane and
           //assume a standard drift velocity (for wirecell recob::Wires)
-          unsigned int planeToPropagateTo = (fIncludeInterPlanePitchInXTickOffsets ? 0 : tpcgeom.Nplanes()-1);
+          unsigned int planeToPropagateTo =
+            (fIncludeInterPlanePitchInXTickOffsets ? 0 : tpcgeom.Nplanes() - 1);
           // Calculate geometric time offset.
           // only works if xyz[0]<=0
           auto const xyz = tpcgeom.Plane(planeToPropagateTo).GetCenter();
