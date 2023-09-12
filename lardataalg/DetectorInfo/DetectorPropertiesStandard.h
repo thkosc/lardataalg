@@ -121,6 +121,8 @@ namespace detinfo {
                 "between the wire planes. This is appropriate for "
                 "recob::RawDigits, and recob::Wires from the 1D unfolding, "
                 "but is not appropriate for recob::Wires from WireCell. "
+                "When disabled, the conversion propagates to the last plane, "
+                "rather than the first plane and assumes a standard drift velocity. "
                 "The default value is 'true', retaining the 'classic' behaviour"),
         true};
 
