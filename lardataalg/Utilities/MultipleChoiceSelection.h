@@ -399,10 +399,6 @@ private:
   /// Removes the specified label from the register.
   void unregisterLabel(std::string const& label);
 
-  /// Retrieves the option with the specified `value`.
-  /// @throw UnknownOptionError if there is no available option with `value`
-  Option_t& get(Choices_t value);
-
   /// Returns an iterator to the option with `label`, or `npos` if none.
   typename OptionList_t::const_iterator findOption(Choices_t value) const;
 
@@ -1007,17 +1003,6 @@ std::size_t util::MultipleChoiceSelection<Choices>::findOptionIndex(std::string 
   auto const iOption = fLabelToOptionIndex.find(label);
   return (iOption == fLabelToOptionIndex.end()) ? npos : iOption->second;
 } // util::MultipleChoiceSelection<>::findOptionIndex(string) const
-
-// -----------------------------------------------------------------------------
-template <typename Choices>
-auto util::MultipleChoiceSelection<Choices>::get(Choices_t value) -> Option_t&
-{
-  auto const iOption = findOption(value);
-  if (iOption == fOptions.end()) {
-    throw UnknownOptionError(Option_t::value_as_string(value).value_or(""));
-  }
-  return *iOption;
-} // util::MultipleChoiceSelection<>::get()
 
 // -----------------------------------------------------------------------------
 
