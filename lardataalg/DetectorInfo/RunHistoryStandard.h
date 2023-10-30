@@ -9,6 +9,7 @@
 #ifndef DETINFO_RUNHISTORY_H
 #define DETINFO_RUNHISTORY_H
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
