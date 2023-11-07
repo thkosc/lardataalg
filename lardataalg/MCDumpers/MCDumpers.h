@@ -343,7 +343,7 @@ void sim::dump::DumpMCTruth(Stream&& out,
 {
   // add a dumper of the generator info
   auto genInfo = truth.GeneratorInfo();
-  out << "Generator ID: " << genInfo.generator << "\n";
+  out << "Generator ID: " << (int) genInfo.generator << "\n";
   out << "Generator Version: " << genInfo.generatorVersion << "\n";
   out << "Generator configuration string map.  Pairs separated by colons. " << "\n";
   for (const auto& gci : genInfo.generatorConfig) {
