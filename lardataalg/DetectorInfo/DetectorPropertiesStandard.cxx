@@ -365,7 +365,8 @@ namespace detinfo {
       for (size_t tpc = 0; tpc < cryostat.NTPC(); ++tpc) {
         const geo::TPCGeo& tpcgeom = cryostat.TPC(tpc);
 
-        const double dir((tpcgeom.DriftDirection() == geo::kNegX) ? +1.0 : -1.0);
+//        const double dir((tpcgeom.DriftDirection() == geo::kNegX) ? +1.0 : -1.0);
+        const double dir((tpcgeom.DetectDriftDirection() < 0) ? +1.0 : -1.0);
         drift_direction[cstat][tpc] = dir;
 
         int nplane = tpcgeom.Nplanes();
