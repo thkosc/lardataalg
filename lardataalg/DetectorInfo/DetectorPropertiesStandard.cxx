@@ -384,8 +384,13 @@ namespace detinfo {
           // only works if xyz[0]<=0
           auto const xyz = tpcgeom.Plane(planeToPropagateTo).GetCenter();
 
+	  double coord = -xyz.X();
+	  if (std::abs(tpcgeom.DetectDriftDirection())==2) coord = -xyz.Y();
+          else if (std::abs(tpcgeom.DetectDriftDirection())==3) coord = -xyz.Z();
+
           x_ticks_offsets[cstat][tpc][plane] =
-            -xyz.X() / (dir * x_ticks_coefficient) + triggerOffset;
+//            -xyz.X() / (dir * x_ticks_coefficient) + triggerOffset;
+	      coord / (dir * x_ticks_coefficient) + triggerOffset;
 
           if (fIncludeInterPlanePitchInXTickOffsets) {
             // Get field in gap between planes
